@@ -1,0 +1,20 @@
+# ninja log v6
+21	2446	8096145143170077	Engine/CMakeFiles/NovaEngineCore.dir/render/opengl/library/texture_library.cpp.obj	956a94768444c9ba
+38	103	8096143942808269	Engine/CMakeFiles/NovaEngineCore.dir/voxel/chunk.cpp.obj	6527da1837199f4d
+31	293	8096143942733147	Engine/CMakeFiles/NovaEngineCore.dir/render/stb_image.cpp.obj	d06b36651f77e5ef
+5	409	8096143942482864	CMakeFiles/glad.dir/Linking/src/glad/glad.c.obj	7b824ed4b7ed7423
+410	481	8096143946531508	glad.lib	ba67f7fb4b059a99
+12	744	8096143942542881	Engine/CMakeFiles/NovaEngineCore.dir/render/opengl/camera.cpp.obj	db7f69be89f7bee9
+34	2823	8096143942768228	Engine/CMakeFiles/NovaEngineCore.dir/render/texture.cpp.obj	fa8cceae526f8773
+14	2860	8096143942567957	Engine/CMakeFiles/NovaEngineCore.dir/render/opengl/gltexture.cpp.obj	aa5e99fa1139a3cd
+41	2922	8096143942838269	Engine/CMakeFiles/NovaEngine.dir/main.cpp.obj	f199eefd7a515b9f
+9	2984	8096143942512877	Engine/CMakeFiles/NovaEngineCore.dir/log/logger.cpp.obj	be50f2669ab82af1
+24	3243	8096143942663094	Engine/CMakeFiles/NovaEngineCore.dir/render/opengl/shader.cpp.obj	751b37306b4f3f04
+17	2442	8096145143134943	Engine/CMakeFiles/NovaEngineCore.dir/render/opengl/library/shader_library.cpp.obj	cf22497585a43806
+24	2578	8096145143200072	Engine/CMakeFiles/NovaEngineCore.dir/render/program.cpp.obj	1f1f0620ca4c8963
+2580	2694	8096145168765642	Engine/NovaEngineCore.lib	6d8d41128d89ad69
+2694	3164	8096145169912170	Engine/NovaEngine.exe	f55c3566ff6e15cd
+15	2406	8096147396216149	Engine/CMakeFiles/NovaEngine.dir/main.cpp.obj	f199eefd7a515b9f
+11	2507	8096147396176150	Engine/CMakeFiles/NovaEngineCore.dir/render/window/program.cpp.obj	4097e078b40bf7e9
+2509	2596	8096147421164592	Engine/NovaEngineCore.lib	f60350d4096660e0
+2597	2900	8096147422026042	Engine/NovaEngine.exe	f55c3566ff6e15cd
