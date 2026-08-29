@@ -1,11 +1,5 @@
 {
 	"abstract" : true,
-	"artifacts" : 
-	[
-		{
-			"path" : "D:/Nova/NovaEngine/Linking/lib/GLFW/glfw3.lib"
-		}
-	],
 	"backtrace" : 3,
 	"backtraceGraph" : 
 	{
@@ -27,7 +21,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 20,
+				"line" : 18,
 				"parent" : 0
 			},
 			{
@@ -37,7 +31,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 6,
+				"line" : 22,
 				"parent" : 2
 			}
 		]
@@ -47,16 +41,13 @@
 		"major" : 2,
 		"minor" : 9
 	},
-	"id" : "glfw::@6890427a1f51a3e7e1df",
-	"imported" : true,
-	"local" : true,
-	"name" : "glfw",
-	"nameOnDisk" : "glfw3.lib",
+	"id" : "glm::@6890427a1f51a3e7e1df",
+	"name" : "glm",
 	"paths" : 
 	{
 		"build" : ".",
 		"source" : "."
 	},
 	"sources" : [],
-	"type" : "STATIC_LIBRARY"
+	"type" : "INTERFACE_LIBRARY"
 }

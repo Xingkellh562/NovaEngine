@@ -10,11 +10,8 @@ file(GLOB_RECURSE ENGINE_SOURCES CMAKE_CONFIGURE_DEPENDS
 )
 
 list(FILTER ENGINE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
-
 add_library(NovaEngineCore STATIC ${ENGINE_SOURCES})
-
 target_compile_options(NovaEngineCore PRIVATE "/utf-8")
-
 set_target_properties(NovaEngineCore PROPERTIES LINKER_LANGUAGE CXX)
 
 #引用本地头文件
@@ -25,9 +22,7 @@ target_include_directories(NovaEngineCore PUBLIC ${NE_THIRD_PARTY_INCLUDE_DIR})
 target_link_libraries(NovaEngineCore PUBLIC glfw glad glm)
 
 add_executable(NovaEngine "main.cpp" "render/opengl/camera.h")
-
 target_compile_options(NovaEngine PRIVATE "/utf-8")
-
 target_link_libraries(NovaEngine PUBLIC NovaEngineCore)
 
 

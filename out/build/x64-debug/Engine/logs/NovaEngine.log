@@ -1,22 +1,14 @@
-[2026-08-28 18:01:58.185] [33960] [info] [CORE] [LogSystem] Log system initialized successfully
-[2026-08-28 18:01:58.334] [33960] [info] [CORE] [RenderSystem] Load texture sucessfully from path:assets/grass.png,size:4096
-[2026-08-28 18:01:58.335] [33960] [info] [CORE] [RenderSystem] Bind texture to id:1
-[2026-08-28 18:01:58.335] [33960] [info] [CORE] [RenderSystem] Add texture with name:Grass
-[2026-08-28 18:01:58.335] [33960] [info] [CORE] [RenderSystem] Creating shader program with 2 shaders
-[2026-08-28 18:01:58.335] [33960] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/vert.glsl', type=Vertex_Shader
-[2026-08-28 18:01:58.393] [33960] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/frag.glsl', type=Fragment_Shader
-[2026-08-28 18:01:58.402] [33960] [trace] [CORE] [RenderSystem] Attached shader ID 1 to program 3
-[2026-08-28 18:01:58.402] [33960] [trace] [CORE] [RenderSystem] Attached shader ID 2 to program 3
-[2026-08-28 18:01:58.402] [33960] [info] [CORE] [RenderSystem] Shader program (ID=3) linked successfully
-[2026-08-28 18:01:58.402] [33960] [info] [CORE] [RenderSystem] Add shader with name:BaseShader
-[2026-08-28 18:05:43.167] [12912] [info] [CORE] [LogSystem] Log system initialized successfully
-[2026-08-28 18:05:43.317] [12912] [info] [CORE] [RenderSystem] Load texture sucessfully from path:assets/grass.png,size:4096
-[2026-08-28 18:05:43.317] [12912] [info] [CORE] [RenderSystem] Bind texture to id:1
-[2026-08-28 18:05:43.317] [12912] [info] [CORE] [RenderSystem] Add texture with name:Grass
-[2026-08-28 18:05:43.317] [12912] [info] [CORE] [RenderSystem] Creating shader program with 2 shaders
-[2026-08-28 18:05:43.317] [12912] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/vert.glsl', type=Vertex_Shader
-[2026-08-28 18:05:43.381] [12912] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/frag.glsl', type=Fragment_Shader
-[2026-08-28 18:05:43.384] [12912] [trace] [CORE] [RenderSystem] Attached shader ID 1 to program 3
-[2026-08-28 18:05:43.384] [12912] [trace] [CORE] [RenderSystem] Attached shader ID 2 to program 3
-[2026-08-28 18:05:43.384] [12912] [info] [CORE] [RenderSystem] Shader program (ID=3) linked successfully
-[2026-08-28 18:05:43.384] [12912] [info] [CORE] [RenderSystem] Add shader with name:BaseShader
+[2026-08-29 18:06:18.189] [9832] [info] [CORE] [LogSystem] Log system initialized successfully
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [GameCore] Successful initialization, taking 127.96859999999998 ms
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Add camera with name:MainCamera
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Load texture successfully from path:assets/grass.png,size:4096 byte
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Bind texture to id:1
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Add texture with name:Grass
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Creating shader program with 2 shaders
+[2026-08-29 18:06:18.336] [9832] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/vert.glsl', type=Vertex_Shader
+[2026-08-29 18:06:18.392] [9832] [info] [CORE] [RenderSystem] Compiling shader: path='shaders/frag.glsl', type=Fragment_Shader
+[2026-08-29 18:06:18.394] [9832] [trace] [CORE] [RenderSystem] Attached shader ID 1 to program 3
+[2026-08-29 18:06:18.394] [9832] [trace] [CORE] [RenderSystem] Attached shader ID 2 to program 3
+[2026-08-29 18:06:18.394] [9832] [info] [CORE] [RenderSystem] Shader program (ID=3) linked successfully
+[2026-08-29 18:06:18.394] [9832] [info] [CORE] [RenderSystem] Add shader with name:BaseShader
+[2026-08-29 18:06:18.394] [9832] [info] [CORE] [GameCore] Successfully loaded, taking 58.72780000000003 ms

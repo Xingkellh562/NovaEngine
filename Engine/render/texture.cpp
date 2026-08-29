@@ -13,7 +13,7 @@ namespace nova_engine::render {
             NE_CORE_ERROR("RenderSystem","Failed to load texture from {}." ,path);
         }
         else {
-            NE_CORE_INFO("RenderSystem","Load texture sucessfully from path:{},size:{}", path , width*height* channels);
+            NE_CORE_INFO("RenderSystem","Load texture successfully from path:{},size:{} byte", path , width*height* channels);
         }
 
         // 构造 TextureData 时拷贝数据
