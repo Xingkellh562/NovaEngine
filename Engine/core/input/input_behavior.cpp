@@ -57,19 +57,18 @@ namespace nova_engine::core::input {
 
         // 处理 forward 与 up 平行（或接近平行）的情况
         glm::vec3 right;
-        float dot = glm::dot(forward, up);
-        if (std::abs(dot) > 0.999f) {
+        double dot = glm::dot(forward, up);
+        if (std::abs(dot) > 0.99999) {
             // 若平行，使用一个临时向量构建正交基
             glm::vec3 temp = (std::abs(forward.y) < 0.9f) ? glm::vec3(0.0f, 1.0f, 0.0f)
                 : glm::vec3(1.0f, 0.0f, 0.0f);
             right = glm::normalize(glm::cross(forward, temp));
-            up = glm::normalize(glm::cross(right, forward)); // 重新计算真正的上方向
         }
         else {
             right = glm::normalize(glm::cross(forward, up));
-            up = glm::normalize(glm::cross(right, forward));
         }
 
+        forward = -glm::normalize(glm::cross(right, up));
         // 根据坐标系习惯，检查 right 方向是否正确（通常 cross(前, 上) 得到左方向，取反得右）
         // 这里假设我们想要的是“右手系”的右方向，即 forward × up = -right（取决于具体实现）
         // 若发现移动左右颠倒，可取消下面一行的注释：
@@ -85,5 +84,41 @@ namespace nova_engine::core::input {
 
         // 乘以时间增量得到位移
         return velocity * dt;
+    }
+
+    glm::vec3 UpdateRotation(
+        double deltaTime,
+        glm::vec3 rotation,
+        double sensitivity,
+        InputState& state) {
+
+        glm::vec3 uRot = glm::normalize(rotation);
+
+        glm::vec3 eulerAngle = glm::vec3(
+            std::atan2(uRot.x, uRot.z),
+            std::asin(uRot.y),
+            0
+        );
+        uRot.y = std::clamp(uRot.y, -1.0f, 1.0f);
+
+        double deltaYaw = - sensitivity * state.trunX * 3.1415926 / 180.0 * deltaTime / 1000;
+        double deltaPitch = - sensitivity * state.trunY * 3.1415926 / 180.0 * deltaTime / 1000;
+
+        eulerAngle.x += deltaYaw;
+        
+
+        eulerAngle.y += deltaPitch;
+        double pitchMinRad = -89.0f * 3.1415f / 180.0f;
+        double pitchMaxRad = 89.0f * 3.1415f / 180.0f;
+        eulerAngle.y = std::clamp((double)eulerAngle.y, pitchMinRad, pitchMaxRad);
+
+        state.trunX = 0;
+        state.trunY = 0;
+
+        auto result = glm::vec3(std::cos(eulerAngle.y) * std::sin(eulerAngle.x),
+                      std::sin(eulerAngle.y),
+                      std::cos(eulerAngle.y) * std::cos(eulerAngle.x));
+
+        return glm::normalize(result);
     }
 }

@@ -3,7 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include <render/opengl/gltexture.h>
+#include <render/opengl/texture/gltexture.h>
 
 
 namespace nova_engine::render::opengl {

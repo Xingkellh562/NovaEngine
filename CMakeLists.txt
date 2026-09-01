@@ -22,3 +22,4 @@ add_subdirectory(Engine)
 
 
 # TODO: 如有需要，请添加测试并安装目标。
+add_subdirectory(Tests)

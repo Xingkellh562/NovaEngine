@@ -4,7 +4,7 @@
 
 namespace nova_engine::render::opengl {
 	TextureLibrary::TextureLibrary() {
-		AddTexture("Grass", "assets/grass.png");
+		//AddTexture("Grass", "assets/grass.png");
 	}
 
 	const GLTexture* TextureLibrary::GetTexture(const std::string& name) const {

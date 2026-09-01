@@ -1,10 +1,12 @@
 #include "window.h"
 #include <log/logger.h>
-#include <render/opengl/library/shader_library.h>
-#include <render/opengl/library/texture_library.h>
-#include <render/opengl/library/camera_library.h>
+#include <render/opengl/renderer/block_renderer.h>
 #include <render/opengl/glmesh.h>
 #include <core/input/input_system.h>
+#include <render/utils/mesh_builder.h>
+#include <iostream>
+#include <ui/debug_ui/debug_ui_manager.h>
+#include <random>
 
 namespace rd = nova_engine::render;
 namespace rd_gl = nova_engine::render::opengl;
@@ -14,17 +16,12 @@ namespace nova_engine::window {
 	constexpr double FIXED_STEP_MS = 1000.0 / 60.0;  // 16.666...
 	constexpr double MAX_ACCUM_MS = 100.0;
 
-	glm::mat4 projection;
-	glm::mat4 view;
+	rd_gl::BlockRenderer* renderer;
 
 	void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
 		glViewport(0, 0, width, height);
-		rd_gl::Camera* camera = rd_gl::CameraLibrary::GetInstance().GetCamera("MainCamera");
-		if(camera != nullptr)
-			projection = camera->GetTransformMatrix(width, height);
-		if (rd_gl::ShaderLibrary::GetInstance().GetShader("BaseShader") != nullptr)
-			rd_gl::ShaderLibrary::GetInstance().GetShader("BaseShader")->SetMat4("projection", projection);
+		renderer->OnResize(width,height);
 	}
 
 	void Window::processInput(GLFWwindow* window)
@@ -89,6 +86,19 @@ namespace nova_engine::window {
 		
 	}
 
+	void Window::mouseMoveCallBack(GLFWwindow* window, double xPos, double yPos) {
+		static double pastX = xPos;
+		static double pastY = yPos;
+		nova_engine::core::input::InputState* state = &nova_engine::core::input::InputSystem::GetInstance().GetState();
+		if (state == nullptr) return;
+		if(state->trunX == 0)
+			state->trunX = xPos - pastX;
+		if (state->trunY == 0)
+			state->trunY = yPos - pastY;
+
+		pastX = xPos, pastY = yPos;
+	}
+
 	void Window::Run() {
 		Init();
 
@@ -108,17 +118,33 @@ namespace nova_engine::window {
 		try
 		{
 			while (!glfwWindowShouldClose(window_)) {
-				time = glfwGetTime() * 1000;
-				glfwPollEvents();
-				deltaTime += time - pastTime;
-				while (deltaTime >= FIXED_STEP_MS) {
-					double step = std::min(deltaTime, MAX_ACCUM_MS);
-					processInput(window_);
-					Update(step);
-					deltaTime -= step;
+				// 1. 获取时间 & 处理事件（必须每帧都处理！）
+				processInput(window_);  // ✅ 关键修改：移到外面来，每帧无条件执行
+
+				double currentTime = glfwGetTime() * 1000.0;
+				double frameDelta = currentTime - pastTime;
+				pastTime = currentTime;
+
+				// 防螺旋死锁（防止Debug断点后画面爆炸）
+				if (frameDelta > MAX_ACCUM_MS) frameDelta = MAX_ACCUM_MS;
+
+				deltaTime += frameDelta;
+
+				// 2. 固定步长物理更新（Catch-up 机制）
+				// 为了防止“死亡螺旋”，这里限制单次最大更新次数（例如 3~5 次）
+				int loopCount = 0;
+				while (deltaTime >= FIXED_STEP_MS && loopCount < 5) {
+					Update(FIXED_STEP_MS);
+					deltaTime -= FIXED_STEP_MS;
+					loopCount++;
 				}
-				Render(time - pastTime);
-				pastTime = time;
+
+				// 3. 渲染插值（黄金标准：传入 Alpha 百分比，而非绝对毫秒）
+				// Alpha = 剩余时间 / 固定步长，范围 [0.0, 1.0]
+				float alpha = (float)(deltaTime / FIXED_STEP_MS);
+				Render(alpha);  // 你的 Render 内部需要使用这个 Alpha 进行插值
+
+				// 注意：pastTime 已在帧开头更新过了，这里不要再更新！
 			}
 		}
 		catch (const std::exception& exception)
@@ -154,66 +180,84 @@ namespace nova_engine::window {
 
 		glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
 		glfwSetKeyCallback(window_,keyCallback);
+		glfwSetCursorPosCallback(window_, mouseMoveCallBack);
+
+		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetCursorPos(window_, 400, 300);
+		glfwSwapInterval(1);
+		glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+
+		//创建ImGui上下文
+		ui::debug_ui::DebugUIManager::GetInstance().Init(window_,"#version 330");
 	}
 
-	unsigned int VAO;
-	unsigned int VBO;
-	unsigned int EBO;
-
 	rd_gl::GLMesh* mesh = nullptr;
+
+	int rnd(int min, int max) {
+		static std::mt19937 gen(std::random_device{}()); // 只初始化一次
+		return std::uniform_int_distribution<int>(min, max)(gen);
+	}
+	// 调用：int x = rnd(1, 100);
+
+	float fps = 1.0f;
 
 	void Window::Load() {
 		
 		glViewport(0, 0, 800, 600);
 		glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
-		rd_gl::Camera* camera = rd_gl::CameraLibrary::GetInstance().GetCamera("MainCamera");
-		if (camera != nullptr)
-			projection = camera->GetTransformMatrix(800, 600);
+		renderer = new rd_gl::BlockRenderer();
+		renderer->OnResize(800, 600);
 
-		mesh = new rd_gl::GLMesh({
-			{
-				0.5f, 0.5f, 4.0f,0,0,0,
-				0.5f, -0.5f, 4.0f,1,0,1,
-				-0.5f, -0.5f, 3.0f,1,1,0,
-				-0.5f, 0.5f, 3.0f,0,1,0,},
-			{
-				0, 1, 3,
-				1, 2, 3
-			} });
-		
-		//弄一张临时图片
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, (rd_gl::TextureLibrary::GetInstance().GetTexture("Grass")->get()));
+		ui::debug_ui::DebugUIManager::GetInstance().RegisterPanel(
+			"Debug", [this]() {
+				ImGui::Text("Application average %.3f ms / frame (%.1f FPS) ",
+					1000.0f / fps, fps);
+				ImGui::Text("爸爸的爸爸叫爷爷 ");
+				ImGui::Text("我也要被显示吗 ");
+				ImGui::Text("? ! UIIU ! ? ");
+				ImGui::Text("Nuclear_Clay是给 ");
+			},true
+		);
 
-		const rd_gl::Shader* shader = rd_gl::ShaderLibrary::GetInstance().GetShader("BaseShader");
-		//std::move();
-		if (shader == nullptr) {
-			return;
-		}
-		shader->Use();
-		shader->SetMat4("projection", projection);
-		shader->SetTextureUnit("uTexture", 0);
-
-		auto console = spdlog::stdout_color_mt("console");
+		voxel::chunk::Chunk chunk = (32);
+		for (int x = 0; x < chunk.Size(); x++)
+			for (int y = 0; y < chunk.Size(); y++)
+				for (int z = 0; z < chunk.Size(); z++) {
+					int i = rnd(1, 100);
+					if (i > 97) {
+						if (y < 31)
+							chunk.SetVoxel(x, y, z, 2);
+						else
+							chunk.SetVoxel(x, y, z, 1);
+					}
+					else chunk.SetVoxel(x, y, z, 0);
+					
+				}
+		mesh = new rd_gl::GLMesh(render::utils::MeshBuilder::BuildMeshFromChunk(chunk,voxel::block::BlockLibrary::GetInstance()));
 	}
 
 	void Window::Render(double time) {
 		//我渲染:
-		glClear(GL_COLOR_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
 
-		rd_gl::ShaderLibrary::GetInstance().GetShader("BaseShader")->Use(); //指定着色器程序
-		rd_gl::Camera* camera = rd_gl::CameraLibrary::GetInstance().GetCamera("MainCamera");
-		if (camera != nullptr)
-			view = camera->GetViewMatrix();
+		glfwPollEvents();
 
-		rd_gl::ShaderLibrary::GetInstance().GetShader("BaseShader")->SetMat4("view", view);
+		//ImGui_ImplOpenGL3_NewFrame();
+		//ImGui_ImplGlfw_NewFrame();
+		//ImGui::NewFrame();
 
-		if (mesh != nullptr) {
-			mesh->Bind();
-			glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT, 0);
-		}
-		
-		//glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/ sizeof(float));//以三角形形式绘制顶点
+		if(mesh != nullptr)
+			renderer->Render(*mesh);
+
+		fps = ImGui::GetIO().Framerate;
+
+		ui::debug_ui::DebugUIManager::GetInstance().BeginFrame();
+		ui::debug_ui::DebugUIManager::GetInstance().EndFrame();
 
 		glfwSwapBuffers(window_);//交换前后缓冲区
 	}
@@ -224,7 +268,10 @@ namespace nova_engine::window {
 
 	void Window::Unload() {
 		glfwTerminate();
+		ui::debug_ui::DebugUIManager::GetInstance().Shutdown();
 		delete(mesh);
+		delete(renderer);
+		NE_CORE_INFO("GameCore", "Unload game.");
 	}
 
 }

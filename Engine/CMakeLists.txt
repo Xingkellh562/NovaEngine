@@ -19,7 +19,7 @@ target_include_directories(NovaEngineCore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 #引用第三方头文件
 target_include_directories(NovaEngineCore PUBLIC ${NE_THIRD_PARTY_INCLUDE_DIR})
 
-target_link_libraries(NovaEngineCore PUBLIC glfw glad glm)
+target_link_libraries(NovaEngineCore PUBLIC glfw glad glm imgui)
 
 add_executable(NovaEngine "main.cpp" "render/opengl/camera.h")
 target_compile_options(NovaEngine PRIVATE "/utf-8")

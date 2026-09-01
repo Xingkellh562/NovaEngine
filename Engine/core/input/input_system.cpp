@@ -11,7 +11,7 @@ namespace nova_engine::core::input {
 		Camera* camera = CameraLibrary::GetInstance().GetCamera("MainCamera");
 		if (camera != nullptr) {
 			camera->position += MoveUpdate(time,SPEED,camera->rotation,camera->GetWorldUp(),state_);
-			//NE_CORE_DEBUG("InputSystem", "state.fwd：{}", state_.forward);
+			camera->rotation = UpdateRotation(time,camera->rotation,40,state_);
 		}
 	}
 }

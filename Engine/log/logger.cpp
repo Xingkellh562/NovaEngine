@@ -1,4 +1,6 @@
 #include "logger.h"
+#include <chrono>
+#include <sstream>
 
 namespace nova_engine::log {
 	std::shared_ptr<spdlog::logger> LogManager::s_CoreLogger;
@@ -16,8 +18,21 @@ namespace nova_engine::log {
 		console_sink->set_level(spdlog::level::trace);
 		console_sink->set_pattern(pattern);
 
+		auto now = std::chrono::system_clock::now();
+		auto now_s = std::chrono::system_clock::to_time_t(now);
+		std::tm local_tm;
+#ifdef _WIN32
+		localtime_s(&local_tm,&now_s);
+#else
+		localtime_r(&now_s, &local_tm);
+#endif
+		std::stringstream ss;
+		ss << "logs/log_";
+		ss << std::put_time(&local_tm, "%Y-%m-%d_%H-%M-%S");
+		ss << ".log";
+
 		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-			"logs/NovaEngine.log", 1024 * 1024 * 10, 5);
+			ss.str().c_str(), 1024 * 1024 * 10, 5);
 
 		file_sink->set_level(spdlog::level::trace);
 		file_sink->set_pattern(pattern);

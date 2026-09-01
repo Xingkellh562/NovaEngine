@@ -22,7 +22,7 @@ namespace nova_engine::render::opengl {
 		std::unordered_map<std::string, std::unique_ptr<Shader>> library_;
 
 		ShaderLibrary();
-		~ShaderLibrary() = default;
+		~ShaderLibrary();
 		void Cleanup();
 	};
 }

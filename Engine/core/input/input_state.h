@@ -8,6 +8,5 @@ namespace nova_engine::core::input {
 		float axisZ = 0, axisX = 0, axisY = 0;
 
 		float trunX = 0, trunY = 0;
-		float sensitivity = 1;
 	};
 }

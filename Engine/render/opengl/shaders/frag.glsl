@@ -1,10 +1,10 @@
-#version 460 core
+#version 330 core
 
 in vec3 outColor;
 out vec4 FragColor;
 
-uniform sampler2D uTexture;
+uniform sampler2DArray uTextures;
 
 void main(){
-	FragColor = texture(uTexture,vec2(outColor.x,outColor.y));
+	FragColor = texture(uTextures,outColor);
 }

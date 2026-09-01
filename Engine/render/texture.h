@@ -26,6 +26,10 @@ namespace nova_engine::render {
         inline const unsigned char* data() const { return data_.data(); }
         inline std::size_t size() const { return data_.size(); }
 
+        void Clear() {
+            data_.clear();
+        }
+
     private:
         int width_;
         int height_;

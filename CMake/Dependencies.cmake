@@ -23,3 +23,18 @@ add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE
     ${NE_THIRD_PARTY_INCLUDE_DIR}
 )
+
+#imgui
+file(GLOB IMGUI_SOURCES
+    ${NE_THIRD_PARTY_SRC_DIR}/imgui/*.cpp
+    ${NE_THIRD_PARTY_SRC_DIR}/imgui/backends/*.cpp
+)
+
+add_library(imgui STATIC ${IMGUI_SOURCES})
+
+target_include_directories(imgui PUBLIC 
+    ${NE_THIRD_PARTY_INCLUDE_DIR}/imgui
+    ${NE_THIRD_PARTY_INCLUDE_DIR}/imgui/backends
+)
+
+target_link_libraries(imgui PUBLIC glfw glad)

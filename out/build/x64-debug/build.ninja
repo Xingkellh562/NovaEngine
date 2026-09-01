@@ -79,6 +79,105 @@ build glad.lib: C_STATIC_LIBRARY_LINKER__glad_Debug CMakeFiles\glad.dir\Linking\
   TARGET_PDB = glad.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\glad.dir
 
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target imgui
+
+
+#############################################
+# Order-only phony target for imgui
+
+build cmake_object_order_depends_target_imgui: phony || cmake_object_order_depends_target_glad
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\backends\imgui_impl_glfw.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\backends\imgui_impl_glfw.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui\backends
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\backends\imgui_impl_opengl3.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\backends\imgui_impl_opengl3.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui\backends
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\imgui.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\imgui.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\imgui_demo.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\imgui_demo.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\imgui_draw.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\imgui_draw.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\imgui_tables.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\imgui_tables.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+build CMakeFiles\imgui.dir\Linking\src\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\imgui\imgui_widgets.cpp || cmake_object_order_depends_target_imgui
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\Linking\src\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target imgui
+
+
+#############################################
+# Link the static library imgui.lib
+
+build imgui.lib: CXX_STATIC_LIBRARY_LINKER__imgui_Debug CMakeFiles\imgui.dir\Linking\src\imgui\backends\imgui_impl_glfw.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\backends\imgui_impl_opengl3.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\imgui.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\imgui_demo.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\imgui_draw.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\imgui_tables.cpp.obj CMakeFiles\imgui.dir\Linking\src\imgui\imgui_widgets.cpp.obj || glad.lib
+  CONFIG = Debug
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_FILE = imgui.lib
+  TARGET_PDB = imgui.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\imgui.dir
+
 
 #############################################
 # Utility command for edit_cache
@@ -114,12 +213,12 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 #############################################
 # Order-only phony target for NovaEngineCore
 
-build cmake_object_order_depends_target_NovaEngineCore: phony || cmake_object_order_depends_target_glad
+build cmake_object_order_depends_target_NovaEngineCore: phony || cmake_object_order_depends_target_glad cmake_object_order_depends_target_imgui
 
 build Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_behavior.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\core\input\input_behavior.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\core\input
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -129,7 +228,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_behavior.cpp.obj: CX
 build Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_system.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\core\input\input_system.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\core\input
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -139,7 +238,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_system.cpp.obj: CXX_
 build Engine\CMakeFiles\NovaEngineCore.dir\log\logger.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\log\logger.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\log
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -149,7 +248,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\log\logger.cpp.obj: CXX_COMPILER__Nov
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\camera.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\camera.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -159,17 +258,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\camera.cpp.obj: CXX_COM
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\glmesh.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\glmesh.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
-  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
-  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl
-  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
-  TARGET_PDB = Engine\NovaEngineCore.pdb
-  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
-
-build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\gltexture.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\gltexture.cpp || cmake_object_order_depends_target_NovaEngineCore
-  CONFIG = Debug
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -179,7 +268,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\gltexture.cpp.obj: CXX_
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\camera_library.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\library\camera_library.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -189,7 +278,17 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\camera_library.
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\shader_library.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\library\shader_library.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_array_library.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\library\texture_array_library.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -199,9 +298,19 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\shader_library.
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_library.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\library\texture_library.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\renderer\block_renderer.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\renderer\block_renderer.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\renderer
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
   TARGET_PDB = Engine\NovaEngineCore.pdb
   TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
@@ -209,9 +318,29 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_library
 build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\shader.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\shader.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture\gltexture.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\texture\gltexture.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture\gltexture_array.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\opengl\texture\gltexture_array.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
   TARGET_PDB = Engine\NovaEngineCore.pdb
   TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
@@ -219,7 +348,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\shader.cpp.obj: CXX_COM
 build Engine\CMakeFiles\NovaEngineCore.dir\render\stb_image.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\stb_image.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -229,19 +358,59 @@ build Engine\CMakeFiles\NovaEngineCore.dir\render\stb_image.cpp.obj: CXX_COMPILE
 build Engine\CMakeFiles\NovaEngineCore.dir\render\texture.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\texture.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
   TARGET_PDB = Engine\NovaEngineCore.pdb
   TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
 
-build Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\voxel\chunk.cpp || cmake_object_order_depends_target_NovaEngineCore
+build Engine\CMakeFiles\NovaEngineCore.dir\render\utils\mesh_builder.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\render\utils\mesh_builder.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
-  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\voxel
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\render\utils
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\ui\debug_ui\debug_ui_mamager.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\ui\debug_ui\debug_ui_mamager.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\ui\debug_ui
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\utils\loaders\model_loader.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\utils\loaders\model_loader.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\utils\loaders
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\voxel\block\block_library.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\voxel\block\block_library.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\voxel\block
+  TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
+  TARGET_PDB = Engine\NovaEngineCore.pdb
+  TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+
+build Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk\chunk.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\voxel\chunk\chunk.cpp || cmake_object_order_depends_target_NovaEngineCore
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
+  OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
   TARGET_PDB = Engine\NovaEngineCore.pdb
   TARGET_SUPPORT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
@@ -249,7 +418,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk.cpp.obj: CXX_COMPILER__No
 build Engine\CMakeFiles\NovaEngineCore.dir\window\window.cpp.obj: CXX_COMPILER__NovaEngineCore_unscanned_Debug D$:\Nova\NovaEngine\Engine\window\window.cpp || cmake_object_order_depends_target_NovaEngineCore
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngineCore.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngineCore.dir\window
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngineCore.dir\NovaEngineCore.pdb
@@ -264,7 +433,7 @@ build Engine\CMakeFiles\NovaEngineCore.dir\window\window.cpp.obj: CXX_COMPILER__
 #############################################
 # Link the static library Engine\NovaEngineCore.lib
 
-build Engine\NovaEngineCore.lib: CXX_STATIC_LIBRARY_LINKER__NovaEngineCore_Debug Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_behavior.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_system.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\log\logger.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\camera.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\glmesh.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\gltexture.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\camera_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\shader_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\shader.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\stb_image.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\texture.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\window\window.cpp.obj || glad.lib
+build Engine\NovaEngineCore.lib: CXX_STATIC_LIBRARY_LINKER__NovaEngineCore_Debug Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_behavior.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\core\input\input_system.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\log\logger.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\camera.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\glmesh.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\camera_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\shader_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_array_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\library\texture_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\renderer\block_renderer.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\shader.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture\gltexture.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\opengl\texture\gltexture_array.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\stb_image.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\texture.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\render\utils\mesh_builder.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\ui\debug_ui\debug_ui_mamager.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\utils\loaders\model_loader.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\voxel\block\block_library.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\voxel\chunk\chunk.cpp.obj Engine\CMakeFiles\NovaEngineCore.dir\window\window.cpp.obj || glad.lib imgui.lib
   CONFIG = Debug
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
   LINK_FLAGS = /machine:x64
@@ -283,12 +452,12 @@ build Engine\NovaEngineCore.lib: CXX_STATIC_LIBRARY_LINKER__NovaEngineCore_Debug
 #############################################
 # Order-only phony target for NovaEngine
 
-build cmake_object_order_depends_target_NovaEngine: phony || cmake_object_order_depends_target_NovaEngineCore cmake_object_order_depends_target_glad
+build cmake_object_order_depends_target_NovaEngine: phony || cmake_object_order_depends_target_NovaEngineCore cmake_object_order_depends_target_glad cmake_object_order_depends_target_imgui
 
 build Engine\CMakeFiles\NovaEngine.dir\main.cpp.obj: CXX_COMPILER__NovaEngine_unscanned_Debug D$:\Nova\NovaEngine\Engine\main.cpp || cmake_object_order_depends_target_NovaEngine
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /utf-8
-  INCLUDES = -ID:\Nova\NovaEngine\Engine -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -external:ID:\Nova\NovaEngine\Linking\include -external:W0
   OBJECT_DIR = Engine\CMakeFiles\NovaEngine.dir
   OBJECT_FILE_DIR = Engine\CMakeFiles\NovaEngine.dir
   TARGET_COMPILE_PDB = Engine\CMakeFiles\NovaEngine.dir\
@@ -303,11 +472,11 @@ build Engine\CMakeFiles\NovaEngine.dir\main.cpp.obj: CXX_COMPILER__NovaEngine_un
 #############################################
 # Link the executable Engine\NovaEngine.exe
 
-build Engine\NovaEngine.exe: CXX_EXECUTABLE_LINKER__NovaEngine_Debug Engine\CMakeFiles\NovaEngine.dir\main.cpp.obj | Engine\NovaEngineCore.lib D$:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib glad.lib || Engine\NovaEngineCore.lib glad.lib
+build Engine\NovaEngine.exe: CXX_EXECUTABLE_LINKER__NovaEngine_Debug Engine\CMakeFiles\NovaEngine.dir\main.cpp.obj | Engine\NovaEngineCore.lib imgui.lib D$:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib glad.lib || Engine\NovaEngineCore.lib glad.lib imgui.lib
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = Engine\NovaEngineCore.lib  D:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib  glad.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = Engine\NovaEngineCore.lib  imgui.lib  D:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib  glad.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = Engine\CMakeFiles\NovaEngine.dir
   POST_BUILD = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\Nova\NovaEngine\out\build\x64-debug\Engine && "D:\Visual Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory D:/Nova/NovaEngine/Engine/Render/OpenGL/shaders D:/Nova/NovaEngine/out/build/x64-debug/Engine/shaders && cd /D D:\Nova\NovaEngine\out\build\x64-debug\Engine && "D:\Visual Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_directory D:/Nova/NovaEngine/assets D:/Nova/NovaEngine/out/build/x64-debug/Engine/assets"
   PRE_LINK = cd .
@@ -341,7 +510,133 @@ build Engine\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
 build Engine\rebuild_cache: phony Engine\CMakeFiles\rebuild_cache.util
 
 # =============================================================================
+# Write statements declared in CMakeLists.txt:
+# D:/Nova/NovaEngine/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target GTestLocal
+
+
+#############################################
+# Order-only phony target for GTestLocal
+
+build cmake_object_order_depends_target_GTestLocal: phony || .
+
+build Tests\CMakeFiles\GTestLocal.dir\__\Linking\src\googletext\gtest-all.cc.obj: CXX_COMPILER__GTestLocal_unscanned_Debug D$:\Nova\NovaEngine\Linking\src\googletext\gtest-all.cc || cmake_object_order_depends_target_GTestLocal
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI /wd4530 /wd4577 /wd4800
+  INCLUDES = -ID:\Nova\NovaEngine\Linking\include\googletext -ID:\Nova\NovaEngine\Linking\src\googletext\src
+  OBJECT_DIR = Tests\CMakeFiles\GTestLocal.dir
+  OBJECT_FILE_DIR = Tests\CMakeFiles\GTestLocal.dir\__\Linking\src\googletext
+  TARGET_COMPILE_PDB = Tests\CMakeFiles\GTestLocal.dir\GTestLocal.pdb
+  TARGET_PDB = Tests\GTestLocal.pdb
+  TARGET_SUPPORT_DIR = Tests\CMakeFiles\GTestLocal.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target GTestLocal
+
+
+#############################################
+# Link the static library Tests\GTestLocal.lib
+
+build Tests\GTestLocal.lib: CXX_STATIC_LIBRARY_LINKER__GTestLocal_Debug Tests\CMakeFiles\GTestLocal.dir\__\Linking\src\googletext\gtest-all.cc.obj
+  CONFIG = Debug
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = Tests\CMakeFiles\GTestLocal.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = Tests\CMakeFiles\GTestLocal.dir\GTestLocal.pdb
+  TARGET_FILE = Tests\GTestLocal.lib
+  TARGET_PDB = Tests\GTestLocal.pdb
+  TARGET_SUPPORT_DIR = Tests\CMakeFiles\GTestLocal.dir
+
+# =============================================================================
+# Object build statements for EXECUTABLE target EngineCoreTests
+
+
+#############################################
+# Order-only phony target for EngineCoreTests
+
+build cmake_object_order_depends_target_EngineCoreTests: phony || cmake_object_order_depends_target_GTestLocal cmake_object_order_depends_target_NovaEngineCore cmake_object_order_depends_target_glad cmake_object_order_depends_target_imgui
+
+build Tests\CMakeFiles\EngineCoreTests.dir\main_test.cpp.obj: CXX_COMPILER__EngineCoreTests_unscanned_Debug D$:\Nova\NovaEngine\Tests\main_test.cpp || cmake_object_order_depends_target_EngineCoreTests
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -ID:\Nova\NovaEngine\Linking\include\googletext -ID:\Nova\NovaEngine\Linking\src\googletext\src -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+  OBJECT_FILE_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+  TARGET_COMPILE_PDB = Tests\CMakeFiles\EngineCoreTests.dir\
+  TARGET_PDB = Tests\EngineCoreTests.pdb
+  TARGET_SUPPORT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+
+build Tests\CMakeFiles\EngineCoreTests.dir\octree_test.cpp.obj: CXX_COMPILER__EngineCoreTests_unscanned_Debug D$:\Nova\NovaEngine\Tests\octree_test.cpp || cmake_object_order_depends_target_EngineCoreTests
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI
+  INCLUDES = -ID:\Nova\NovaEngine\Engine -ID:\Nova\NovaEngine\Linking\include\imgui -ID:\Nova\NovaEngine\Linking\include\imgui\backends -ID:\Nova\NovaEngine\Linking\include\googletext -ID:\Nova\NovaEngine\Linking\src\googletext\src -external:ID:\Nova\NovaEngine\Linking\include -external:W0
+  OBJECT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+  OBJECT_FILE_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+  TARGET_COMPILE_PDB = Tests\CMakeFiles\EngineCoreTests.dir\
+  TARGET_PDB = Tests\EngineCoreTests.pdb
+  TARGET_SUPPORT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target EngineCoreTests
+
+
+#############################################
+# Link the executable Tests\EngineCoreTests.exe
+
+build Tests\EngineCoreTests.exe: CXX_EXECUTABLE_LINKER__EngineCoreTests_Debug Tests\CMakeFiles\EngineCoreTests.dir\main_test.cpp.obj Tests\CMakeFiles\EngineCoreTests.dir\octree_test.cpp.obj | Engine\NovaEngineCore.lib Tests\GTestLocal.lib imgui.lib D$:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib glad.lib || Engine\NovaEngineCore.lib Tests\GTestLocal.lib glad.lib imgui.lib
+  CONFIG = Debug
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
+  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
+  LINK_LIBRARIES = Engine\NovaEngineCore.lib  Tests\GTestLocal.lib  imgui.lib  D:\Nova\NovaEngine\Linking\lib\GLFW\glfw3.lib  glad.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = Tests\CMakeFiles\EngineCoreTests.dir\
+  TARGET_FILE = Tests\EngineCoreTests.exe
+  TARGET_IMPLIB = Tests\EngineCoreTests.lib
+  TARGET_PDB = Tests\EngineCoreTests.pdb
+  TARGET_SUPPORT_DIR = Tests\CMakeFiles\EngineCoreTests.dir
+
+
+#############################################
+# Utility command for edit_cache
+
+build Tests\CMakeFiles\edit_cache.util: CUSTOM_COMMAND
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\Nova\NovaEngine\out\build\x64-debug\Tests && "D:\Visual Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build Tests\edit_cache: phony Tests\CMakeFiles\edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build Tests\CMakeFiles\rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\Nova\NovaEngine\out\build\x64-debug\Tests && "D:\Visual Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --regenerate-during-build -SD:\Nova\NovaEngine -BD:\Nova\NovaEngine\out\build\x64-debug"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build Tests\rebuild_cache: phony Tests\CMakeFiles\rebuild_cache.util
+
+# =============================================================================
 # Target aliases.
+
+build EngineCoreTests: phony Tests\EngineCoreTests.exe
+
+build EngineCoreTests.exe: phony Tests\EngineCoreTests.exe
+
+build GTestLocal: phony Tests\GTestLocal.lib
+
+build GTestLocal.lib: phony Tests\GTestLocal.lib
 
 build NovaEngine: phony Engine\NovaEngine.exe
 
@@ -353,6 +648,8 @@ build NovaEngineCore.lib: phony Engine\NovaEngineCore.lib
 
 build glad: phony glad.lib
 
+build imgui: phony imgui.lib
+
 # =============================================================================
 # Folder targets.
 
@@ -361,7 +658,7 @@ build glad: phony glad.lib
 #############################################
 # Folder: D:/Nova/NovaEngine/out/build/x64-debug
 
-build all: phony glad.lib Engine\all
+build all: phony glad.lib imgui.lib Engine\all Tests\all
 
 # =============================================================================
 
@@ -371,20 +668,27 @@ build all: phony glad.lib Engine\all
 build Engine\all: phony Engine\NovaEngineCore.lib Engine\NovaEngine.exe
 
 # =============================================================================
+
+#############################################
+# Folder: D:/Nova/NovaEngine/out/build/x64-debug/Tests
+
+build Tests\all: phony Tests\GTestLocal.lib Tests\EngineCoreTests.exe
+
+# =============================================================================
 # Built-in targets
 
 
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja D$:\Nova\NovaEngine\out\build\x64-debug\cmake_install.cmake D$:\Nova\NovaEngine\out\build\x64-debug\Engine\cmake_install.cmake: RERUN_CMAKE | CMakeCache.txt CMakeFiles\4.2.3-msvc3\CMakeCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeCXXCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeRCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeSystem.cmake D$:\Nova\NovaEngine\CMakeLists.txt D$:\Nova\NovaEngine\CMake\Dependencies.cmake D$:\Nova\NovaEngine\Engine\CMakeLists.txt D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompilerABI.c D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompilerABI.cpp D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCompilerIdDetection.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerABI.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerSupport.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeFindBinUtils.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseLibraryArchitecture.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystem.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCompilerCommon.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Bruce-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CrayClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Diab-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX-CXXImportStd.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVHPC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OrangeC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Renesas-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SDCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TIClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Tasking-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeDetermineLinkerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCXXLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\FeatureTesting.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Determine-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake
+build build.ninja D$:\Nova\NovaEngine\out\build\x64-debug\cmake_install.cmake D$:\Nova\NovaEngine\out\build\x64-debug\Engine\cmake_install.cmake D$:\Nova\NovaEngine\out\build\x64-debug\Tests\cmake_install.cmake D$:\Nova\NovaEngine\out\build\x64-debug\Tests\CTestTestfile.cmake: RERUN_CMAKE | CMakeCache.txt CMakeFiles\4.2.3-msvc3\CMakeCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeCXXCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeRCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeSystem.cmake D$:\Nova\NovaEngine\CMakeLists.txt D$:\Nova\NovaEngine\CMake\Dependencies.cmake D$:\Nova\NovaEngine\Engine\CMakeLists.txt D$:\Nova\NovaEngine\Tests\CMakeLists.txt D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompilerABI.c D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompilerABI.cpp D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCompilerIdDetection.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerABI.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerSupport.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeFindBinUtils.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseLibraryArchitecture.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystem.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCompilerCommon.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Bruce-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CrayClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Diab-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX-CXXImportStd.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVHPC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OrangeC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Renesas-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SDCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TIClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Tasking-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeDetermineLinkerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCXXLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\FeatureTesting.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Determine-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build CMakeCache.txt CMakeFiles\4.2.3-msvc3\CMakeCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeCXXCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeRCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeSystem.cmake D$:\Nova\NovaEngine\CMakeLists.txt D$:\Nova\NovaEngine\CMake\Dependencies.cmake D$:\Nova\NovaEngine\Engine\CMakeLists.txt D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompilerABI.c D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompilerABI.cpp D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCompilerIdDetection.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerABI.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerSupport.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeFindBinUtils.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseLibraryArchitecture.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystem.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCompilerCommon.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Bruce-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CrayClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Diab-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX-CXXImportStd.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVHPC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OrangeC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Renesas-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SDCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TIClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Tasking-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeDetermineLinkerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCXXLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\FeatureTesting.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Determine-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake: phony
+build CMakeCache.txt CMakeFiles\4.2.3-msvc3\CMakeCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeCXXCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeRCCompiler.cmake CMakeFiles\4.2.3-msvc3\CMakeSystem.cmake D$:\Nova\NovaEngine\CMakeLists.txt D$:\Nova\NovaEngine\CMake\Dependencies.cmake D$:\Nova\NovaEngine\Engine\CMakeLists.txt D$:\Nova\NovaEngine\Tests\CMakeLists.txt D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCCompilerABI.c D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXCompilerABI.cpp D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeCompilerIdDetection.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerABI.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineCompilerSupport.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeDetermineSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeFindBinUtils.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitIncludeInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseImplicitLinkInfo.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeParseLibraryArchitecture.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCCompiler.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystem.cmake.in D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCXXCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestCompilerCommon.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\CMakeTestRCCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ADSP-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMCC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\ARMClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\AppleClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Borland-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Bruce-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Clang-DetermineCompilerInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Cray-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\CrayClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Diab-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Embarcadero-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Fujitsu-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GHS-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\HP-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IAR-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Intel-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX-CXXImportStd.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVHPC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\NVIDIA-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\OrangeC-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PGI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\PathScale-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Renesas-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SCO-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SDCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TI-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TIClang-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Tasking-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\Watcom-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XL-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-C-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeDetermineLinkerId.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\CMakeInspectCXXLinker.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Internal\FeatureTesting.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-GNU.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Determine-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake D$:\Visual$ Studio\vs\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake: phony
 
 
 #############################################

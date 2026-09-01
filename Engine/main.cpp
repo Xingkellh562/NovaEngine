@@ -11,5 +11,4 @@ int main()
 
 	nova_engine::window::Window::GetInstance().Run();
 	return 0;
-	//cout << "1111";
 }
