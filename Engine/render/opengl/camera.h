@@ -25,7 +25,5 @@ namespace nova_engine::render::opengl {
 		float nearPlane_;
 		float farPlane_;
 		float fieldOfView_;
-
-		
 	};
 }

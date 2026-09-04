@@ -14,24 +14,25 @@ namespace nova_engine::collection::data_structure {
 		int depth = 0;// 节点的深度，根节点为0
 	};
 
-	template <typename T>
+	template <typename T ,int RootSize,int LeafSize>
 	class Octree {
-	public:
-		//要求:rootSize必须是2的幂次方，leafSize必须是2的幂次方，且rootSize必须大于等于leafSize
-		Octree(int rootSize,int leafSize) : m_rootSize(rootSize), m_leafSize(leafSize) {
-			auto isPowerOfTwo = [](int v) { return v > 0 && (v & (v - 1)) == 0; };
-			if (!isPowerOfTwo(rootSize) || !isPowerOfTwo(leafSize) || rootSize < leafSize) {
-				throw std::invalid_argument("rootSize and leafSize must be powers of two and rootSize >= leafSize");
-			}
-			// 改用移位计算深度，避免浮点误差
+		static_assert((RootSize& (RootSize - 1)) == 0, "RootSize must be a power of 2");
+		static_assert((LeafSize& (LeafSize - 1)) == 0, "LeafSize must be a power of 2");
+		static_assert(RootSize >= LeafSize, "RootSize must >= LeafSize");
+
+		static constexpr const int ComputeMaxDepth() {
 			int depth = 0;
-			int temp = rootSize;
-			while (temp > leafSize) {
-				temp >>= 1;
+			int tmp = RootSize;
+			while (tmp > LeafSize) {
+				tmp >>= 1;
 				++depth;
 			}
-			m_maxDepth = depth;
+			return depth;
+		}
 
+	public:
+		//要求:rootSize必须是2的幂次方，leafSize必须是2的幂次方，且rootSize必须大于等于leafSize
+		Octree() {
 			m_nodes.reserve(2048); // 预估节点数量，避免频繁扩容
 			m_chunks.reserve(512); // 预估块数量，避免频繁扩容
 
@@ -43,10 +44,12 @@ namespace nova_engine::collection::data_structure {
 		Octree(const Octree&) = delete;
 		Octree& operator=(const Octree&) = delete;
 
+		Octree(Octree&&) = default;
+		Octree& operator=(Octree&&) = default;
+
 		int GetChildIndexWithPos(int x,int y,int z,int depth) const {
-			if (depth < 0 || depth > m_maxDepth) return -1;
-			assert(depth >= 0 && depth < m_maxDepth);
-			int half = m_rootSize >> (depth + 1);
+			if (depth < 0 || depth > MAX_DEPTH) return -1;
+			int half = ROOT_SIZE >> (depth + 1);
 			int index = 0;
 			if ((half & x) != 0) index |= 1;
 			if ((half & y) != 0) index |= 2;
@@ -58,12 +61,12 @@ namespace nova_engine::collection::data_structure {
 		// 查找指定坐标的块，如果不存在则返回nullptr
 		T* Find(int x,int y,int z) const {
 			// 检查坐标是否在八叉树范围内
-			if (x < 0 || y < 0 || z < 0 || x >= m_rootSize || y >= m_rootSize || z >= m_rootSize) {
+			if (x < 0 || y < 0 || z < 0 || x >= ROOT_SIZE || y >= ROOT_SIZE || z >= ROOT_SIZE) {
 				return nullptr;
 			}
 			//往下递归八叉树，找到坐标对应的叶子节点，如果中间断掉或叶子节点没有对应的块，则返回nullptr
 			int nodeIndex = 0;
-			for (int d = 0;d < m_maxDepth; ++d) {
+			for (int d = 0;d < MAX_DEPTH; ++d) {
 				const OctreeNode& node = m_nodes[nodeIndex];
 				if (node.childFirstIndex < 0) return nullptr;
 				int childIndex = GetChildIndexWithPos(x, y, z, node.depth);
@@ -80,12 +83,12 @@ namespace nova_engine::collection::data_structure {
 
 		void Add(int x,int y,int z, T&& chunk) {
 			// 检查坐标是否在八叉树范围内
-			if (x < 0 || y < 0 || z < 0 || x >= m_rootSize || y >= m_rootSize || z >= m_rootSize) {
+			if (x < 0 || y < 0 || z < 0 || x >= ROOT_SIZE || y >= ROOT_SIZE || z >= ROOT_SIZE) {
 				return;
 			}
 			//逐渐往下递归八叉树，直到到达叶子节点
 			int nodeIndex = 0;
-			for (int d = 0; d < m_maxDepth; ++d) {
+			for (int d = 0; d < MAX_DEPTH; ++d) {
 				//if ( nodeIndex >= m_nodes.size()) return;
 				nodeIndex = AddChildNode(nodeIndex, x, y, z);
 			}
@@ -100,42 +103,41 @@ namespace nova_engine::collection::data_structure {
 			}
 		}
 
-		std::optional<T> Remove(int x,int y,int z) {
-			if (x < 0 || y < 0 || z < 0 || x >= m_rootSize || y >= m_rootSize || z >= m_rootSize) {
-				return std::nullopt;
+		std::unique_ptr<T> Remove(int x,int y,int z) {
+			if (x < 0 || y < 0 || z < 0 || x >= ROOT_SIZE || y >= ROOT_SIZE || z >= ROOT_SIZE) {
+				return nullptr;
 			}
 			//往下递归八叉树，找到坐标对应的叶子节点，如果中间断掉或叶子节点没有对应的块，则返回null
 			int nodeIndex = 0;
-			for (int d = 0;d < m_maxDepth; ++d) {
+			for (int d = 0;d < MAX_DEPTH; ++d) {
 				//if (nodeIndex < 0 || nodeIndex >= m_nodes.size()) return std::nullopt;
 				OctreeNode& node = m_nodes[nodeIndex];
-				if (node.childFirstIndex == -1) return std::nullopt;
+				if (node.childFirstIndex == -1) return nullptr;
 				int childIndex = GetChildIndexWithPos(x, y, z, node.depth);
 
 				if (node.childMask & (1 << childIndex))
 					nodeIndex = node.childFirstIndex + childIndex;
-				else return std::nullopt;
+				else return nullptr;
 			}
 			//此时nodeIndex已经指向叶子节点，删除对应的块
 			OctreeNode& leafNode = m_nodes[nodeIndex];
-			if (leafNode.chunkIndex == -1) return std::nullopt;
+			if (leafNode.chunkIndex == -1) return nullptr;
 
 			std::unique_ptr<T> ptr = std::move(m_chunks[leafNode.chunkIndex]);
-			T value = std::move(*ptr);   // 移动数据
 
 			leafNode.chunkIndex = -1;
 			//往上递归八叉树,如果父节点没有子节点了,则移除父节点Mask
 			PruneEmptyAncestors(nodeIndex);
-			return value;
+			return ptr;
 		}
+
+		static constexpr int MAX_DEPTH = ComputeMaxDepth();
+		static constexpr int ROOT_SIZE = RootSize;
+		static constexpr int LEAF_SIZE = LeafSize;
 
 	private:
 		std::vector<OctreeNode> m_nodes;
 		std::vector<std::unique_ptr<T>> m_chunks;
-
-		int m_maxDepth = 0;
-		int m_rootSize;
-		int m_leafSize;
 
 		int AddChildNode(int nodeIndex,int x,int y,int z) {
 			EnsureOctNodes(nodeIndex);
@@ -146,7 +148,6 @@ namespace nova_engine::collection::data_structure {
 			}
 			return node.childFirstIndex + childIndex;
 		}
-
 		//确保八个子节点位置存在，如果不存在则创建
 		void EnsureOctNodes(int nodeIndex) {
 			if (m_nodes[nodeIndex].childFirstIndex == -1) {

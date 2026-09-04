@@ -24,7 +24,7 @@ enable_testing()
 
 set(TEST_SOURCES
     main_test.cpp          # 你自己的 main 入口
-	octree_test.cpp
+	test_file/mesh_cache.cpp
 )
 
 add_executable(EngineCoreTests ${TEST_SOURCES})

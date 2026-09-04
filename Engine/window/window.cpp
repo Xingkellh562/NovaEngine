@@ -1,12 +1,13 @@
 #include "window.h"
 #include <log/logger.h>
-#include <render/opengl/renderer/block_renderer.h>
-#include <render/opengl/glmesh.h>
 #include <core/input/input_system.h>
 #include <render/utils/mesh_builder.h>
 #include <iostream>
 #include <ui/debug_ui/debug_ui_manager.h>
 #include <random>
+#include <core/world/world.h>
+#include <render/system/render_system.h>
+#include <voxel/chunk/chunk_system.h>
 
 namespace rd = nova_engine::render;
 namespace rd_gl = nova_engine::render::opengl;
@@ -16,12 +17,18 @@ namespace nova_engine::window {
 	constexpr double FIXED_STEP_MS = 1000.0 / 60.0;  // 16.666...
 	constexpr double MAX_ACCUM_MS = 100.0;
 
-	rd_gl::BlockRenderer* renderer;
+	core::world::World world;
+	std::optional<rd_gl::context::RenderContext> context;
 
 	void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
+		if (width == 0 || height == 0)
+			return;
 		glViewport(0, 0, width, height);
-		renderer->OnResize(width,height);
+		if (context != std::nullopt) {
+			auto& real = *context;
+			real.blockRenderer.OnResize(width, height);
+		}
 	}
 
 	void Window::processInput(GLFWwindow* window)
@@ -210,35 +217,29 @@ namespace nova_engine::window {
 		
 		glViewport(0, 0, 800, 600);
 		glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
-		renderer = new rd_gl::BlockRenderer();
-		renderer->OnResize(800, 600);
+
+		/*renderer = new render::opengl::BlockRenderer();
+		renderer->OnResize(800, 600);*/
+
+		context.emplace();
+		
+		if (context != std::nullopt) {
+			context->blockRenderer.OnResize(800, 600);
+		}
+			
 
 		ui::debug_ui::DebugUIManager::GetInstance().RegisterPanel(
 			"Debug", [this]() {
 				ImGui::Text("Application average %.3f ms / frame (%.1f FPS) ",
 					1000.0f / fps, fps);
-				ImGui::Text("爸爸的爸爸叫爷爷 ");
-				ImGui::Text("我也要被显示吗 ");
-				ImGui::Text("? ! UIIU ! ? ");
-				ImGui::Text("Nuclear_Clay是给 ");
+				ImGui::Text("playerPos: < x: %.2f , y: %.2f , z: %.2f >",
+					world.playerPos.x,world.playerPos.y,world.playerPos.z);
+				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMeshCache.MeshCount() : 0);
+				ImGui::Text("Pool length: %d", context ? context->chunkMeshCache.PoolLength() : 0);
 			},true
 		);
 
-		voxel::chunk::Chunk chunk = (32);
-		for (int x = 0; x < chunk.Size(); x++)
-			for (int y = 0; y < chunk.Size(); y++)
-				for (int z = 0; z < chunk.Size(); z++) {
-					int i = rnd(1, 100);
-					if (i > 97) {
-						if (y < 31)
-							chunk.SetVoxel(x, y, z, 2);
-						else
-							chunk.SetVoxel(x, y, z, 1);
-					}
-					else chunk.SetVoxel(x, y, z, 0);
-					
-				}
-		mesh = new rd_gl::GLMesh(render::utils::MeshBuilder::BuildMeshFromChunk(chunk,voxel::block::BlockLibrary::GetInstance()));
+		mesh = new rd_gl::GLMesh();
 	}
 
 	void Window::Render(double time) {
@@ -247,12 +248,10 @@ namespace nova_engine::window {
 
 		glfwPollEvents();
 
-		//ImGui_ImplOpenGL3_NewFrame();
-		//ImGui_ImplGlfw_NewFrame();
-		//ImGui::NewFrame();
-
-		if(mesh != nullptr)
-			renderer->Render(*mesh);
+		if (context != std::nullopt) {
+			auto& real = *context;
+			render::system::RenderSystem::GetInstance().Render(real);
+		}
 
 		fps = ImGui::GetIO().Framerate;
 
@@ -263,15 +262,21 @@ namespace nova_engine::window {
 	}
 
 	void Window::Update(double time) {
-		nova_engine::core::input::InputSystem::GetInstance().Update(time);
+		nova_engine::core::input::InputSystem::GetInstance().Update(time, world);
+
+		voxel::chunk::ChunkSystem::GetInstance().Update(world);
+
+		if (context != std::nullopt) {
+			auto& realContext = *context;
+			render::system::RenderSystem::GetInstance().Update(world, realContext);
+		}
 	}
 
 	void Window::Unload() {
 		glfwTerminate();
 		ui::debug_ui::DebugUIManager::GetInstance().Shutdown();
 		delete(mesh);
-		delete(renderer);
+		//delete(renderer);
 		NE_CORE_INFO("GameCore", "Unload game.");
 	}
-
 }

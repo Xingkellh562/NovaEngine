@@ -17,7 +17,7 @@ namespace nova_engine::voxel::chunk {
 		int GetVoxel(int x, int y, int z) const ;
 		void SetVoxel(int x, int y, int z, int voxel);
 		unsigned int Size() const { return size_; }
-		inline std::vector<int>& GetVoxelSpan() { return voxels_; }
+		inline const std::vector<int>& GetVoxelSpan() const { return voxels_; }
 	private:
 		unsigned int size_;
 		std::vector<int> voxels_;

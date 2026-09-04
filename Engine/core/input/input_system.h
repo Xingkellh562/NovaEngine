@@ -1,6 +1,7 @@
 #pragma once
 
 #include "input_state.h"
+#include <core/world/world.h>
 
 namespace nova_engine::core::input {
 	class InputSystem {
@@ -12,7 +13,7 @@ namespace nova_engine::core::input {
 
 		InputState& GetState() { return state_; }
 
-		void Update(double time);
+		void Update(double time, world::World& world);
 
 		InputSystem(const InputSystem&) = delete;
 		InputSystem& operator=(const InputSystem&) = delete;

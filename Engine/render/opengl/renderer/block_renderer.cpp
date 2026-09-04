@@ -20,12 +20,14 @@ namespace nova_engine::render::opengl {
 		}
 	}
 
-	void BlockRenderer::Render(const GLMesh& mesh) {
+	void BlockRenderer::Render(const GLMesh& mesh){
 		if (shader_ == nullptr || camera_ == nullptr)
 			return;
+
 		view_ = camera_->GetViewMatrix();
 		shader_->Use();
 		shader_->SetMat4("view", view_);
+		shader_->SetMat4("model", mesh.GetModelMatrix());
 
 		mesh.Bind();
 		glDrawElements(GL_TRIANGLES, mesh.GetElementLength(), GL_UNSIGNED_INT, 0);
