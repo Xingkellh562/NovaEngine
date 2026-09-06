@@ -33,7 +33,8 @@ namespace nova_engine::render::system {
 				context.chunkMeshCache.FreeMesh(mesh.position.x, mesh.position.y, mesh.position.z);
 			}
 		}
-		
+		const int MAXCOUNT = 6;
+		int count = 0;
 		for (const glm::ivec3& chunkPos : chunksPos) {
 			int cx = chunkPos.x + (int)playerPos.x,
 				cy = chunkPos.y + (int)playerPos.y,
@@ -58,11 +59,14 @@ namespace nova_engine::render::system {
 				const MeshData& mesh = 
 					utils::MeshBuilder::BuildMeshFromChunk(*chunk, nei,voxel::block::BlockLibrary::GetInstance());
 				context.chunkMeshCache.SubmitMesh(cx, cy, cz, mesh);
+				count++;
 			}
 			/*if((((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 96 * 96) || !chunk) && exist){
 				context.chunkMeshCache.FreeMesh(cx, cy, cz);
 			}*/
-				
+
+			if (count >= MAXCOUNT) break;
+			
 		}
 
 		

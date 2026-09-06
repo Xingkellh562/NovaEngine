@@ -37,8 +37,8 @@ namespace nova_engine::render::opengl {
 			first.width(), first.height(), (GLsizei)filePaths.size(),
 			0,format,GL_UNSIGNED_BYTE,nullptr);
 
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -66,7 +66,6 @@ namespace nova_engine::render::opengl {
 			first.Clear();
 			glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 		}
-		
 		catch (const std::exception&)
 		{
 			NE_CORE_ERROR("RenderSystem", "Create texture array failed.");

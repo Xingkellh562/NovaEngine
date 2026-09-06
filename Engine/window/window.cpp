@@ -167,6 +167,7 @@ namespace nova_engine::window {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  //指定openGL版本号
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//指定openGL渲染模式为立即模式
+		glfwWindowHint(GLFW_SAMPLES,4);
 
 		//创建一个大小为800*600的窗口
 		window_ = glfwCreateWindow(800, 600, "GANGLV", NULL, NULL);
@@ -198,6 +199,7 @@ namespace nova_engine::window {
 		glDepthMask(GL_TRUE);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		glEnable(GL_MULTISAMPLE);
 
 		//创建ImGui上下文
 		ui::debug_ui::DebugUIManager::GetInstance().Init(window_,"#version 330");

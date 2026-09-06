@@ -14,12 +14,14 @@ namespace nova_engine::render::utils {
 
 	private:
 		static const std::array<std::array<int, 3>, 6> neighbours_;
+		static const std::array<std::array<std::array<int, 3>, 12>, 6> aos_;
 
 		static inline void AddQuadMesh(const voxel::block::QuadFace& face,
 			std::vector<float>& vertices,
 			std::vector<int>& indices,
+			std::array<float, 4> aos,
 			int& vertexCount, int x, int y, int z);
 
-		static void GetNeighTable();
+		static inline const std::array<float,4>& GetAOValueForMesh(int idx,int dir);
 	};
 }

@@ -7,9 +7,19 @@ namespace nova_engine::render::utils {
 		{{-1,0,0},{1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}
 	};
 
+	const std::array<std::array<std::array<int, 3>, 12>, 6> MeshBuilder::aos_ = {{
+		{{{-1,1,0},{-1,1,1},{-1,0,1},{-1,1,0},{-1,1,-1},{-1,0,-1},{-1,0,-1},{-1,-1,-1},{-1,-1,0},{-1,0,1},{-1,-1,1},{-1,-1,0}}},
+		{{{1,0,-1},{1,-1,-1},{1,-1,0},{1,1,0},{1,1,-1},{1,0,-1},{1,1,0},{1,1,1},{1,0,1},{1,0,1},{1,-1,1},{1,-1,0}}},
+		{{{1,1,1},{0,1,1},{1,1,0},{1,1,0},{1,1,-1},{0,1,-1},{0,1,-1},{-1,1,-1},{-1,1,0},{-1,1,0},{-1,1,1},{0,1,1}}},
+		{{{-1,-1,0},{-1,-1,-1},{0,-1,-1},{0,-1,-1},{1,-1,-1},{1,-1,0},{1,-1,0},{1,-1,1},{0,-1,1},{0,-1,1},{-1,-1,1},{-1,-1,0}}},
+		{{{-1,0,1},{-1,-1,1},{0,-1,1},{0,-1,1},{1,-1,1},{1,0,1},{1,0,1},{1,1,1},{0,1,1},{0,1,1},{-1,1,1},{-1,0,1}}},
+		{{{0,1,-1},{1,1,-1},{1,0,-1},{1,0,-1},{1,-1,-1},{0,-1,-1},{0,-1,-1},{-1,-1,-1},{-1,0,-1},{-1,0,-1},{-1,1,-1},{0,1,-1}}}
+	}};
+
 	void MeshBuilder::AddQuadMesh(const voxel::block::QuadFace& face,
 										std::vector<float>& vertices,
 										std::vector<int>& indices,
+										std::array<float,4> aos,
 										int& vertexCount,
 										int x,int y,int z) 
 	{
@@ -24,8 +34,17 @@ namespace nova_engine::render::utils {
 			vertices.push_back(face.uvs[j][0]);
 			vertices.push_back(face.uvs[j][1]);
 			vertices.push_back(face.uvs[j][2]);
+			vertices.push_back(aos[j]);
 		}
 		vertexCount += 4;
+	}
+
+	const std::array<float, 4>& MeshBuilder::GetAOValueForMesh(int idx, int dir) {
+		const int CHUNK_LENGTH = 32768;
+		const int MASK = 31;
+		
+
+
 	}
 
 	//遗留版本，几乎不使用
@@ -50,7 +69,7 @@ namespace nova_engine::render::utils {
 						for (int i = 0;i < blockMesh.faces.size();i++) {
 							int ori = blockMesh.faces[i].orientation;
 							if (ori == 6) {
-								AddQuadMesh(blockMesh.faces[i],vertices, indices, vertexCount,x, y, z);
+								AddQuadMesh(blockMesh.faces[i], vertices, indices, { 1,1,1,1 }, vertexCount, x, y, z);
 							}
 							else {
 								int nx = neighbours_[ori][0] + x, 
@@ -61,7 +80,7 @@ namespace nova_engine::render::utils {
 									ny < 0 || ny >= chunk.Size() ||
 									nz < 0 || nz >= chunk.Size() ||
 									chunk.GetVoxel(nx, ny, nz) == 0) {
-									AddQuadMesh(blockMesh.faces[i], vertices, indices, vertexCount,x,y,z);
+									AddQuadMesh(blockMesh.faces[i], vertices, indices, { 1,1,1,1 }, vertexCount,x,y,z);
 								}
 							}
 						}
@@ -87,12 +106,57 @@ namespace nova_engine::render::utils {
 		const int MASK = 31;
 		//制表(仅在第一次执行函数时调用一次)
 		static int16_t neighborTable[CHUNK_LENGTH][6];
+		static int aoTable[CHUNK_LENGTH][6][12];
 		static std::once_flag flag;
 		std::call_once(flag, [] {
-			const int AREA = SIZE * SIZE;
-
-			//遍历整个体素
+			//static int aoTable[CHUNK_LENGTH][6][12];
 			int x = 0, y = 0, z = 0;
+			for (int i = 0;i < CHUNK_LENGTH;i++) {
+				//位运算更新xyz值
+				z = i & 31;
+				y = (i >> 5) & 31;
+				x = (i >> 10) & 31;
+
+				for (int face = 0;face < 6;face++)
+					for (int ver = 0;ver < 12;ver++) {
+						int fx = x + aos_[face][ver][0];
+						int fy = y + aos_[face][ver][1];
+						int fz = z + aos_[face][ver][2];
+
+						int mx = fx & ~MASK;
+						int my = fy & ~MASK;
+						int mz = fz & ~MASK;
+
+						//有至少两个邻居越界:暂时占位
+						if ((mx && my) ||
+							(my && mz) ||
+							(mx && mz))
+						{
+							//-1作为占位符
+							aoTable[i][face][ver] = -1;
+						}
+						else if (mx || my || mz) { //只有一个邻居越界:计算邻居索引
+							int ffx = fx & MASK, ffy = fy & MASK, ffz = fz & MASK;
+							int ori = 0;
+							if (mx) ori = (fx < 0 ? 0 : 1);
+							else if (my) ori = (fy < 0 ? 3 : 2);
+							else if (mz) ori = (fz < 0 ? 5 : 4);
+						
+							int fi = (1 << 31) + (ori << 15) + (ffx << 10) + (ffy << 5) + ffz;
+							aoTable[i][face][ver] = fi;
+						}
+						else {//无邻居越界:直接计算索引
+							int fi = (fx << 10) + (fy << 5) + fz;
+							aoTable[i][face][ver] = fi;
+						}
+
+					}
+
+			}
+
+			const int AREA = SIZE * SIZE;
+			//遍历整个体素
+			x = 0, y = 0, z = 0;
 			for (int i = 0;i < AREA * SIZE;i++) {
 				//位运算更新xyz值
 				z = i & 31;
@@ -115,7 +179,7 @@ namespace nova_engine::render::utils {
 					}
 				}
 			}
-	    });
+			});
 
 		//准备收集数据的容器
 		std::vector<float> vertices;
@@ -168,19 +232,38 @@ namespace nova_engine::render::utils {
 					int ori = blockMesh->faces[j].orientation;
 					//如果是内部面: 面方向枚举 == None == 6则不进行遮挡面剔除，直接构建
 					if (ori == 6)
-						AddQuadMesh(blockMesh->faces[j], vertices, indices, vertexCount, x, y, z);
+						AddQuadMesh(blockMesh->faces[j], vertices, indices, { 1,1,1,1 }, vertexCount, x, y, z);
 					else { //如果不是(面含有方向属性->进入遮挡面剔除流程)
 						int16_t nIdx = neighborTable[i][ori];
+						std::array<float, 4> aos{1,1,1,1};
+						//计算ao值
+						for (int a = 0; a < 4;a++) {
+							int aoIdx0 = aoTable[i][ori][a * 3];
+							int aoIdx1 = aoTable[i][ori][a * 3 + 1];
+							int aoIdx2 = aoTable[i][ori][a * 3 + 2];
+
+							bool blockAoId0{}, blockAoId1{}, blockAoId2{};
+
+							blockAoId0 = aoIdx0 != -1 ? (aoIdx0 < 0 && nei[(aoIdx0 >> 15) & 7] ?
+								*nei[(aoIdx0 >> 15) & 7] : voxels)[aoIdx0 & 0x00007FFF] : 0;
+							blockAoId1 = aoIdx1 != -1 ? (aoIdx1 < 0 && nei[(aoIdx1 >> 15) & 7] ?
+								*nei[(aoIdx1 >> 15) & 7] : voxels)[aoIdx1 & 0x00007FFF] : 0;
+							blockAoId2 = aoIdx2 != -1 ? (aoIdx2 < 0 && nei[(aoIdx2 >> 15) & 7] ?
+								*nei[(aoIdx2 >> 15) & 7] : voxels)[aoIdx2 & 0x00007FFF] : 0;
+
+							aos[a] = 1 - (blockAoId0 + blockAoId1 + blockAoId2) * 0.2;
+						}
+
 						if (nIdx < 0) {
 							if (nei[ori] && !(*nei[ori])[nIdx & 0x7FFF]) {
-								AddQuadMesh(blockMesh->faces[j], vertices, indices, vertexCount, x, y, z);
+								AddQuadMesh(blockMesh->faces[j], vertices, indices, aos, vertexCount, x, y, z);
 							}
 							else if (!nei[ori]) {
-								AddQuadMesh(blockMesh->faces[j], vertices, indices, vertexCount, x, y, z);
+								AddQuadMesh(blockMesh->faces[j], vertices, indices, aos, vertexCount, x, y, z);
 							}
 						}
 						else if (!voxels[nIdx]) {
-							AddQuadMesh(blockMesh->faces[j], vertices, indices, vertexCount, x, y, z);
+							AddQuadMesh(blockMesh->faces[j], vertices, indices,aos, vertexCount, x, y, z);
 						}
 					}
 				}
