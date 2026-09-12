@@ -1,10 +1,16 @@
 #pragma once
 
-#include "chunk_mesh_cache.h"
+#include "static_mesh.h"
+#include <render/opengl/renderer/post_process_renderer.h>
+#include <render/opengl/renderer/parallel_light_renderer.h>
+#include <render/opengl/renderer/semi_transparent_renderer.h>
 
 namespace nova_engine::render::opengl::context {
 	struct RenderContext {
-		ChunkMeshCache chunkMeshCache;
+		StaticMesh chunkMesh;
 		BlockRenderer blockRenderer;
+		PostProcessRenderer postProcessRenderer;
+		ParallelLightRenderer parallelLightRenderer;
+		SemiTransparentRenderer semiTranRenderer;
 	};
 }

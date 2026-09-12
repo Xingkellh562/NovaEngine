@@ -6,6 +6,10 @@
 #include <render/mesh_data.h>
 
 namespace nova_engine::render::opengl {
+	enum VaoType {
+		Main = 0,Shadow = 1
+	};
+
 	class GLMesh {
 	public:
 		glm::vec3 position = glm::vec3(0, 0, 0);
@@ -22,13 +26,13 @@ namespace nova_engine::render::opengl {
 
 		void GetOrUpdateData(const MeshData& data);
 
-		void Bind() const;
+		void Bind(VaoType v) const;
 		int GetElementLength() const { return elementLength_; }
 		const glm::mat4 GetModelMatrix()const;
 		void Sleep() { elementLength_ = 0; }
 	private:
-		GLuint vao_ = 0;
-		GLuint vbo_ = 0;
+		GLuint vao_ = 0, shadowVao_ = 0;
+		GLuint verVbo_ = 0,uvVbo_ = 0,aoVbo_ = 0;
 		GLuint ebo_ = 0;
 
 		int elementLength_;

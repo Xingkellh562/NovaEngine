@@ -3,7 +3,25 @@
 
 namespace nova_engine::render::opengl {
 	ShaderLibrary::ShaderLibrary() {
-		AddShader("BaseShader", { {"shaders/vert.glsl",GL_VERTEX_SHADER},{"shaders/frag.glsl",GL_FRAGMENT_SHADER} });
+		AddShader("BaseShader", { 
+			{"shaders/vert.glsl",GL_VERTEX_SHADER},
+			{"shaders/frag.glsl",GL_FRAGMENT_SHADER} });
+
+		AddShader("ShadowShader",{ 
+			{"shaders/para_vert.glsl",GL_VERTEX_SHADER},
+			{"shaders/para_frag.glsl",GL_FRAGMENT_SHADER} });
+
+		AddShader("PostProcessShader", { 
+			{"shaders/post_process_vert.glsl",GL_VERTEX_SHADER},
+			{"shaders/post_process_frag.glsl",GL_FRAGMENT_SHADER} });
+
+		AddShader("DepthPrepassShader",{ 
+			{"shaders/depth_prepass_vert.glsl", GL_VERTEX_SHADER}, 
+			{"shaders/depth_prepass_frag.glsl",GL_FRAGMENT_SHADER}});
+
+		AddShader("AccumPassShader", {
+			{"shaders/accum_pass_vert.glsl", GL_VERTEX_SHADER},
+			{"shaders/accum_pass_frag.glsl",GL_FRAGMENT_SHADER}});
 	}
 
 	const Shader* ShaderLibrary::GetShader(const std::string& name) const {

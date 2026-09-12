@@ -1,6 +1,18 @@
 #include "terrain_generator.h"
+#include <random>
+#include <algorithm>
+
 
 namespace nova_engine::voxel::terrain {
+
+	int randomInt(int min, int max) {
+		if (min > max) std::swap(min, max);
+
+		static std::mt19937 gen(std::random_device{}());
+		std::uniform_int_distribution<int> dist(min, max);
+		return dist(gen);
+	}
+
 	int TerrainGenerator::GetHeight(int x,int z) const {
 		const int Range1 = 64, Range2 = 16, Range3 = 4;
 		const int SeaLevel = 64;
@@ -24,12 +36,14 @@ namespace nova_engine::voxel::terrain {
 
 				for (int yi = 0; yi < size;yi++) {
 					//简单地形
-					if (fy + yi > height)
+					if (fy + yi == height + 16)
+						chunk.SetVoxel(xi, yi, zi, 4);
+					else if (fy + yi > height)
 						chunk.SetVoxel(xi, yi, zi, 0);//填充为空气
 					else if (fy + yi == height)
-						chunk.SetVoxel(xi, yi, zi, 3);//填充为草方块
+						chunk.SetVoxel(xi, yi, zi, 1);//填充为草方块
 					else if (fy + yi >= height - 3)
-						chunk.SetVoxel(xi, yi, zi, 3);//填充为泥土
+						chunk.SetVoxel(xi, yi, zi, 2);//填充为泥土
 					else 
 						chunk.SetVoxel(xi, yi, zi, 3);//填充为石
 				}

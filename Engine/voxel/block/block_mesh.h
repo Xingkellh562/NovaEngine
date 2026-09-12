@@ -26,7 +26,8 @@ namespace nova_engine::voxel::block {
 	//一个方块模型包含多个四边形面
 	struct BlockMesh
 	{
+		int modelType = 0;
 		std::vector<QuadFace> faces;
-		BlockMesh(const std::vector<QuadFace>& faces) :faces(faces){}
+		BlockMesh(const std::vector<QuadFace>& faces,int type) :faces(faces),modelType(type){}
 	};
 }

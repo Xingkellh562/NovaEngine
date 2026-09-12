@@ -28,6 +28,9 @@ namespace nova_engine::window {
 		if (context != std::nullopt) {
 			auto& real = *context;
 			real.blockRenderer.OnResize(width, height);
+			real.postProcessRenderer.OnResize(width, height);
+			real.parallelLightRenderer.OnResize(width, height);
+			real.semiTranRenderer.OnResize(width, height);
 		}
 	}
 
@@ -204,13 +207,6 @@ namespace nova_engine::window {
 		//创建ImGui上下文
 		ui::debug_ui::DebugUIManager::GetInstance().Init(window_,"#version 330");
 	}
-
-	rd_gl::GLMesh* mesh = nullptr;
-
-	int rnd(int min, int max) {
-		static std::mt19937 gen(std::random_device{}()); // 只初始化一次
-		return std::uniform_int_distribution<int>(min, max)(gen);
-	}
 	// 调用：int x = rnd(1, 100);
 
 	float fps = 1.0f;
@@ -218,7 +214,7 @@ namespace nova_engine::window {
 	void Window::Load() {
 		
 		glViewport(0, 0, 800, 600);
-		glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
+		glClearColor(0.4f, 0.5f, 0.9f, 1.0f);
 
 		/*renderer = new render::opengl::BlockRenderer();
 		renderer->OnResize(800, 600);*/
@@ -227,6 +223,9 @@ namespace nova_engine::window {
 		
 		if (context != std::nullopt) {
 			context->blockRenderer.OnResize(800, 600);
+			context->postProcessRenderer.OnResize(800, 600);
+			context->parallelLightRenderer.OnResize(800, 600);
+			context->semiTranRenderer.OnResize(800, 600);
 		}
 			
 
@@ -236,17 +235,21 @@ namespace nova_engine::window {
 					1000.0f / fps, fps);
 				ImGui::Text("playerPos: < x: %.2f , y: %.2f , z: %.2f >",
 					world.playerPos.x,world.playerPos.y,world.playerPos.z);
-				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMeshCache.MeshCount() : 0);
-				ImGui::Text("Pool length: %d", context ? context->chunkMeshCache.PoolLength() : 0);
+				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMesh.GetLayer(Default) ? 
+					context->chunkMesh.GetLayer(Default)->MeshCount() : 0 : 0);
+				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ? 
+					context->chunkMesh.GetLayer(Default)->PoolLength() : 0 : 0);
 			},true
 		);
 
-		mesh = new rd_gl::GLMesh();
+
+
 	}
 
 	void Window::Render(double time) {
+
 		//我渲染:
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
 
 		glfwPollEvents();
 
@@ -277,7 +280,6 @@ namespace nova_engine::window {
 	void Window::Unload() {
 		glfwTerminate();
 		ui::debug_ui::DebugUIManager::GetInstance().Shutdown();
-		delete(mesh);
 		//delete(renderer);
 		NE_CORE_INFO("GameCore", "Unload game.");
 	}

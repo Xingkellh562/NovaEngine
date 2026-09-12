@@ -15,6 +15,7 @@ namespace nova_engine::render::opengl {
 
 		const glm::mat4 GetTransformMatrix(int width,int height) const;
 		const glm::mat4 GetViewMatrix() const;
+		const glm::mat4 GetOrthoMatrix(float halfSize) const;
 		const glm::vec3 GetWorldUp() const {
 			return glm::vec3(0, 1, 0);
 		}

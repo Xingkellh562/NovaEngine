@@ -18,9 +18,11 @@ namespace nova_engine::render::utils {
 
 	void MeshBuilder::AddQuadMesh(const voxel::block::QuadFace& face,
 										std::vector<float>& vertices,
+										std::vector<float>& uvws,
+										std::vector<float>& aos,
 										std::vector<int>& indices,
-										std::array<float,4> aos,
 										int& vertexCount,
+										const std::array<float, 4>& aoArray,
 										int x,int y,int z) 
 	{
 		for (int i = 0;i < 6;i++) {
@@ -31,10 +33,10 @@ namespace nova_engine::render::utils {
 			vertices.push_back(face.vertices[j][0] + x);
 			vertices.push_back(face.vertices[j][1] + y);
 			vertices.push_back(face.vertices[j][2] + z);
-			vertices.push_back(face.uvs[j][0]);
-			vertices.push_back(face.uvs[j][1]);
-			vertices.push_back(face.uvs[j][2]);
-			vertices.push_back(aos[j]);
+			uvws.push_back(face.uvs[j][0]);
+			uvws.push_back(face.uvs[j][1]);
+			uvws.push_back(face.uvs[j][2]);
+			aos.push_back(aoArray[j]);
 		}
 		vertexCount += 4;
 	}
@@ -42,61 +44,9 @@ namespace nova_engine::render::utils {
 	const std::array<float, 4>& MeshBuilder::GetAOValueForMesh(int idx, int dir) {
 		const int CHUNK_LENGTH = 32768;
 		const int MASK = 31;
-		
-
-
 	}
 
-	//遗留版本，几乎不使用
-	MeshData MeshBuilder::BuildMeshFromChunk(const voxel::chunk::Chunk& chunk, const voxel::block::BlockLibrary& library) {
-		//准备收集数据的容器
-		std::vector<float> vertices;
-		std::vector<int> indices;
-		int vertexCount = 0;
-		//遍历区块
-		try {
-			for (int x = 0; x < chunk.Size(); x++){
-				for (int y = 0; y < chunk.Size(); y++){
-					for (int z = 0; z < chunk.Size(); z++){
-						//获取方块mesh
-						int blockId = chunk.GetVoxel(x,y,z);
-						if (blockId == 0) continue;
-						auto block = library.FindBlock(blockId);
-						if (block == nullptr) continue;
-						voxel::block::BlockMesh blockMesh = block->GetMesh();
-						//遮挡面剔除
-						//遍历blockMesh中所有的面
-						for (int i = 0;i < blockMesh.faces.size();i++) {
-							int ori = blockMesh.faces[i].orientation;
-							if (ori == 6) {
-								AddQuadMesh(blockMesh.faces[i], vertices, indices, { 1,1,1,1 }, vertexCount, x, y, z);
-							}
-							else {
-								int nx = neighbours_[ori][0] + x, 
-									ny = neighbours_[ori][1] + y, 
-									nz = neighbours_[ori][2] + z;
-
-								if (nx < 0 || nx >= chunk.Size() ||
-									ny < 0 || ny >= chunk.Size() ||
-									nz < 0 || nz >= chunk.Size() ||
-									chunk.GetVoxel(nx, ny, nz) == 0) {
-									AddQuadMesh(blockMesh.faces[i], vertices, indices, { 1,1,1,1 }, vertexCount,x,y,z);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		catch (std::exception& e) {
-			NE_CORE_ERROR("MeshBuilder","Failed to build mesh : '{}'",e.what());
-			return MeshData(std::move(vertices), std::move(indices));
-		}
-
-		return MeshData(std::move(vertices), std::move(indices));
-	}
-
-	MeshData MeshBuilder::BuildMeshFromChunk(
+	std::array<std::optional<MeshData>,2> MeshBuilder::BuildMeshFromChunk(
 		const voxel::chunk::Chunk& chunk, 
 		const std::array<voxel::chunk::Chunk*, 6> neighbours,
 		const voxel::block::BlockLibrary& library) 
@@ -182,15 +132,20 @@ namespace nova_engine::render::utils {
 			});
 
 		//准备收集数据的容器
-		std::vector<float> vertices;
-		std::vector<int> indices;
+		//暂时只有一份，加入透明网格后继续添加
+		std::vector<float> vertices,lucencyVer;
+		std::vector<float> uvws, lucencyUvws;
+		std::vector<float> aos, lucencyAos;
+		std::vector<int> indices , lucencyIdx;
 
-		constexpr int MAX_VERTS_FLOATS = 32 * 32 * 32 * 6 * 4 * 6; // 6个float/顶点
+		constexpr int MAX_VERTS_FLOATS = 32 * 32 * 32 * 6 * 4; // 6个float/顶点
 		constexpr int MAX_INDICES = 32 * 32 * 32 * 6 * 6; // 最多6个面，每个面6个索引
-		vertices.reserve(MAX_VERTS_FLOATS);
+		vertices.reserve(MAX_VERTS_FLOATS * 3);
+		uvws.reserve(MAX_VERTS_FLOATS * 3);
+		aos.reserve(MAX_VERTS_FLOATS);
 		indices.reserve(MAX_INDICES);
 
-		int vertexCount = 0;
+		int vertexCount = 0, lucencyVertexCount = 0;
 
 		//预加载方块模型，暂时硬编码方块数量，后续会完善方块数量查询入口
 		int blockCount = 16;
@@ -213,6 +168,7 @@ namespace nova_engine::render::utils {
 			}
 
 			int x = 0, y = 0, z = 0;
+			std::array<float, 4> aoArray = { 1,1,1,1 };
 			for (size_t i = 0; i < CHUNK_LENGTH; i++)
 			{
 				//通过纯位运算更新xyz的值
@@ -222,7 +178,7 @@ namespace nova_engine::render::utils {
 
 				//获取方块id与mesh
 				int blockId = voxels[i];
-				if (blockId == 0) continue;
+				if (blockId == 0) continue; //空气，直接跳过
 
 				const voxel::block::BlockMesh* blockMesh = blockMeshs[blockId];
 				if (!blockMesh) continue;
@@ -231,39 +187,64 @@ namespace nova_engine::render::utils {
 					//获取每个面的方向
 					int ori = blockMesh->faces[j].orientation;
 					//如果是内部面: 面方向枚举 == None == 6则不进行遮挡面剔除，直接构建
-					if (ori == 6)
-						AddQuadMesh(blockMesh->faces[j], vertices, indices, { 1,1,1,1 }, vertexCount, x, y, z);
+					if (ori == 6) {
+						AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, {1,1,1,1}, x, y, z);
+					}
 					else { //如果不是(面含有方向属性->进入遮挡面剔除流程)
 						int16_t nIdx = neighborTable[i][ori];
-						std::array<float, 4> aos{1,1,1,1};
-						//计算ao值
-						for (int a = 0; a < 4;a++) {
-							int aoIdx0 = aoTable[i][ori][a * 3];
-							int aoIdx1 = aoTable[i][ori][a * 3 + 1];
-							int aoIdx2 = aoTable[i][ori][a * 3 + 2];
+						aoArray = { 1,1,1,1 };
+						switch (blockMesh->modelType)
+						{
+						case 0: //默认网格
+							//计算ao值
+							for (int a = 0; a < 4;a++) {
+								int aoIdx0 = aoTable[i][ori][a * 3];
+								int aoIdx1 = aoTable[i][ori][a * 3 + 1];
+								int aoIdx2 = aoTable[i][ori][a * 3 + 2];
 
-							bool blockAoId0{}, blockAoId1{}, blockAoId2{};
+								bool blockAoId0{}, blockAoId1{}, blockAoId2{};
 
-							blockAoId0 = aoIdx0 != -1 ? (aoIdx0 < 0 && nei[(aoIdx0 >> 15) & 7] ?
-								*nei[(aoIdx0 >> 15) & 7] : voxels)[aoIdx0 & 0x00007FFF] : 0;
-							blockAoId1 = aoIdx1 != -1 ? (aoIdx1 < 0 && nei[(aoIdx1 >> 15) & 7] ?
-								*nei[(aoIdx1 >> 15) & 7] : voxels)[aoIdx1 & 0x00007FFF] : 0;
-							blockAoId2 = aoIdx2 != -1 ? (aoIdx2 < 0 && nei[(aoIdx2 >> 15) & 7] ?
-								*nei[(aoIdx2 >> 15) & 7] : voxels)[aoIdx2 & 0x00007FFF] : 0;
+								blockAoId0 = aoIdx0 != -1 ? blockMeshs[(aoIdx0 < 0 && nei[(aoIdx0 >> 15) & 7] ?
+									*nei[(aoIdx0 >> 15) & 7] : voxels)[aoIdx0 & 0x00007FFF]]->modelType == 0 : 0;
+								blockAoId1 = aoIdx1 != -1 ? blockMeshs[(aoIdx1 < 0 && nei[(aoIdx1 >> 15) & 7] ?
+									*nei[(aoIdx1 >> 15) & 7] : voxels)[aoIdx1 & 0x00007FFF]]->modelType == 0 : 0;
+								blockAoId2 = aoIdx2 != -1 ? blockMeshs[(aoIdx2 < 0 && nei[(aoIdx2 >> 15) & 7] ?
+									*nei[(aoIdx2 >> 15) & 7] : voxels)[aoIdx2 & 0x00007FFF]]->modelType == 0 : 0;
 
-							aos[a] = 1 - (blockAoId0 + blockAoId1 + blockAoId2) * 0.2;
-						}
-
-						if (nIdx < 0) {
-							if (nei[ori] && !(*nei[ori])[nIdx & 0x7FFF]) {
-								AddQuadMesh(blockMesh->faces[j], vertices, indices, aos, vertexCount, x, y, z);
+								aoArray[a] = 1 - (blockAoId0 + blockAoId1 + blockAoId2) * 0.2;
 							}
-							else if (!nei[ori]) {
-								AddQuadMesh(blockMesh->faces[j], vertices, indices, aos, vertexCount, x, y, z);
+
+							if (nIdx < 0) {
+								if (nei[ori] && blockMeshs[(*nei[ori])[nIdx & 0x7FFF]]->modelType) {
+									AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, aoArray, x, y, z);
+								}
+								else if (!nei[ori]) {
+									AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, aoArray, x, y, z);
+								}
 							}
-						}
-						else if (!voxels[nIdx]) {
-							AddQuadMesh(blockMesh->faces[j], vertices, indices,aos, vertexCount, x, y, z);
+							else if (blockMeshs[voxels[nIdx]]->modelType) {
+								AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, aoArray, x, y, z);
+							}
+							break;
+						case 1: //透明网格
+							//这里将要写透明网格的面剔除逻辑
+							if (nIdx < 0) {
+								if (nei[ori] && (*nei[ori])[nIdx & 0x7FFF] != blockId) {
+									AddQuadMesh(blockMesh->faces[j], lucencyVer, lucencyUvws, 
+										lucencyAos, lucencyIdx, lucencyVertexCount, aoArray, x, y, z);
+								}
+								else if (!nei[ori]) {
+									AddQuadMesh(blockMesh->faces[j], lucencyVer, lucencyUvws, 
+										lucencyAos, lucencyIdx, lucencyVertexCount, aoArray, x, y, z);
+								}
+							}
+							else if (voxels[nIdx] != blockId) {
+								AddQuadMesh(blockMesh->faces[j], lucencyVer, lucencyUvws,
+									lucencyAos, lucencyIdx, lucencyVertexCount, aoArray, x, y, z);
+							}
+							break;
+						default: //什么都不做，就当是空气
+							break;
 						}
 					}
 				}
@@ -271,9 +252,11 @@ namespace nova_engine::render::utils {
 		}
 		catch (std::exception& e) {
 			NE_CORE_ERROR("MeshBuilder", "Failed to build mesh : '{}'", e.what());
-			return MeshData(std::move(vertices), std::move(indices));
+			return { {{{std::move(vertices), std::move(uvws), std::move(aos), std::move(indices)}},
+				{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos), std::move(lucencyIdx)}}} };
 		}
 
-		return MeshData(std::move(vertices), std::move(indices));
+		return { {{{std::move(vertices), std::move(uvws), std::move(aos), std::move(indices)}},
+			{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos), std::move(lucencyIdx)}}} };
 	}
 }

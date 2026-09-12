@@ -12,16 +12,16 @@ namespace nova_engine::utils::loader {
 		std::ifstream file(path);
 		if (!file.is_open()) {
 			NE_CORE_ERROR("ModelLoader","Could not open file with path: {}",path);
-			return BlockMesh({});
+			return BlockMesh({},-1);
 		}
-
+		
 		try {
 			json jData = json::parse(file);
 			auto oData = jData.get<OriginalModelData>();
 
 			if (oData.vertices.size() != oData.uvs.size()) {
 				NE_CORE_ERROR("ModelLoader", "Could not build model! The file format is uncurrent!");
-				return BlockMesh({});
+				return BlockMesh({}, -1);
 			}
 			std::vector<QuadFace> faces;
 
@@ -29,7 +29,7 @@ namespace nova_engine::utils::loader {
 			for (int i = 0;i < count;i++) {
 				if (oData.vertices[i].size() != oData.uvs[i].size() && oData.vertices[i].size() != 4) {
 					NE_CORE_ERROR("ModelLoader", "Could not build model! The file format is uncurrent!");
-					return BlockMesh({});
+					return BlockMesh({}, -1);
 				}
 				int orientation = oData.orientation.size() > i ? oData.orientation[i] : None;
 
@@ -42,12 +42,12 @@ namespace nova_engine::utils::loader {
 				QuadFace face = QuadFace(std::move(oData.vertices[i]), std::move(uvs), (QuadFaceOrientation)orientation);
 				faces.push_back(face);
 			}
-
-			return BlockMesh(faces);
+			NE_CORE_DEBUG("ModelLoader", "modelType：{}", oData.type);
+			return BlockMesh(faces, oData.type);
 		}
 		catch (const json::exception& e) {
 			NE_CORE_ERROR("ModelLoader", "Failed to build model.{}" ,e.what());
 		}
-		return BlockMesh({});
+		return BlockMesh({},-1);
 	}
 }

@@ -4,6 +4,8 @@
 namespace nova_engine::render {
 	struct MeshData {
 		std::vector<float> vertices;
+		std::vector<float> uvws;
+		std::vector<float> aos;
 		std::vector<int> indices;
 
 		bool isValid() const {

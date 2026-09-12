@@ -111,6 +111,10 @@ namespace nova_engine::render::opengl {
 		glUniform1ui(GetVarLocation(name), value);
 	}
 
+	void Shader::SetVec2(const char* name, const glm::vec2& value) const {
+		glUniform2fv(GetVarLocation(name), 1, glm::value_ptr(value));
+	}
+
 	void Shader::SetVec3(const char* name, const glm::vec3& value) const {
 		glUniform3fv(GetVarLocation(name), 1, glm::value_ptr(value));
 	}
@@ -146,7 +150,12 @@ namespace nova_engine::render::opengl {
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(shader, 512, NULL, infoLog);
-			std::cout << infoLog << std::endl;
+			NE_CORE_ERROR(
+				"RenderSystem",
+				"Shader program compile failed (program ID {}): {}",
+				id_,
+				infoLog
+			);
 		}
 
 		return shader;

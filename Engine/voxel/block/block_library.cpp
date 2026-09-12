@@ -26,7 +26,7 @@ namespace nova_engine::voxel::block {
 
 	void BlockLibrary::AddBlock(int id, const std::string& name, const BlockMesh& mesh) {
 		blocks_.try_emplace(id,std::make_unique<Block>(id,name,mesh));
-		NE_CORE_INFO("BlockLoader","Load block <id:{};name:{}>",id,name);
+		NE_CORE_INFO("BlockLoader","Load block <id:{};name:{},mesh_type:{}>",id,name,mesh.modelType);
 	}
 
 	
@@ -36,7 +36,7 @@ namespace nova_engine::voxel::block {
 	BlockLibrary::BlockLibrary() {
 		namespace fs = std::filesystem;
 
-		AddBlock(0, "air", BlockMesh({}));
+		AddBlock(0, "air", BlockMesh({},-1));
 
 		fs::path blocksDir(BLOCKDIR);
 		if (!fs::exists(blocksDir) || !fs::is_directory(blocksDir)) {

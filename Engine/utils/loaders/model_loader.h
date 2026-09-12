@@ -13,8 +13,9 @@ namespace nova_engine::utils::loader {
 		std::vector<std::vector<std::array<float, 2>>> uvs;
 		std::vector<int> orientation;
 		std::vector<std::string> textures;
+		int type;
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(OriginalModelData, vertices, uvs, orientation, textures);
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(OriginalModelData, vertices, uvs, orientation, textures,type);
 	};
 
 	class ModelLoader {

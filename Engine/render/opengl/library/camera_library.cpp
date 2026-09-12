@@ -4,6 +4,7 @@
 namespace nova_engine::render::opengl {
 	CameraLibrary::CameraLibrary() {
 		AddCamera("MainCamera");
+		AddCamera("ShadowCamera");
 	}
 
 	Camera* CameraLibrary::GetCamera(const std::string& name) const {
