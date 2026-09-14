@@ -1,12 +1,9 @@
 #include "semi_transparent_renderer.h"
 #include <log/logger.h>
+#include <render/opengl/library/frame_buffer_library.h>
 
 namespace nova_engine::render::opengl {
 	SemiTransparentRenderer::SemiTransparentRenderer() {
-		glGenTextures(1, &accumTex_);
-		glGenTextures(1, &revealTex_);
-		glGenFramebuffers(1, &semiTranFbo_);
-
 		depthShader_ = ShaderLibrary::GetInstance().GetShader("DepthPrepassShader");
 		accumShader_ = ShaderLibrary::GetInstance().GetShader("AccumPassShader");
 		camera_ = CameraLibrary::GetInstance().GetCamera("MainCamera");
@@ -23,35 +20,12 @@ namespace nova_engine::render::opengl {
 
 
 	void SemiTransparentRenderer::CreateSemiTranFbo() {
-		
-
-		glBindTexture(GL_TEXTURE_2D,accumTex_);
-		glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA16F,width_,height_,0,GL_RGBA,GL_FLOAT,nullptr);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glBindTexture(GL_TEXTURE_2D,revealTex_);
-		glTexImage2D(GL_TEXTURE_2D,0,GL_R16F,width_,height_,0,GL_RED,GL_FLOAT,nullptr);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, semiTranFbo_);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumTex_, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,GL_TEXTURE_2D, revealTex_, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D, mainDepthTex_, 0);
-
-		GLenum attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-		glDrawBuffers(2, attachments);
-		
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			NE_CORE_DEBUG("RenderSystem", "SemiTran FBO incomplete: {}", status);
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame")->Bind();
+		auto mainFbo = FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame");
+		if (mainFbo) {
+			GLuint depthTex = mainFbo->FindTexture("DepthTex");
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -59,7 +33,7 @@ namespace nova_engine::render::opengl {
 
 	void SemiTransparentRenderer::Render(const GLMesh& mesh) {
 		if (needResizeFBO_) {
-			CreateSemiTranFbo();
+			//CreateSemiTranFbo();
 			if (camera_) {
 				projection_ = camera_->GetTransformMatrix(width_, height_);
 				
@@ -69,8 +43,10 @@ namespace nova_engine::render::opengl {
 		}
 
 		//直接渲染
-		glBindFramebuffer(GL_FRAMEBUFFER, mainFbo_);
-			
+		//glBindFramebuffer(GL_FRAMEBUFFER, mainFbo_);
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame")->Bind();
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_TRUE);        // 写深度
@@ -102,7 +78,9 @@ namespace nova_engine::render::opengl {
 		glBlendFunci(0, GL_ONE, GL_ONE);              // accum: additive
 		glBlendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR); // revealage: multiplicative
 
-		glBindFramebuffer(GL_FRAMEBUFFER, semiTranFbo_);
+		//glBindFramebuffer(GL_FRAMEBUFFER, semiTranFbo_);
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame")->Bind();
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);

@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 in vec2 uv;
 out vec4 FragColor;
 
@@ -22,10 +22,10 @@ float ShadowCalculation(vec4 fragPosLightSpace){
         return 0.0; // 超出范围，认为无阴影
     }
 
-    float shadow =0.0;
+    float shadow = 0.0;
     vec2 texelSize = 1.0/textureSize(shadowMap,0);
-    float bias = 0.0025;
-    int samples = 5;
+    float bias = 0.0007;
+    int samples = 3;
     float radius = 0.5;
     for(int x = -samples/2;x <= samples/2;x++){
         for(int y = -samples/2;y <= samples/2;y++){
@@ -53,7 +53,7 @@ void main() {
     
     worldPos /= worldPos.w;
 
-    vec4 centerWorldPos = vec4(floor(worldPos.xyz * 16.0)/16.0,1.0);
+    vec4 centerWorldPos = vec4(floor(worldPos.xyz * 32.0)/32.0,1.0);
 
     vec4 lightSpacePos = lightSpaceMatrix * centerWorldPos;
 

@@ -12,19 +12,8 @@ namespace nova_engine::render::opengl {
 
 		void OnResize(int w, int h) override;
 
-		const GLuint GetFBO() const override {
-			return depthMapFBO_;
-		}
-
-		const GLuint GetDepthMap() const {
-			return depthMap_;
-		}
-
 		ParallelLightRenderer();
 	private:
-		GLuint depthMapFBO_;
-		GLuint depthMap_;
-
 		const Shader* shader_;
 		const Camera* camera_;
 

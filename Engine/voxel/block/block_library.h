@@ -19,6 +19,10 @@ namespace nova_engine::voxel::block {
 
 		const Block* FindBlock(int id) const;
 		void AddBlock(int id,const std::string& name,const BlockMesh& mesh);
+
+		const size_t Size() const {
+			return blocks_.size();
+		}
 	private:
 		BlockLibrary();
 		std::unordered_map<int,std::unique_ptr<Block>> blocks_;

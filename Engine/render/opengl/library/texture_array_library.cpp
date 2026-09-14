@@ -25,6 +25,7 @@ namespace nova_engine::render::opengl {
 
 	void TextureArrayLibrary::Cleanup() {
 		NE_CORE_INFO("RenderSystem", "Delete All textures.");
+		textures_.clear();
 	}
 
 	TextureArrayLibrary::~TextureArrayLibrary() {

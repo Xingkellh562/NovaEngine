@@ -22,6 +22,8 @@ namespace nova_engine::render::opengl::context {
 		void Clear();
 		//直接提交顶点数据，内部自己判断该更新还是添加
 		void SubmitMesh(int x, int y, int z,const MeshData& data);
+
+		void ReleasePool();
 		//获取Mesh数组用于渲染遍历
 		const std::vector<GLMesh>& GetAllMesh() const {return meshs_;}
 

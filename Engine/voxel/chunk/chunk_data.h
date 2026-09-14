@@ -33,6 +33,11 @@ namespace nova_engine::voxel::chunk {
 		void Clear();
 		//从对象池中获取一个块，如果对象池中没有，则创建一个新的块
 		std::unique_ptr<Chunk> AcquireChunk();
+		//获取容器区块数量O(n)时间查找
+		size_t Size() const;
+		size_t PoolSize() const {
+			return chunkPool_.Size();
+		}
 	private:
 		std::unordered_map<glm::ivec3,collection::data_structure::Octree<Chunk, 2048, 32>> chunkMap_;
 		collection::data_structure::ObjectPool<Chunk, 2048> chunkPool_;

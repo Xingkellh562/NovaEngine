@@ -59,6 +59,13 @@ namespace nova_engine::render::opengl::context {
 		}
 	}
 
+	void ChunkMeshCache::ReleasePool() {
+		for (size_t i = 0;i < pool_.size();i++) {
+			int poolIdx = pool_[i];
+
+		}
+	}
+
 	size_t  ChunkMeshCache::AcquireSlotInternal() {
 		if (pool_.empty()) {
 			meshs_.emplace_back();

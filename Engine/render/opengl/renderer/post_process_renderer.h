@@ -12,23 +12,6 @@ namespace nova_engine::render::opengl {
 
 		void OnResize(int w, int h) override {
 			width_ = w, height_ = h;
-
-		}
-
-		const GLuint GetFBO() const override {
-			return 0;
-		}
-
-		void SetColorTex(GLuint colorTex,GLuint depthTex,GLuint shadowMap) {
-			mainColorTex_ = colorTex;
-			mainDepthTex_ = depthTex;
-			shadowMap_ = shadowMap;
-			setTex_ = true;
-		}
-		void SetOitTex(GLuint accumTex, GLuint revealTex) {
-			accumTex_ = accumTex;
-			revealTex_ = revealTex;
-			setTex_ = true;
 		}
 
 		PostProcessRenderer();
@@ -38,10 +21,6 @@ namespace nova_engine::render::opengl {
 		int width_, height_;
 		GLuint textureUnit_ = GL_TEXTURE0;
 		GLuint quadVao_=0,quadVbo_ = 0;
-
-		GLuint mainColorTex_ = 0,mainDepthTex_  = 0,shadowMap_ = 0;
-		GLuint accumTex_ = 0, revealTex_ = 0;
-		bool setTex_ = false;
 
 		const Shader* shader_;
 

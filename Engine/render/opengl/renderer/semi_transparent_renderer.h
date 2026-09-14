@@ -5,6 +5,7 @@
 #include <render/opengl/library/camera_library.h>
 #include <render/opengl/library/texture_array_library.h>
 #include <array>
+#include <log/logger.h>
 
 namespace nova_engine::render::opengl {
 	class SemiTransparentRenderer : public IRenderer {
@@ -17,28 +18,7 @@ namespace nova_engine::render::opengl {
 			width_ = w, height_ = h;
 			needResizeFBO_ = true;
 		}
-
-		const GLuint GetFBO() const override {
-			return semiTranFbo_;
-		}
-		const GLuint GetAccumTex()const {
-			return accumTex_;
-		}
-		const GLuint GetRevealTex()const {
-			return revealTex_;
-		}
-
-		void SetMainFbo(GLuint mainFbo) {
-			mainFbo_ = mainFbo;
-		}
-
-		void SetDepthTex(GLuint mainDepth) {
-			mainDepthTex_ = mainDepth;
-		}
 	private:
-		GLuint accumTex_ = 0, revealTex_ = 0, semiTranFbo_ = 0;
-		GLuint mainFbo_ = 0,mainDepthTex_ = 0;
-
 		const Shader* depthShader_,*accumShader_;
 		const Camera* camera_;
 

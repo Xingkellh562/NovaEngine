@@ -42,6 +42,7 @@ namespace nova_engine::render::opengl {
 
 	void ShaderLibrary::Cleanup() {
 		NE_CORE_INFO("RenderSystem", "Delete All shaders.");
+		library_.clear();
 	}
 
 	ShaderLibrary::~ShaderLibrary() {

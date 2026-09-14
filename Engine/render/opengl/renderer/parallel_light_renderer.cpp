@@ -1,22 +1,10 @@
 #include "parallel_light_renderer.h"
+#include <render/opengl/library/frame_buffer_library.h>
 
 namespace nova_engine::render::opengl {
 	ParallelLightRenderer::ParallelLightRenderer() {
-		//创建深度纹理
-		glGenTextures(1, &depthMap_);
-		glBindTexture(GL_TEXTURE_2D, depthMap_);
-		glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,2048, 2048,0,GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
-		//设置纹理参数
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		float borderColor[] = {1.0f,1.0f ,1.0f ,1.0f };
-		glTexParameterfv(GL_TEXTURE_2D,GL_TEXTURE_BORDER_COLOR,borderColor);
-		//绑定到FBO
-		glGenFramebuffers(1, &depthMapFBO_);
-		glBindFramebuffer(GL_FRAMEBUFFER,depthMapFBO_);
-		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,depthMap_,0);
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame")->Bind();
 		//不渲染颜色
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
@@ -28,7 +16,7 @@ namespace nova_engine::render::opengl {
 		camera_ = CameraLibrary::GetInstance().GetCamera("ShadowCamera");
 
 		if (camera_) {
-			lightProjection_ = camera_->GetOrthoMatrix(128);
+			lightProjection_ = camera_->GetOrthoMatrix(32);
 		}
 	}
 
@@ -42,7 +30,7 @@ namespace nova_engine::render::opengl {
 			GLint viewport[4];
 			glGetIntegerv(GL_VIEWPORT, viewport);
 			glViewport(0, 0, 2048, 2048);
-			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO_);
+			//glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO_);
 
 			lightView_ = camera_->GetViewMatrix();
 			shader_->Use();
@@ -53,7 +41,7 @@ namespace nova_engine::render::opengl {
 			mesh.Bind(Shadow);
 			glDrawElements(GL_TRIANGLES, mesh.GetElementLength(), GL_UNSIGNED_INT, 0);
 
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 		}
 	}

@@ -13,24 +13,10 @@ namespace nova_engine::render::opengl {
 
 		void OnResize(int w, int h) override;
 
-		const GLuint GetFBO() const override {
-			return mainFBO_;
-		}
-
-		const GLuint GetColorTex() const {
-			return mainColorTex_;
-		}
-
-		const GLuint GetDepthTex() const {
-			return mainDepthTex_;
-		}
-
 		BlockRenderer();
 	private:
 		const Shader* shader_;
 		const Camera* camera_;
-
-		GLuint mainColorTex_, mainDepthTex_, mainFBO_;
 
 		int textureUnit_ = GL_TEXTURE0;
 		glm::mat4 projection_{};

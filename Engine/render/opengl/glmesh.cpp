@@ -72,6 +72,15 @@ namespace nova_engine::render::opengl {
 	void GLMesh::GetOrUpdateData(const MeshData& data) {
 		elementLength_ = data.indices.size();
 
+		if (!vao_ || !shadowVao_) {
+			glGenVertexArrays(1, &vao_);
+			glGenVertexArrays(1, &shadowVao_);
+			glGenBuffers(1, &verVbo_);
+			glGenBuffers(1, &uvVbo_);
+			glGenBuffers(1, &aoVbo_);
+			glGenBuffers(1, &ebo_);
+		}
+
 		if (data.vertices.empty() || data.indices.empty()) {
 			// 释放显存：如果之前分配过大缓冲区，现在归还给驱动
 			// 调用 glBufferData 并传入 size=0 会释放当前缓冲区对象持有的显存

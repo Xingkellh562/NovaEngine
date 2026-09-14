@@ -148,7 +148,7 @@ namespace nova_engine::render::utils {
 		int vertexCount = 0, lucencyVertexCount = 0;
 
 		//预加载方块模型，暂时硬编码方块数量，后续会完善方块数量查询入口
-		int blockCount = 16;
+		int blockCount = library.Size();
 		std::vector<const voxel::block::BlockMesh*> blockMeshs;
 		for (int idx = 0;idx < blockCount; idx++) {
 			auto block = library.FindBlock(idx);

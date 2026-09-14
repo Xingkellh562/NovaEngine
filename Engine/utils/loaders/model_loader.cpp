@@ -42,7 +42,7 @@ namespace nova_engine::utils::loader {
 				QuadFace face = QuadFace(std::move(oData.vertices[i]), std::move(uvs), (QuadFaceOrientation)orientation);
 				faces.push_back(face);
 			}
-			NE_CORE_DEBUG("ModelLoader", "modelType：{}", oData.type);
+			//NE_CORE_DEBUG("ModelLoader", "modelType：{}", oData.type);
 			return BlockMesh(faces, oData.type);
 		}
 		catch (const json::exception& e) {

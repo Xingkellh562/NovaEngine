@@ -8,6 +8,7 @@
 #include <core/world/world.h>
 #include <render/system/render_system.h>
 #include <voxel/chunk/chunk_system.h>
+#include <render/opengl/library/frame_buffer_library.h>
 
 namespace rd = nova_engine::render;
 namespace rd_gl = nova_engine::render::opengl;
@@ -25,6 +26,7 @@ namespace nova_engine::window {
 		if (width == 0 || height == 0)
 			return;
 		glViewport(0, 0, width, height);
+		
 		if (context != std::nullopt) {
 			auto& real = *context;
 			real.blockRenderer.OnResize(width, height);
@@ -32,6 +34,8 @@ namespace nova_engine::window {
 			real.parallelLightRenderer.OnResize(width, height);
 			real.semiTranRenderer.OnResize(width, height);
 		}
+
+		rd_gl::FrameBufferLibrary::GetInstance().OnResize(width, height);
 	}
 
 	void Window::processInput(GLFWwindow* window)
@@ -63,6 +67,18 @@ namespace nova_engine::window {
 				break;
 			case GLFW_KEY_LEFT_SHIFT:
 				state->down = true;
+				break;
+			case GLFW_KEY_F1:
+				if (context != std::nullopt) {
+					auto& real = *context;
+					real.useShadow = !real.useShadow;
+				}
+				break;
+			case GLFW_KEY_F2:
+				if (context != std::nullopt) {
+					auto& real = *context;
+					real.lucencyMesh = !real.lucencyMesh;
+				}
 				break;
 			default:
 				break;
@@ -107,6 +123,31 @@ namespace nova_engine::window {
 			state->trunY = yPos - pastY;
 
 		pastX = xPos, pastY = yPos;
+	}
+
+	void Window::mouseButtonCallBack(GLFWwindow* window,int button ,int action,int mods) {
+		nova_engine::core::input::InputState* state = &nova_engine::core::input::InputSystem::GetInstance().GetState();
+		if (state == nullptr) return;
+		if (action == GLFW_PRESS) {
+			if (button == GLFW_MOUSE_BUTTON_LEFT) {
+				state->destoryBlock = true;
+			}
+			if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+				state->buildBlock = true;
+			}
+		}
+		
+	}
+
+	void Window::scrollCallBack(GLFWwindow* window, double xoffset, double yoffset) {
+		nova_engine::core::input::InputState* state = &nova_engine::core::input::InputSystem::GetInstance().GetState();
+		if (state == nullptr) return;
+		if (yoffset > 0) {
+			state->nowBlock = std::clamp(++state->nowBlock, 1, 9);
+		}
+		else if (yoffset < 0) {
+			state->nowBlock = std::clamp(--state->nowBlock, 1, 9);
+		}
 	}
 
 	void Window::Run() {
@@ -168,7 +209,7 @@ namespace nova_engine::window {
 	void Window::Init() {
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  //指定openGL版本号
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//指定openGL渲染模式为立即模式
 		glfwWindowHint(GLFW_SAMPLES,4);
 
@@ -192,10 +233,12 @@ namespace nova_engine::window {
 		glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
 		glfwSetKeyCallback(window_,keyCallback);
 		glfwSetCursorPosCallback(window_, mouseMoveCallBack);
+		glfwSetMouseButtonCallback(window_, mouseButtonCallBack);
+		glfwSetScrollCallback(window_,scrollCallBack);
 
 		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(window_, 400, 300);
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 		glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 		glEnable(GL_DEPTH_TEST);
@@ -221,6 +264,7 @@ namespace nova_engine::window {
 
 		context.emplace();
 		
+		rd_gl::FrameBufferLibrary::GetInstance().OnResize(800, 600);
 		if (context != std::nullopt) {
 			context->blockRenderer.OnResize(800, 600);
 			context->postProcessRenderer.OnResize(800, 600);
@@ -239,6 +283,14 @@ namespace nova_engine::window {
 					context->chunkMesh.GetLayer(Default)->MeshCount() : 0 : 0);
 				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ? 
 					context->chunkMesh.GetLayer(Default)->PoolLength() : 0 : 0);
+				ImGui::Text("Chunk count: %d", world.chunkData.Size());
+				ImGui::Text("Chunk pool length: %d", world.chunkData.PoolSize());
+
+				ImGui::Text("Pointed block: <%d,%d,%d> <%s>", 
+					world.selectedBlock.x, world.selectedBlock.y, world.selectedBlock.z, world.blockName.c_str());
+
+				ImGui::Text("Seleted block: <%s>", world.heldBlock.c_str());
+
 			},true
 		);
 
@@ -267,7 +319,10 @@ namespace nova_engine::window {
 	}
 
 	void Window::Update(double time) {
-		nova_engine::core::input::InputSystem::GetInstance().Update(time, world);
+		if (context != std::nullopt) {
+			auto& real = *context;
+			nova_engine::core::input::InputSystem::GetInstance().Update(time, world, real);
+		}
 
 		voxel::chunk::ChunkSystem::GetInstance().Update(world);
 

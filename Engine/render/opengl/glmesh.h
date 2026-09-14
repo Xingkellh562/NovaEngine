@@ -30,14 +30,12 @@ namespace nova_engine::render::opengl {
 		int GetElementLength() const { return elementLength_; }
 		const glm::mat4 GetModelMatrix()const;
 		void Sleep() { elementLength_ = 0; }
+		void Cleanup();
 	private:
 		GLuint vao_ = 0, shadowVao_ = 0;
 		GLuint verVbo_ = 0,uvVbo_ = 0,aoVbo_ = 0;
 		GLuint ebo_ = 0;
 
 		int elementLength_;
-		
-
-		void Cleanup();
 	};
 }

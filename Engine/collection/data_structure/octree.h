@@ -58,6 +58,10 @@ namespace nova_engine::collection::data_structure {
 			return index;
 		}
 
+		const size_t Size() const {
+		 	return m_chunks.size() - m_freeIdxs.size();
+		}
+
 		// 查找指定坐标的块，如果不存在则返回nullptr
 		T* Find(int x,int y,int z) const {
 			// 检查坐标是否在八叉树范围内
@@ -95,8 +99,16 @@ namespace nova_engine::collection::data_structure {
 			//此时nodeIndex已经指向叶子节点，将chunk存入
 			OctreeNode& leafNode = m_nodes[nodeIndex];
 			if (leafNode.chunkIndex == -1) {
-				leafNode.chunkIndex = (int)m_chunks.size();
-				m_chunks.push_back(std::make_unique<T>(std::move(chunk)));
+				size_t idx = GetFreeIdx();
+				leafNode.chunkIndex = static_cast<int>(idx);
+
+				auto newPtr = std::make_unique<T>(std::move(chunk));
+				if (idx == m_chunks.size()) {
+					m_chunks.push_back(std::move(newPtr));
+				}
+				else {
+					m_chunks[idx] = std::move(newPtr);
+				}
 			} else {
 				auto newPtr = std::make_unique<T>(std::move(chunk));
 				m_chunks[leafNode.chunkIndex] = std::move(newPtr);
@@ -124,6 +136,7 @@ namespace nova_engine::collection::data_structure {
 			if (leafNode.chunkIndex == -1) return nullptr;
 
 			std::unique_ptr<T> ptr = std::move(m_chunks[leafNode.chunkIndex]);
+			m_freeIdxs.push_back(leafNode.chunkIndex);
 
 			leafNode.chunkIndex = -1;
 			//往上递归八叉树,如果父节点没有子节点了,则移除父节点Mask
@@ -138,6 +151,19 @@ namespace nova_engine::collection::data_structure {
 	private:
 		std::vector<OctreeNode> m_nodes;
 		std::vector<std::unique_ptr<T>> m_chunks;
+		std::vector<size_t> m_freeIdxs;
+
+
+		size_t GetFreeIdx() {
+			if (m_freeIdxs.empty()) {
+				return m_chunks.size();
+			}
+			else {
+				size_t idx = m_freeIdxs.back();
+				m_freeIdxs.pop_back();
+				return idx;
+			}
+		}
 
 		int AddChildNode(int nodeIndex,int x,int y,int z) {
 			EnsureOctNodes(nodeIndex);

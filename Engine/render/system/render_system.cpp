@@ -2,6 +2,7 @@
 #include <render/opengl/context/chunk_mesh_cache.h>
 #include <render/utils/mesh_builder.h>
 #include <render/opengl/library/camera_library.h>
+#include <render/opengl/library/frame_buffer_library.h>
 #include <utils/spatial/chunk_range_finder.h>
 #include <glm/gtx/norm.hpp>
 #include <log/logger.h>
@@ -22,39 +23,36 @@ namespace nova_engine::render::system {
 		glEnable(GL_BLEND);
 
 
+		//---------------------------------平行光阴影渲染器--------------------------------------
+		
+		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame")->Bind();
 
-		//----------------------------------基础渲染器--------------------------------------
-
-		glBindFramebuffer(GL_FRAMEBUFFER, renderContext.parallelLightRenderer.GetFBO());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
-		for (const opengl::GLMesh& mesh : meshs) {
-			if (mesh.GetElementLength()) {
-				renderContext.parallelLightRenderer.Render(mesh);
+		if (renderContext.useShadow) {
+			for (const opengl::GLMesh& mesh : meshs) {
+				if (mesh.GetElementLength()) {
+					renderContext.parallelLightRenderer.Render(mesh);
+				}
 			}
 		}
-
 		
-
 		//----------------------------------方块纹理渲染器--------------------------------------
-
-		GLuint mainFbo = renderContext.blockRenderer.GetFBO();
-		glBindFramebuffer(GL_FRAMEBUFFER, mainFbo);
+		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame")->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
+		renderContext.blockRenderer.Render(emptyMesh);
 		for (const opengl::GLMesh& mesh : meshs) {
 			if (mesh.GetElementLength()) {
 				renderContext.blockRenderer.Render(mesh);
 			}
 		}
-		GLuint depthTex = renderContext.blockRenderer.GetDepthTex();
-		if (depthTex)
-			renderContext.semiTranRenderer.SetDepthTex(depthTex);
-
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -62,49 +60,50 @@ namespace nova_engine::render::system {
 		}
 
 		//----------------------------------WBOIT渲染器--------------------------------------
-
-		glBindFramebuffer(GL_FRAMEBUFFER, renderContext.semiTranRenderer.GetFBO());
-
-		renderContext.semiTranRenderer.SetMainFbo(mainFbo);
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame")->Bind();
+		
 		// Accumulation 清 0
 		const GLfloat accumDefault[]{ 0.0f, 0.0f, 0.0f, 0.0f };
 		const GLfloat revealDefault[]{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glClearBufferfv(GL_COLOR, 0, accumDefault);
 		// Revealage 清 1（乘性累积的初始值）
 		glClearBufferfv(GL_COLOR, 1, revealDefault);
-		// 深度清空由主 FBO 处理
 		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		for (const opengl::GLMesh& mesh : meshs2) {
-			if (mesh.GetElementLength()) {
-				renderContext.semiTranRenderer.Render(mesh);
+		
+		renderContext.semiTranRenderer.Render(emptyMesh);
+		if (renderContext.lucencyMesh) {
+			//首先需要进行距离排序
+			//准备临时容器
+			std::vector<const opengl::GLMesh*> temMesh;
+			//收集网格
+			for (const opengl::GLMesh& mesh : meshs2) {
+				if (mesh.GetElementLength()) {
+					temMesh.push_back(&mesh);
+				}
+			}
+			//排序
+			std::sort(temMesh.begin(), temMesh.end(),
+				[](const opengl::GLMesh* a, const opengl::GLMesh* b) {
+					if (a && b)
+						return glm::length2(a->position) > glm::length2(b->position);
+				});
+			for (const opengl::GLMesh* mesh : temMesh)
+			{
+				if (mesh)
+					renderContext.semiTranRenderer.Render(*mesh);
 			}
 		}
-
-		/*glReadBuffer(GL_COLOR_ATTACHMENT0);
-		float pixel[4];
-		glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, pixel);
-
-		NE_CORE_DEBUG("RenderSystem", "After clear, accum center : {},{},{},{}", pixel[0], pixel[1], pixel[2], pixel[3]);*/
 		
 		//----------------------------------后处理渲染器--------------------------------------
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		GLuint colorTex = renderContext.blockRenderer.GetColorTex();
-		GLuint accumTex = renderContext.semiTranRenderer.GetAccumTex();
-		GLuint revealTex = renderContext.semiTranRenderer.GetRevealTex();
-
-		GLuint shadowMap = renderContext.parallelLightRenderer.GetDepthMap();
-		if (colorTex && depthTex && shadowMap)
-			renderContext.postProcessRenderer.SetColorTex(colorTex, depthTex, shadowMap);
-
-		if (accumTex && revealTex)
-			renderContext.postProcessRenderer.SetOitTex(accumTex, revealTex);
 
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 		renderContext.postProcessRenderer.Render(emptyMesh);
+	
 	}
 
 	static const std::vector<glm::ivec3> chunksPos = nova_engine::utils::spatial::FindChunkInRange(320);
@@ -120,6 +119,17 @@ namespace nova_engine::render::system {
 		if (meshCache && meshCache2) {
 			auto& meshs = meshCache->GetAllMesh();
 
+			/*auto chunk = world.chunkData.FindChunk(0, 0, 0);
+			if (chunk) {
+				bool exist = meshCache->Exist(0, 0, 0);
+				if (!exist) {
+					auto defaultMesh = utils::MeshBuilder::BuildMeshFromChunk(*chunk, {}, voxel::block::BlockLibrary::GetInstance());
+					const MeshData& mesh = defaultMesh[0].value();
+					const MeshData& mesh2 = defaultMesh[1].value();
+					meshCache->SubmitMesh(0, 0, 0, mesh);
+					meshCache2->SubmitMesh(0, 0, 0, mesh2);
+				}
+			}*/
 			for (const auto& mesh : meshs) {
 				auto chunk = world.chunkData.FindChunk(mesh.position.x, mesh.position.y, mesh.position.z);
 				int dis = glm::length2(mesh.position - (glm::vec3)playerPos);
@@ -180,7 +190,7 @@ namespace nova_engine::render::system {
 		if (shadowCamera) {
 			glm::vec3 lightDir = glm::normalize(glm::vec3(0.3, 0.8, 0.5));
 			float distance = 128.0f;
-			glm::vec3 fixedPos = glm::floor(world.playerPos / 4.0f) * 4.0f;
+			glm::vec3 fixedPos = glm::floor(world.playerPos / 1.0f) * 1.0f + 0.5f;
 			glm::vec3 lightPos = fixedPos + lightDir * distance;
 			shadowCamera->position = lightPos;
 			shadowCamera->rotation = fixedPos - lightPos; // 指向玩家的向量

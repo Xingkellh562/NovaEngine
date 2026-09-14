@@ -29,6 +29,8 @@ namespace nova_engine::window {
 		static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void mouseMoveCallBack(GLFWwindow* window,double xPos,double yPos);
+		static void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods);
+		static void scrollCallBack(GLFWwindow* window,double xoffset,double yoffset);
 		void processInput(GLFWwindow* window);
 	};
 }

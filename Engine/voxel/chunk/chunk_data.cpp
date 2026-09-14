@@ -65,6 +65,14 @@ namespace nova_engine::voxel::chunk {
 		return results;
 	}
 
+	size_t ChunkData::Size() const {
+		size_t size = 0;
+		for (const auto& Oct : chunkMap_) {
+			size += Oct.second.Size();
+		}
+		return size;
+	}
+
 	//把所有的数据清空，并且释放对象池中的所有块
 	void ChunkData::Clear() {
 		chunkMap_.clear();

@@ -3,6 +3,7 @@
 #include <glm/gtx/norm.hpp>
 #include <voxel/terrain/terrain_generator.h>
 
+
 namespace nova_engine::voxel::chunk {
 	void ChunkSystem::BuildChunk(ChunkData& chunkData, int x, int y, int z) {
 		static const terrain::TerrainGenerator generator(123);
@@ -10,31 +11,12 @@ namespace nova_engine::voxel::chunk {
 		int fx = x & ~31, fy = y & ~31, fz = z & ~31;
 		//从池中获取一个可供修改的对象
 		std::unique_ptr<Chunk> chunkPtr = chunkData.AcquireChunk();
-		//for (int cx = 0;cx < 32;cx++)
-		//	for (int cz = 0;cz < 32;cz++) {
-		//		double h = noise.Noise((fx + cx) * 0.05f, (fz + cz) * 0.05f);
-		//		int height = static_cast<int>(h * 16 + 64);
-		//		for (int cy = 0;cy < 32;cy++)
-		//		{
-		//			//简单地形
-		//			if (fy + cy > height)
-		//				chunkPtr->SetVoxel(cx, cy, cz, 0);//填充为空气
-		//			else if (fy + cy == height)
-		//				chunkPtr->SetVoxel(cx, cy, cz, 1);//填充为草方块
-		//			else
-		//				chunkPtr->SetVoxel(cx, cy, cz, 2);//填充为泥土
-		//		}
-		//	}
 
 		if (chunkPtr != nullptr) {
-
 			generator.BuildChunk(*chunkPtr, x, y, z);
 			//将对象提交给data容器管理
 			chunkData.SubmitChunk(fx, fy, fz, std::move(chunkPtr));
 		}
-				
-		
-		
 	}
 
 	static const std::vector<glm::ivec3> chunksPos = utils::spatial::FindChunkInRange(320);
@@ -55,7 +37,7 @@ namespace nova_engine::voxel::chunk {
 				count++;
 				BuildChunk(world.chunkData, cx, cy, cz);
 			}
-			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 272 * 272) && chunk)
+			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 280 * 280) && chunk)
 				world.chunkData.RemoveChunk(cx, cy, cz);
 		}
 

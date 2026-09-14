@@ -14,6 +14,8 @@ namespace nova_engine::render::opengl {
 		const char* GetTypeToString() const {
 			switch (shaderType)
 			{
+			case GL_COMPUTE_SHADER:
+				return "Compute_Shader";
 			case GL_VERTEX_SHADER:
 				return "Vertex_Shader";
 			case GL_FRAGMENT_SHADER:

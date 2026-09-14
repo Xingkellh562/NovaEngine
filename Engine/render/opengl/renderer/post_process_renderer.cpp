@@ -1,5 +1,6 @@
 #include "post_process_renderer.h"
 #include <log/logger.h>
+#include <render/opengl/library/frame_buffer_library.h>
 
 namespace nova_engine::render::opengl {
 	PostProcessRenderer::PostProcessRenderer() {
@@ -55,31 +56,49 @@ namespace nova_engine::render::opengl {
 			glm::mat4 invViewProj = glm::inverse(projection * view);
 			
 			glm::mat4 lightView = shadowCamera_->GetViewMatrix();
-			glm::mat4 lightProjection = shadowCamera_->GetOrthoMatrix(128);
+			glm::mat4 lightProjection = shadowCamera_->GetOrthoMatrix(32);
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-			if (setTex_) {
-				shader_->Use();
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, mainColorTex_);
-				shader_->SetTextureUnit("colorTex", 1);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, mainDepthTex_);
-				shader_->SetInt("depthTex", 2);
-
-				glActiveTexture(GL_TEXTURE3);
-				glBindTexture(GL_TEXTURE_2D, shadowMap_);
-				shader_->SetTextureUnit("shadowMap",3);
-
-				glActiveTexture(GL_TEXTURE4);
-				glBindTexture(GL_TEXTURE_2D, accumTex_);
-				shader_->SetTextureUnit("accumTex", 4);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, revealTex_);
-				shader_->SetTextureUnit("revealTex", 5);
+			auto mainFrame = opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame");
+			GLuint mainColorTex = 0, mainDepthTex = 0;
+			if (mainFrame) {
+				mainColorTex = mainFrame->FindTexture("ColorTex");
+			    mainDepthTex = mainFrame->FindTexture("DepthTex");
 			}
+			auto shadowFrame = opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame");
+			GLuint shadowMap = 0;
+			if (shadowFrame) {
+				shadowMap = shadowFrame->FindTexture("ShadowMap");
+			}
+
+			auto oitFrame = opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame");
+			GLuint accumTex = 0,revealTex = 0;
+			if (oitFrame) {
+				accumTex = oitFrame->FindTexture("AccumTex");
+				revealTex = oitFrame->FindTexture("RevealTex");
+			}
+
+			shader_->Use();
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, mainColorTex);
+			shader_->SetTextureUnit("colorTex", 1);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, mainDepthTex);
+			shader_->SetInt("depthTex", 2);
+
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, shadowMap);
+			shader_->SetTextureUnit("shadowMap", 3);
+
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_2D, accumTex);
+			shader_->SetTextureUnit("accumTex", 4);
+
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, revealTex);
+			shader_->SetTextureUnit("revealTex", 5);
+				
 
 			shader_->SetMat4("invViewProj", invViewProj);
 			shader_->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -87,7 +106,7 @@ namespace nova_engine::render::opengl {
 
 			glBindVertexArray(quadVao_);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
-			//NE_CORE_DEBUG("RenderSystem", "PostProcessRenderer called");
+
 			glBindVertexArray(0);
 		}
 
