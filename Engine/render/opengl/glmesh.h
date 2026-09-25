@@ -28,8 +28,15 @@ namespace nova_engine::render::opengl {
 
 		void Bind(VaoType v) const;
 		int GetElementLength() const { return elementLength_; }
-		const glm::mat4 GetModelMatrix()const;
-		void Sleep() { elementLength_ = 0; }
+		glm::mat4 GetModelMatrix()const;
+		glm::mat4 GetModelMatrix(const glm::vec3& camerapos)const;
+		void Sleep() { 
+			//elementLength_ = 0;
+			awake_ = false;
+		}
+		void Wake() { awake_ = true; }
+
+		bool Awake() const { return awake_; }
 		void Cleanup();
 	private:
 		GLuint vao_ = 0, shadowVao_ = 0;
@@ -37,5 +44,6 @@ namespace nova_engine::render::opengl {
 		GLuint ebo_ = 0;
 
 		int elementLength_;
+		bool awake_ = true;
 	};
 }

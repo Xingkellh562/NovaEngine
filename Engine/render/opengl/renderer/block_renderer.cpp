@@ -34,10 +34,10 @@ namespace nova_engine::render::opengl {
 		if (shader_ == nullptr || camera_ == nullptr)
 			return;
 
-		view_ = camera_->GetViewMatrix();
+		view_ = camera_->GetRelativeViewMatrix();
 		shader_->Use();
 		shader_->SetMat4("view", view_);
-		shader_->SetMat4("model", mesh.GetModelMatrix());
+		shader_->SetMat4("model", mesh.GetModelMatrix(camera_->position));
 
 		projection_ = camera_->GetTransformMatrix(width_, height_);
 		shader_->SetMat4("projection", projection_);

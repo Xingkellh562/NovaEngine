@@ -80,6 +80,12 @@ namespace nova_engine::window {
 					real.lucencyMesh = !real.lucencyMesh;
 				}
 				break;
+			case GLFW_KEY_F3:
+				if (context != std::nullopt) {
+					auto& real = *context;
+					real.lodMesh = !real.lodMesh;
+				}
+				break;
 			default:
 				break;
 			}
@@ -130,7 +136,7 @@ namespace nova_engine::window {
 		if (state == nullptr) return;
 		if (action == GLFW_PRESS) {
 			if (button == GLFW_MOUSE_BUTTON_LEFT) {
-				state->destoryBlock = true;
+				state->destroyBlock = true;
 			}
 			if (button == GLFW_MOUSE_BUTTON_RIGHT) {
 				state->buildBlock = true;
@@ -143,10 +149,10 @@ namespace nova_engine::window {
 		nova_engine::core::input::InputState* state = &nova_engine::core::input::InputSystem::GetInstance().GetState();
 		if (state == nullptr) return;
 		if (yoffset > 0) {
-			state->nowBlock = std::clamp(++state->nowBlock, 1, 9);
+			state->nowBlock = std::clamp(++state->nowBlock, 1, 11);
 		}
 		else if (yoffset < 0) {
-			state->nowBlock = std::clamp(--state->nowBlock, 1, 9);
+			state->nowBlock = std::clamp(--state->nowBlock, 1, 11);
 		}
 	}
 
@@ -211,7 +217,7 @@ namespace nova_engine::window {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  //指定openGL版本号
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//指定openGL渲染模式为立即模式
-		glfwWindowHint(GLFW_SAMPLES,4);
+		glfwWindowHint(GLFW_SAMPLES,0);
 
 		//创建一个大小为800*600的窗口
 		window_ = glfwCreateWindow(800, 600, "GANGLV", NULL, NULL);

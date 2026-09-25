@@ -129,13 +129,21 @@ namespace nova_engine::render::opengl {
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
+		Wake();
 		if (vao_ == 0 || verVbo_ == 0 || uvVbo_ == 0 || aoVbo_ == 0 || ebo_ == 0) {
 			NE_CORE_ERROR("RenderSystem", "Mesh load failed");
 		}
 	}
 
-	const glm::mat4 GLMesh::GetModelMatrix() const {
+	glm::mat4 GLMesh::GetModelMatrix() const {
 		glm::mat4 view = glm::lookAt(position,position+rotation,glm::vec3(0,1,0));
+		glm::mat4 model = glm::inverse(view);
+		return model;
+	}
+
+	glm::mat4 GLMesh::GetModelMatrix(const glm::vec3& cameraPos)const {
+		glm::vec3 fixedPos = position - cameraPos;
+		glm::mat4 view = glm::lookAt(fixedPos, fixedPos + rotation, glm::vec3(0, 1, 0));
 		glm::mat4 model = glm::inverse(view);
 		return model;
 	}

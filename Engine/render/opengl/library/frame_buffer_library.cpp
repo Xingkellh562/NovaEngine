@@ -13,12 +13,14 @@ namespace nova_engine::render::opengl {
 		AddFrameBuffer("ShadowFrame");
 		FrameBuffer* shadowFrame = FindFrameBuffer("ShadowFrame");
 		if (shadowFrame) {
-			shadowFrame->AddTexture("ShadowMap", { GL_DEPTH_COMPONENT,GL_DEPTH_COMPONENT,GL_FLOAT,GL_DEPTH_ATTACHMENT,2048,2048 });
+			shadowFrame->AddTexture("ShadowMap", { GL_DEPTH_COMPONENT32F,GL_DEPTH_COMPONENT,GL_FLOAT,GL_DEPTH_ATTACHMENT,2048,2048 });
 			auto tex = shadowFrame->FindTexture("ShadowMap");
 			if (tex) {
 				glBindTexture(GL_TEXTURE_2D, tex);
 				float borderColor[] = { 1.0f,1.0f ,1.0f ,1.0f };
 				glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}

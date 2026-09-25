@@ -272,8 +272,7 @@ namespace nova_engine::render::opengl {
 
 	void Shader::Cleanup() {
 		if (id_ != 0) {
-			glDeleteShader(id_);
-			
+			glDeleteProgram(id_);
 		}
 	}
 }

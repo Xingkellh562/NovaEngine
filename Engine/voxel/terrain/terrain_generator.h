@@ -13,7 +13,7 @@ namespace nova_engine::voxel::terrain {
 		TerrainGenerator(const TerrainGenerator&) = delete;
 		TerrainGenerator& operator=(const TerrainGenerator&) = delete;
 
-		void BuildChunk(chunk::Chunk& chunk,int x,int y,int z) const;
+		void BuildChunk(chunk::Chunk& chunk,int x,int y,int z, int chunkSize = 32) const;
 	private:
 		int seed_;
 		utils::noise::Noise2D noise_;

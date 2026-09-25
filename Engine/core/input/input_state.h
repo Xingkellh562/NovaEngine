@@ -5,7 +5,7 @@ namespace nova_engine::core::input {
 		bool forward = false, back = false, left = false, right = false;
 		bool up = false, down = false;
 
-		bool destoryBlock = false,buildBlock = false;
+		bool destroyBlock = false,buildBlock = false;
 		int nowBlock = 4;
 
 		float axisZ = 0, axisX = 0, axisY = 0;

@@ -8,6 +8,12 @@ namespace nova_engine::render::opengl {
 	const glm::mat4 Camera::GetViewMatrix() const {
 		return glm::lookAt(position, position + rotation, Camera::GetWorldUp());
 	}
+	const glm::mat4 Camera::GetRelativeViewMatrix() const {
+		return glm::lookAt(glm::vec3(0,0,0), rotation, Camera::GetWorldUp());
+	}
+	const glm::mat4 Camera::GetRelativeViewMatrix(const glm::vec3& pos) const {
+		return glm::lookAt(position - pos, position - pos + rotation, Camera::GetWorldUp());
+	}
 	const glm::mat4 Camera::GetOrthoMatrix(float halfSize) const {
 		return glm::ortho(-halfSize, halfSize,-halfSize, halfSize,0.1f,300.0f);
 	}

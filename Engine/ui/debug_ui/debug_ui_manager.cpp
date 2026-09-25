@@ -10,8 +10,9 @@ namespace nova_engine::ui::debug_ui {
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		// 加载字体文件，并指定字符范围
-		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyh.ttc", 18.0f, NULL,
-			io.Fonts->GetGlyphRangesChineseFull()); // 加载常用全量中文字符[reference:1]
+		// 暂时注释，等以后用到中文字符再说
+		//io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyh.ttc", 18.0f, NULL,
+		//	io.Fonts->GetGlyphRangesChineseFull()); // 加载常用全量中文字符[reference:1]
 
 		ImGui::StyleColorsDark();
 

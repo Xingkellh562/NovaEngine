@@ -1,8 +1,15 @@
 #include "mesh_cache.h"
+
 #include <voxel/chunk/chunk.h>
 #include <render/mesh_data.h>
 #include <chrono>
 #include <iostream>
+#include <render/utils/mesh_builder.h>
+#include <voxel/terrain/terrain_generator.h>
+#include <utils/spatial/chunk_range_finder.h>
+#include <core/config/config.h>
+#include <voxel/block/block_library.h>
+#include <unordered_set>
 
 GLFWwindow* MeshCacheTest::window = nullptr;
 
@@ -66,69 +73,276 @@ nova_engine::render::MeshData GenerateLargePlane(int segX, int segZ, float size 
 
 
 TEST_F(MeshCacheTest, SubmitAndFindMesh) {
+    std::array<nova_engine::render::MeshData*, 8> datas = {};
+    for (int i = 0;i < 8;i++) {
 
-	nova_engine::render::MeshData data{ 
-        {
-            // X     Y     Z      NX    NY    NZ
-             0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // v0 (中心)
-            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // v1 (左下)
-             1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // v2 (右下)
-             1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  // v3 (右上)
-            -1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f   // v4 (左上)
-        },{
-            0, 1, 2,  // 三角形 1 (左下)
-            0, 2, 3,  // 三角形 2 (右下)
-            0, 3, 4,  // 三角形 3 (右上)
-            0, 4, 1   // 三角形 4 (左上)
-        } };
-    meshs.SubmitMesh(0, 0, 0, data);
+        datas[i] = &data;
+    }
 
-    EXPECT_EQ(meshs.Exist(0,0,0),true);
+    meshs.TrySubdivide(0, 0, 0,0,datas);
+
+    int depth = 0;
+    ASSERT_NE(meshs.Find(0,0,0,&depth), nullptr);
+    
+    EXPECT_EQ(depth,1);
+
+    meshs.TrySubdivide(1024, 1024, 1024,1, datas);
+    ASSERT_NE(meshs.Find(0, 0, 0, &depth), nullptr);
+    EXPECT_EQ(depth, 1);
+
+    ASSERT_NE(meshs.Find(1024, 1024, 1024, &depth), nullptr);
+    EXPECT_EQ(depth, 2);
 }
 
-//TEST_F(MeshCacheTest, SubmitAndFind512LargeMesh) {
-//    nova_engine::render::MeshData large_mesh = GenerateLargePlane(512, 512, 500.0f);
-//    for (int x = 0;x < 8;x++)
-//        for (int y = 0;y < 8;y++)
-//            for (int z = 0;z < 8;z++) {
-//                
-//                meshs.SubmitMesh(x, y, z, large_mesh);
-//            }
-//
-//    for (int x = 0;x < 8;x++)
-//        for (int y = 0;y < 8;y++)
-//            for (int z = 0;z < 8;z++)
-//                EXPECT_EQ(meshs.Exist(x, y, z), true);
-//    
-//}
+TEST_F(MeshCacheTest, MoreCooTest) {
+    
+    std::array<nova_engine::render::MeshData*, 8> datas = {};
+    for (int i = 0;i < 8;i++) {
+        datas[i] = &data;
+    }
 
-TEST_F(MeshCacheTest, TestMeshRecycle) {
-    nova_engine::render::MeshData large_mesh = GenerateLargePlane(512, 512, 500.0f);
-    for (int x = -2;x < 6;x++)
-        for (int y = -2;y < 6;y++)
-            for (int z = -2;z < 6;z++) {
+    meshs.TrySubdivide(12432, 24355, 23234,1, datas);
 
-                meshs.SubmitMesh(x * 32 + 5, y * 32 + 3, z * 32 + 5, large_mesh);
+    int depth = 0;
+    auto mesh = meshs.Find(12435, 24355, 23234, &depth);
+    ASSERT_NE(mesh, nullptr);
+
+    EXPECT_EQ(depth, 1);
+
+    if (mesh) {
+         EXPECT_EQ(mesh->GetElementLength(), 12);
+    }
+
+    auto mesh2 = meshs.Find(0, 0,0, &depth);
+    EXPECT_EQ(mesh2,nullptr);
+
+    meshs.TryCombine(12432, 24355, 23234,0, &data);
+    meshs.Find(12435, 24355, 23234, &depth);
+    EXPECT_EQ(depth, 0);
+}
+TEST_F(MeshCacheTest, TraverseTest) {
+    std::array<nova_engine::render::MeshData*, 8> datas = {};
+    for (int i = 0;i < 8;i++) {
+        datas[i] = &data;
+    }
+
+    meshs.TrySubdivide(0, 0, 0,0 ,datas);
+    meshs.TrySubdivide(1024, 1024, 1024,1, datas);
+
+    int size = 0;
+    for (const auto& mesh : meshs.AllData()) {
+        EXPECT_EQ(mesh.GetElementLength(), 12);
+        size++;
+    }
+    EXPECT_EQ(size, 15);
+}
+
+static void Subdivide(
+    nova_engine::render::opengl::context::LodMeshCache& cache,
+    const nova_engine::voxel::terrain::TerrainGenerator& generator,
+    int x, int y, int z, int depth);
+
+static void Combine(
+    nova_engine::render::opengl::context::LodMeshCache& cache,
+    const nova_engine::voxel::terrain::TerrainGenerator& generator,
+    int x, int y, int z, int depth);
+
+TEST_F(MeshCacheTest, AnalogLodLoading) {
+    constexpr int maxDepth = nova_engine::core::config::OCTREE_BIT1 - nova_engine::core::config::CHUNK_BIT1; // = 6
+    constexpr int layerCount = maxDepth + 1;
+
+    static nova_engine::voxel::terrain::TerrainGenerator generator(123);
+    static std::array<std::vector<glm::ivec3>, layerCount> coordTable = {};
+
+    static std::once_flag flag;
+    std::call_once(flag, [] {
+        int range = nova_engine::core::config::OCTREE_SIZE * 8;
+        for (int i = 0; i < layerCount; ++i) {
+            int size = nova_engine::core::config::OCTREE_SIZE >> i;
+            coordTable[i] = nova_engine::utils::spatial::GetLatticeCooInRange(range >> i, size);
+        }
+        });
+
+    //动态更新Lod网格
+    glm::ivec3 playerPos = {0,0,0};
+
+    int budget = 256;
+
+    // 粗 -> 细：细分
+    for (int d = 0; d <= maxDepth && budget > 0; ++d) {
+        int size = nova_engine::core::config::OCTREE_SIZE >> d;
+        int shift = nova_engine::core::config::OCTREE_BIT1 - d;
+
+        glm::ivec3 anchor = {
+            (playerPos.x >> shift) << shift,
+            (playerPos.y >> shift) << shift,
+            (playerPos.z >> shift) << shift
+        };
+
+        for (const auto& off : coordTable[d]) {
+            if (budget <= 0) break;
+
+            int x = anchor.x + off.x;
+            int y = anchor.y + off.y;
+            int z = anchor.z + off.z;
+
+            int depth = 0;
+            meshs.Find(x, y, z, &depth);
+            
+
+            if (depth < d && depth < maxDepth) {
+                Subdivide(meshs, generator, x, y, z, depth + 1);
+                //--budget;
             }
+        }
+    }
 
-    for (int x = -2;x < 6;x++)
-        for (int y = -2;y < 6;y++)
-            for (int z = -2;z < 6;z++)
-                meshs.FreeMesh(x * 32 + 5, y * 32 + 6, z * 32 + 6);
+    budget = 8;
 
-    for (int x = -2;x < 6;x++)
-        for (int y = -2;y < 6;y++)
-            for (int z = -2;z < 6;z++)
-                EXPECT_EQ(meshs.Exist(x * 32, y * 32, z * 32), false);
+    // 细 -> 粗：合并
+    //for (int d = maxDepth; d >= 0 && budget > 0; --d) {
+    //    int shift = nova_engine::core::config::OCTREE_BIT1 - d;
+    //    glm::ivec3 anchor = {
+    //        (playerPos.x >> shift) << shift,
+    //        (playerPos.y >> shift) << shift,
+    //        (playerPos.z >> shift) << shift
+    //    };
 
-    for (int x = -2;x < 6;x++)
-        for (int y = -2;y < 6;y++)
-            for (int z = -2;z < 6;z++)
-                meshs.SubmitMesh(x * 32, y * 32, z * 32, large_mesh);
+    //    for (const auto& off : coordTable[d]) {
+    //        if (budget <= 0) break;
 
+    //        int x = anchor.x + off.x;
+    //        int y = anchor.y + off.y;
+    //        int z = anchor.z + off.z;
 
-    for (int x = -2;x < 6;x++)
-        for (int y = -2;y < 6;y++)
-            for (int z = -2;z < 6;z++)
-                EXPECT_EQ(meshs.Exist(x * 32 + 2, y * 32 +4, z * 32 + 4), true);
+    //        int depth = 0;
+    //        meshs.Find(x, y, z, &depth);
+    //        
+    //        if (depth > d && depth > 0) {
+    //            //Combine(meshs, generator, x, y, z, depth - 1);
+    //            //--budget;
+    //        }
+    //    }
+    //}
+    int mistake = 0;
+    int count = 0;
+
+    std::unordered_set<glm::ivec3> coos;
+    //让我康康
+    for (int d = maxDepth; d >= 0; --d) {
+        int size = nova_engine::core::config::OCTREE_SIZE >> d;
+        int shift = nova_engine::core::config::OCTREE_BIT1 - d;
+
+        glm::ivec3 anchor = {
+            (playerPos.x >> shift) << shift,
+            (playerPos.y >> shift) << shift,
+            (playerPos.z >> shift) << shift
+        };
+
+        
+        for (const auto& off : coordTable[d]) {
+            if (budget <= 0) break;
+
+            int x = anchor.x + off.x;
+            int y = anchor.y + off.y;
+            int z = anchor.z + off.z;
+
+            int depth = 0;
+            meshs.Find(x, y, z, &depth);
+            count++;
+            auto it = coos.find({ x,y,z });
+            if (it == coos.end()) {
+                EXPECT_EQ(depth ,d) << "Coord:" << x << "," << y << "," << z
+                    << "  mistake=" << ++mistake << "   count = " << count;
+                coos.insert({ x,y,z });
+            }
+            else {
+                EXPECT_TRUE(depth >= d);
+            }
+        }
+    }
+}
+
+static nova_engine::render::MeshData meshData{
+        {
+        // X     Y     Z      NX    NY    NZ
+         0.0f,  0.0f, 0.0f,   // v0 (中心)
+        -1.0f, -1.0f, 0.0f,    // v1 (左下)
+         1.0f, -1.0f, 0.0f,    // v2 (右下)
+         1.0f,  1.0f, 0.0f,    // v3 (右上)
+        -1.0f,  1.0f, 0.0f,     // v4 (左上)
+    },{
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f
+    },{
+        1,1,1,1,1
+    },{
+        0, 1, 2,  // 三角形 1 (左下)
+        0, 2, 3,  // 三角形 2 (右下)
+        0, 3, 4,  // 三角形 3 (右上)
+        0, 4, 1   // 三角形 4 (左上)
+    } };
+
+void Subdivide(
+    nova_engine::render::opengl::context::LodMeshCache& cache,
+    const nova_engine::voxel::terrain::TerrainGenerator& generator,
+    int x, int y, int z, int depth)
+{
+    static const std::array<glm::ivec3, 8> NeiOffCoord = { {
+        {0,0,0},{1,0,0},{1,0,1},{0,0,1},
+        {0,1,0},{1,1,0},{1,1,1},{0,1,1}
+    } };
+
+    const int maxDepth = nova_engine::core::config::OCTREE_BIT1 - nova_engine::core::config::CHUNK_BIT1;
+    if (depth <= 0 || depth > maxDepth) return;
+
+    int childSize = nova_engine::core::config::OCTREE_SIZE >> depth;
+    int parentSize = childSize << 1;
+    int scale = 1 << (maxDepth - depth);
+
+    // 父节点原点
+    int px = x & ~(parentSize - 1);
+    int py = y & ~(parentSize - 1);
+    int pz = z & ~(parentSize - 1);
+
+    std::array<nova_engine::render::MeshData, 8> datas = {};
+    std::array<nova_engine::render::MeshData*, 8> dataPtr = {};
+
+    for (int i = 0; i < 8; ++i) {
+        int fx = px + NeiOffCoord[i].x * childSize;
+        int fy = py + NeiOffCoord[i].y * childSize;
+        int fz = pz + NeiOffCoord[i].z * childSize;
+
+        nova_engine::voxel::chunk::Chunk chunk(nova_engine::core::config::CHUNK_SIZE);
+        generator.BuildChunk(chunk, fx, fy, fz, childSize);
+        datas[i] = meshData;
+        dataPtr[i] = &datas[i];
+    }
+
+    cache.TrySubdivide(px, py, pz, depth, dataPtr);
+}
+
+void Combine(
+    nova_engine::render::opengl::context::LodMeshCache& cache,
+    const nova_engine::voxel::terrain::TerrainGenerator& generator,
+    int x, int y, int z, int depth)
+{
+    const int maxDepth = nova_engine::core::config::OCTREE_BIT1 - nova_engine::core::config::CHUNK_BIT1;
+    if (depth < 0 || depth >= maxDepth) return;
+
+    int parentSize = nova_engine::core::config::OCTREE_SIZE >> depth;
+    int scale = 1 << (maxDepth - depth);
+
+    int px = x & ~(parentSize - 1);
+    int py = y & ~(parentSize - 1);
+    int pz = z & ~(parentSize - 1);
+
+    nova_engine::voxel::chunk::Chunk chunk(nova_engine::core::config::CHUNK_SIZE);
+    generator.BuildChunk(chunk, px, py, pz, parentSize);
+    nova_engine::render::MeshData data = meshData;
+
+    cache.TryCombine(px, py, pz, depth, &data);
 }

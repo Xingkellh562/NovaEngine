@@ -23,16 +23,16 @@ namespace nova_engine::render::utils {
 										std::vector<int>& indices,
 										int& vertexCount,
 										const std::array<float, 4>& aoArray,
-										int x,int y,int z) 
+										int x,int y,int z,int scale) 
 	{
 		for (int i = 0;i < 6;i++) {
 			indices.push_back(face.indices[i] + vertexCount);
 		}
 
 		for (int j = 0;j < 4;j++) {
-			vertices.push_back(face.vertices[j][0] + x);
-			vertices.push_back(face.vertices[j][1] + y);
-			vertices.push_back(face.vertices[j][2] + z);
+			vertices.push_back((face.vertices[j][0] + x) * scale);
+			vertices.push_back((face.vertices[j][1] + y) * scale);
+			vertices.push_back((face.vertices[j][2] + z) * scale);
 			uvws.push_back(face.uvs[j][0]);
 			uvws.push_back(face.uvs[j][1]);
 			uvws.push_back(face.uvs[j][2]);
@@ -147,7 +147,7 @@ namespace nova_engine::render::utils {
 
 		int vertexCount = 0, lucencyVertexCount = 0;
 
-		//预加载方块模型，暂时硬编码方块数量，后续会完善方块数量查询入口
+		//预加载方块模型
 		int blockCount = library.Size();
 		std::vector<const voxel::block::BlockMesh*> blockMeshs;
 		for (int idx = 0;idx < blockCount; idx++) {
@@ -258,5 +258,97 @@ namespace nova_engine::render::utils {
 
 		return { {{{std::move(vertices), std::move(uvws), std::move(aos), std::move(indices)}},
 			{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos), std::move(lucencyIdx)}}} };
+	}
+
+
+	MeshData MeshBuilder::BuildLodMesh(const voxel::chunk::Chunk& chunk,size_t scale, const voxel::block::BlockLibrary& library) {
+		std::vector<float> vertices;
+		std::vector<float> uvws;
+		std::vector<float> aos;
+		std::vector<int> indices;
+
+		const int CHUNK_LENGTH = 32768;
+		const int SIZE = 32;
+		const int MASK = 31;
+
+		constexpr int MAX_VERTS_FLOATS = 32 * 32 * 32 * 6 * 4; // 6个float/顶点
+		constexpr int MAX_INDICES = 32 * 32 * 32 * 6 * 6; // 最多6个面，每个面6个索引
+		vertices.reserve(MAX_VERTS_FLOATS * 3 / 4);
+		uvws.reserve(MAX_VERTS_FLOATS * 3 / 4);
+		aos.reserve(MAX_VERTS_FLOATS / 4);
+		indices.reserve(MAX_INDICES / 4);
+
+		
+
+		int blockCount = library.Size();
+		std::vector<const voxel::block::BlockMesh*> blockMeshs;
+		for (int idx = 0;idx < blockCount; idx++) {
+			auto block = library.FindBlock(idx);
+			if (block)
+				blockMeshs.push_back(&block->GetMesh());
+			else blockMeshs.push_back(nullptr);
+		}
+
+		
+
+		try
+		{
+			const std::vector<int>& voxels = chunk.GetVoxelSpan();
+			int x = 0, y = 0, z = 0;
+			std::array<float, 4> aoArray = { 1,1,1,1 };
+			int vertexCount = 0;
+			for (size_t i = 0; i < CHUNK_LENGTH; i++)
+			{
+				//通过纯位运算更新xyz的值
+				z = i & 31;
+				y = (i >> 5) & MASK;
+				x = (i >> 10) & MASK;
+
+				//获取方块id与mesh
+				int blockId = voxels[i];
+				if (blockId == 0) continue; //空气，直接跳过
+
+				const voxel::block::BlockMesh* blockMesh = blockMeshs[blockId];
+				if (!blockMesh) continue;
+
+				for (int j = 0;j < blockMesh->faces.size();j++) {
+					//获取每个面的方向
+					int ori = blockMesh->faces[j].orientation;
+					//如果是内部面: 面方向枚举 == None == 6则不进行遮挡面剔除，直接构建
+					
+					if (ori == 6) {
+						AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, aoArray, x, y, z, scale);
+					}
+					else { //如果不是(面含有方向属性->进入遮挡面剔除流程)
+						int nx = neighbours_[ori][0] + x;
+						int ny = neighbours_[ori][1] + y;
+						int nz = neighbours_[ori][2] + z;
+
+						int nIdx = (nx << 10) + (ny << 5) + nz;
+
+						switch (blockMesh->modelType)
+						{
+						case 0: //默认网格
+							if (nx < 0 || nx >= 32 ||
+								ny < 0 || ny >= 32 ||
+								nz < 0 || nz >= 32) {
+							}
+							else if (blockMeshs[voxels[nIdx]]->modelType) {
+								AddQuadMesh(blockMesh->faces[j], vertices, uvws, aos, indices, vertexCount, aoArray, x, y, z, scale);
+							}
+							break;
+						default: //什么都不做，就当是空气
+							break;
+						}
+					}
+				}
+			}
+		}
+		catch (const std::exception& e)
+		{
+			NE_CORE_ERROR("MeshBuilder", "Failed to build mesh : '{}'", e.what());
+			return {std::move(vertices), std::move(uvws), std::move(aos), std::move(indices)};
+		}
+		return { std::move(vertices), std::move(uvws), std::move(aos), std::move(indices) };
 	}
 }

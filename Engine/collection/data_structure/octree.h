@@ -7,7 +7,7 @@
 
 namespace nova_engine::collection::data_structure {
 	struct OctreeNode {
-		char childMask = 0;// 低八位表示子节点是否存在，1表示存在，0表示不存在
+		unsigned char childMask = 0;// 低八位表示子节点是否存在，1表示存在，0表示不存在
 		int childFirstIndex = -1;// 子节点在节点数组中的起始索引
 		int chunkIndex = -1;// 节点对应的块索引，没有则为-1
 		int parentIndex = -1;// 父节点在节点数组中的索引，没有则为-1
@@ -54,12 +54,31 @@ namespace nova_engine::collection::data_structure {
 			if ((half & x) != 0) index |= 1;
 			if ((half & y) != 0) index |= 2;
 			if ((half & z) != 0) index |= 4;
-			
+
+
 			return index;
 		}
 
 		const size_t Size() const {
 		 	return m_chunks.size() - m_freeIdxs.size();
+		}
+
+		int GetDepth(int x, int y, int z) const {
+			if (x < 0 || y < 0 || z < 0 || x >= ROOT_SIZE || y >= ROOT_SIZE || z >= ROOT_SIZE) {
+				return 0;
+			}
+
+			int nodeIndex = 0;
+			for (int d = 0;d < MAX_DEPTH; ++d) {
+				const OctreeNode& node = m_nodes[nodeIndex];
+				if (node.childFirstIndex < 0) return d;
+				int childIndex = GetChildIndexWithPos(x, y, z, node.depth);
+
+				if (node.childMask & (1 << childIndex))
+					nodeIndex = node.childFirstIndex + childIndex;
+				else return d;
+			}
+			return MAX_DEPTH;
 		}
 
 		// 查找指定坐标的块，如果不存在则返回nullptr

@@ -5,15 +5,36 @@ namespace nova_engine::voxel::chunk {
 	//这里统一传入绝对世界坐标
 	Chunk* ChunkData::FindChunk(int x, int y, int z) const{
 		//计算八叉树key坐标(涉及负数)
-		int ox = x >> 11,oy = y >> 11,oz = z >> 11;
+		int ox = x >> core::config::OCTREE_BIT1,
+			oy = y >> core::config::OCTREE_BIT1,
+			oz = z >> core::config::OCTREE_BIT1;
 		//计算八叉树内的局部坐标
-		int cx = x & 0x7FF, cy = y & 0x7FF, cz = z & 0x7FF;
+		int cx = x & (core::config::OCTREE_SIZE - 1),
+			cy = y & (core::config::OCTREE_SIZE - 1),
+			cz = z & (core::config::OCTREE_SIZE - 1);
 
 		auto it = chunkMap_.find(glm::ivec3(ox, oy, oz));
 		if (it != chunkMap_.end()) {
 			return it->second.Find(cx, cy, cz);
 		}
 		return nullptr;
+	}
+
+	int ChunkData::GetDepth(int x, int y, int z) const {
+		//计算八叉树key坐标(涉及负数)
+		int ox = x >> core::config::OCTREE_BIT1,
+			oy = y >> core::config::OCTREE_BIT1,
+			oz = z >> core::config::OCTREE_BIT1;
+		//计算八叉树内的局部坐标
+		int cx = x & (core::config::OCTREE_SIZE - 1),
+			cy = y & (core::config::OCTREE_SIZE - 1),
+			cz = z & (core::config::OCTREE_SIZE - 1);
+
+		auto it = chunkMap_.find(glm::ivec3(ox, oy, oz));
+		if (it != chunkMap_.end()) {
+			return it->second.GetDepth(cx, cy, cz);
+		}
+		return 0;
 	}
 
 	std::unique_ptr<Chunk> ChunkData::AcquireChunk() {
@@ -23,8 +44,12 @@ namespace nova_engine::voxel::chunk {
 	void ChunkData::SubmitChunk(int x,int y,int z, std::unique_ptr<Chunk> chunk) {
 		if (!chunk) return;
 
-		int ox = x >> 11, oy = y >> 11, oz = z >> 11;
-		int cx = x & 0x7FF, cy = y & 0x7FF, cz = z & 0x7FF;
+		int ox = x >> core::config::OCTREE_BIT1,
+			oy = y >> core::config::OCTREE_BIT1,
+			oz = z >> core::config::OCTREE_BIT1;
+		int cx = x & (core::config::OCTREE_SIZE - 1),
+			cy = y & (core::config::OCTREE_SIZE - 1),
+			cz = z & (core::config::OCTREE_SIZE - 1);
 
 		auto octree = chunkMap_.find(glm::ivec3(ox, oy, oz));
 		if (octree != chunkMap_.end()) {
@@ -37,8 +62,12 @@ namespace nova_engine::voxel::chunk {
 	}
 
 	void ChunkData::RemoveChunk(int x, int y, int z) {
-		int ox = x >> 11, oy = y >> 11, oz = z >> 11;
-		int cx = x & 0x7FF, cy = y & 0x7FF, cz = z & 0x7FF;
+		int ox = x >> core::config::OCTREE_BIT1, 
+			oy = y >> core::config::OCTREE_BIT1, 
+			oz = z >> core::config::OCTREE_BIT1;
+		int cx = x & (core::config::OCTREE_SIZE - 1), 
+			cy = y & (core::config::OCTREE_SIZE - 1),
+			cz = z & (core::config::OCTREE_SIZE - 1);
 
 		auto it = chunkMap_.find(glm::ivec3(ox, oy, oz));
 		if (it != chunkMap_.end()) {
@@ -54,12 +83,14 @@ namespace nova_engine::voxel::chunk {
 		{{-1,0,0},{1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}
 		};
 
+		const int CHUNK_BIT1 = core::config::CHUNK_BIT1;
+
 		std::array<Chunk*, 6> results{};
 
 		for (int i = 0;i < 6;i++) {
 			std::array<int, 3> nei = NeighBours[i];
 
-			results[i] = FindChunk(nei[0] * 32 + x, nei[1] * 32 + y, nei[2] * 32 + z);
+			results[i] = FindChunk((nei[0] << CHUNK_BIT1) + x, (nei[1] << CHUNK_BIT1) + y, (nei[2] << CHUNK_BIT1) + z);
 		}
 
 		return results;

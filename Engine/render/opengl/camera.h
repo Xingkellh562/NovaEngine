@@ -6,7 +6,7 @@
 namespace nova_engine::render::opengl {
 	class Camera {
 	public:
-		Camera(float nearPlane = 0.1f, float farPlane = 1000.0f, float fieldOfView = 3.14f / 4) :
+		Camera(float nearPlane = 0.1f, float farPlane = 10000.0f, float fieldOfView = 3.14f / 4) :
 			nearPlane_(nearPlane), farPlane_(farPlane), fieldOfView_(fieldOfView),
 			position(glm::vec3(0, 0, 0)), rotation(glm::vec3(0, 0, 1))
 		{}
@@ -15,6 +15,8 @@ namespace nova_engine::render::opengl {
 
 		const glm::mat4 GetTransformMatrix(int width,int height) const;
 		const glm::mat4 GetViewMatrix() const;
+		const glm::mat4 GetRelativeViewMatrix() const;
+		const glm::mat4 GetRelativeViewMatrix(const glm::vec3& pos) const;
 		const glm::mat4 GetOrthoMatrix(float halfSize) const;
 		const glm::vec3 GetWorldUp() const {
 			return glm::vec3(0, 1, 0);

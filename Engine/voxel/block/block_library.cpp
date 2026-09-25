@@ -8,8 +8,8 @@
 
 using json = nlohmann::json;
 
-namespace nova_engine::voxel::block {
-
+namespace nova_engine::voxel::block 
+{
 	const Block* BlockLibrary::FindBlock(int id) const{
 		auto it = blocks_.find(id);
 		if (it != blocks_.end()) {
@@ -40,8 +40,8 @@ namespace nova_engine::voxel::block {
 
 		fs::path blocksDir(BLOCKDIR);
 		if (!fs::exists(blocksDir) || !fs::is_directory(blocksDir)) {
-			NE_CORE_ERROR("BlockLoader","Block directory not found: {}", BLOCKDIR);
-			throw;
+			NE_CORE_ERROR("BlockLoader", "Block directory not found: {}", BLOCKDIR);
+			throw std::runtime_error("Block directory not found!");
 		}
 		for (const auto& entry : fs::directory_iterator(blocksDir)) {
 			if (!entry.is_directory()) continue;

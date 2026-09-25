@@ -1,7 +1,6 @@
 #pragma once
 
 #include <render/opengl/glmesh.h>
-#include <render/opengl/context/glcontext.h>
 
 namespace nova_engine::render::opengl {
 	class IRenderer {

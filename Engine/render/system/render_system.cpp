@@ -6,6 +6,7 @@
 #include <utils/spatial/chunk_range_finder.h>
 #include <glm/gtx/norm.hpp>
 #include <log/logger.h>
+#include <voxel/terrain/terrain_generator.h>
 
 namespace nova_engine::render::system {
 	void RenderSystem::Render(opengl::context::RenderContext& renderContext) const
@@ -13,16 +14,19 @@ namespace nova_engine::render::system {
 		static opengl::GLMesh emptyMesh = {};
 		opengl::context::ChunkMeshCache* meshCache = renderContext.chunkMesh.GetLayer(Default);
 		opengl::context::ChunkMeshCache* meshCache2 = renderContext.chunkMesh.GetLayer(Lucency);
+		//opengl::context::ChunkMeshCache* lodMeshCache = renderContext.chunkMesh.GetLayer(Lod);
 		if (!meshCache) return;
 
 		const std::vector<opengl::GLMesh>& meshs = meshCache->GetAllMesh();
 		const std::vector<opengl::GLMesh>& meshs2 = meshCache2->GetAllMesh();
+		
 
 		glBlendFunc(GL_ONE, GL_ZERO);
 		glBlendEquation(GL_FUNC_ADD);
 		glEnable(GL_BLEND);
 
 
+		
 		//---------------------------------平行光阴影渲染器--------------------------------------
 		
 		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("ShadowFrame"))
@@ -32,13 +36,16 @@ namespace nova_engine::render::system {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
+		//glEnable(GL_POLYGON_OFFSET_FILL);
+		//glPolygonOffset(-2.0f, -4.0f);
 		if (renderContext.useShadow) {
 			for (const opengl::GLMesh& mesh : meshs) {
-				if (mesh.GetElementLength()) {
+				if (mesh.Awake()) {
 					renderContext.parallelLightRenderer.Render(mesh);
 				}
 			}
 		}
+		//glDisable(GL_POLYGON_OFFSET_FILL);
 		
 		//----------------------------------方块纹理渲染器--------------------------------------
 		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
@@ -49,10 +56,21 @@ namespace nova_engine::render::system {
 		glDepthFunc(GL_LESS);
 		renderContext.blockRenderer.Render(emptyMesh);
 		for (const opengl::GLMesh& mesh : meshs) {
-			if (mesh.GetElementLength()) {
+			if (mesh.Awake()) {
 				renderContext.blockRenderer.Render(mesh);
 			}
 		}
+
+		if (renderContext.lodMesh) {
+			for (const auto& lodMesh : renderContext.lodMeshCache.AllData()) {
+				if (lodMesh.Awake()) {
+					renderContext.blockRenderer.Render(lodMesh);
+				}
+			}
+		}
+		
+		//NE_CORE_DEBUG("RenderSystem","lod mesh count:{}", count);
+
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
@@ -69,9 +87,8 @@ namespace nova_engine::render::system {
 		glClearBufferfv(GL_COLOR, 0, accumDefault);
 		// Revealage 清 1（乘性累积的初始值）
 		glClearBufferfv(GL_COLOR, 1, revealDefault);
-		
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
+
 		renderContext.semiTranRenderer.Render(emptyMesh);
 		if (renderContext.lucencyMesh) {
 			//首先需要进行距离排序
@@ -79,7 +96,7 @@ namespace nova_engine::render::system {
 			std::vector<const opengl::GLMesh*> temMesh;
 			//收集网格
 			for (const opengl::GLMesh& mesh : meshs2) {
-				if (mesh.GetElementLength()) {
+				if (mesh.Awake()) {
 					temMesh.push_back(&mesh);
 				}
 			}
@@ -106,8 +123,9 @@ namespace nova_engine::render::system {
 	
 	}
 
-	static const std::vector<glm::ivec3> chunksPos = nova_engine::utils::spatial::FindChunkInRange(320);
+	static const std::vector<glm::ivec3> chunksPos = nova_engine::utils::spatial::FindChunkInRange(256);
 
+	bool firstLod = true;
 	void RenderSystem::Update(
 		const nova_engine::core::world::World& world, 
 		opengl::context::RenderContext& context)
@@ -119,21 +137,10 @@ namespace nova_engine::render::system {
 		if (meshCache && meshCache2) {
 			auto& meshs = meshCache->GetAllMesh();
 
-			/*auto chunk = world.chunkData.FindChunk(0, 0, 0);
-			if (chunk) {
-				bool exist = meshCache->Exist(0, 0, 0);
-				if (!exist) {
-					auto defaultMesh = utils::MeshBuilder::BuildMeshFromChunk(*chunk, {}, voxel::block::BlockLibrary::GetInstance());
-					const MeshData& mesh = defaultMesh[0].value();
-					const MeshData& mesh2 = defaultMesh[1].value();
-					meshCache->SubmitMesh(0, 0, 0, mesh);
-					meshCache2->SubmitMesh(0, 0, 0, mesh2);
-				}
-			}*/
 			for (const auto& mesh : meshs) {
 				auto chunk = world.chunkData.FindChunk(mesh.position.x, mesh.position.y, mesh.position.z);
 				int dis = glm::length2(mesh.position - (glm::vec3)playerPos);
-				if ((dis > 272 * 272 || !chunk)) {
+				if ((dis > 192 * 192 || !chunk)) {
 					meshCache->FreeMesh(mesh.position.x, mesh.position.y, mesh.position.z);
 					meshCache2->FreeMesh(mesh.position.x, mesh.position.y, mesh.position.z);
 				}
@@ -144,10 +151,10 @@ namespace nova_engine::render::system {
 				int cx = chunkPos.x + (int)playerPos.x,
 					cy = chunkPos.y + (int)playerPos.y,
 					cz = chunkPos.z + (int)playerPos.z;
+
 				auto chunk = world.chunkData.FindChunk(cx, cy, cz);
 				bool exist = meshCache->Exist(cx, cy, cz);
 				const glm::ivec3& cp = chunkPos;
-				//((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) < 96 * 96) &&
 				if (chunk && !exist) {
 					const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
 					//只要有邻居不存在，不构建网格
@@ -165,20 +172,19 @@ namespace nova_engine::render::system {
 
 					const MeshData& mesh = defaultMesh[0].value();
 					const MeshData& mesh2 = defaultMesh[1].value();
-						
+
 					meshCache->SubmitMesh(cx, cy, cz, mesh);
 					meshCache2->SubmitMesh(cx, cy, cz, mesh2);
 					count++;
 				}
-				/*if((((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 96 * 96) || !chunk) && exist){
-					context.chunkMeshCache.FreeMesh(cx, cy, cz);
-				}*/
 
 				if (count >= MAXCOUNT) break;
-
 			}
-
 		}
+
+		//lodSystem_.Update(context.lodMeshCache, world);
+		lodSystem_.Update(context, world.playerPos);
+		
 		
 		opengl::Camera* camera = opengl::CameraLibrary::GetInstance().GetCamera("MainCamera");
 		if (camera) {
@@ -188,12 +194,27 @@ namespace nova_engine::render::system {
 
 		opengl::Camera* shadowCamera = opengl::CameraLibrary::GetInstance().GetCamera("ShadowCamera");
 		if (shadowCamera) {
+			float orthoSize = 64.0f;
+			int shadowResolution = 2048;
+			float texelWorldPos = (2.0 * orthoSize) / shadowResolution;
+
 			glm::vec3 lightDir = glm::normalize(glm::vec3(0.3, 0.8, 0.5));
 			float distance = 128.0f;
-			glm::vec3 fixedPos = glm::floor(world.playerPos / 1.0f) * 1.0f + 0.5f;
-			glm::vec3 lightPos = fixedPos + lightDir * distance;
-			shadowCamera->position = lightPos;
-			shadowCamera->rotation = fixedPos - lightPos; // 指向玩家的向量
+			//glm::vec3 fixedPos = glm::floor(world.playerPos / 1.0f) * 1.0f + 0.5f;
+			glm::vec3 lightPos = world.playerPos + lightDir * distance;
+
+			glm::mat4 lightView = glm::lookAt(lightPos, world.playerPos,glm::vec3(0,1,0));
+			glm::vec4 playerInLightSpace = lightView * glm::vec4(world.playerPos, 1.0);
+
+			playerInLightSpace.x = glm::floor(playerInLightSpace.x / texelWorldPos) * texelWorldPos;
+			playerInLightSpace.y = glm::floor(playerInLightSpace.y / texelWorldPos) * texelWorldPos;
+
+			glm::mat4 invLightView = glm::inverse(lightView);
+			glm::vec4 alignedPlayer = invLightView * playerInLightSpace;
+			glm::vec3 alignedTarget = glm::vec3(alignedPlayer);
+
+			shadowCamera->position = alignedTarget + lightDir * distance;
+			shadowCamera->rotation = -lightDir;
 		}
 	}
 }

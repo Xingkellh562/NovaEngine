@@ -33,7 +33,7 @@ namespace nova_engine::render::opengl {
 
 	void SemiTransparentRenderer::Render(const GLMesh& mesh) {
 		if (needResizeFBO_) {
-			//CreateSemiTranFbo();
+			CreateSemiTranFbo();
 			if (camera_) {
 				projection_ = camera_->GetTransformMatrix(width_, height_);
 				
@@ -57,9 +57,15 @@ namespace nova_engine::render::opengl {
 		glCullFace(GL_BACK);
 
 		//mvp
-		if (camera_)
-			view_ = camera_->GetViewMatrix();
-		glm::mat4 model = mesh.GetModelMatrix();
+		glm::mat4 model;
+		if (camera_) {
+			view_ = camera_->GetRelativeViewMatrix();
+			model = mesh.GetModelMatrix(camera_->position);
+		}
+		else {
+			model = mesh.GetModelMatrix();
+		}
+			
 
 		if (depthShader_) {
 			depthShader_->Use();
@@ -107,7 +113,5 @@ namespace nova_engine::render::opengl {
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 		glEnable(GL_CULL_FACE);
-
-		
 	}
 }

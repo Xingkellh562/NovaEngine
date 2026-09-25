@@ -4,7 +4,13 @@
 
 namespace nova_engine::voxel::block {
 	enum QuadFaceOrientation {
-		North, South, Up, Down, East, West, None//-x,+x,+y,-y,+z,-z,none
+		North = 0, 
+		South = 1,
+		Up    = 2, 
+		Down  = 3, 
+		East  = 4, 
+		West  = 5, 
+		None  = 6//-x,+x,+y,-y,+z,-z,none
 	};
 
 	//这一个对象代表一个四边形面

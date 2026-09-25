@@ -2,6 +2,7 @@
 
 #include <core/world/world.h>
 #include <render/opengl/context/render_context.h>
+#include "lod_system.h"
 
 namespace nova_engine::render::system {
 	class RenderSystem {
@@ -17,5 +18,9 @@ namespace nova_engine::render::system {
 		void Update(const nova_engine::core::world::World& world,opengl::context::RenderContext& context);
 	private:
 		RenderSystem() = default;
+
+		void UpdateLodMesh(opengl::context::RenderContext& renderContext, const voxel::chunk::ChunkData& chunkData, glm::vec3 playerPos);
+
+		LodSystem lodSystem_;
 	};
 }

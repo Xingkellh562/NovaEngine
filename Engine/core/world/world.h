@@ -9,7 +9,7 @@ namespace nova_engine::core::world {
 		//目前只有一个区块数据
 		nova_engine::voxel::chunk::ChunkData chunkData;
 		//临时测试用的玩家数据
-		glm::vec3 playerPos = {0,70,0};
+		glm::vec3 playerPos = {0,128,0};
 		glm::vec3 playerRot = { 0,0,1 };
 
 		glm::ivec3 selectedBlock = { 0,0,0 };

@@ -41,12 +41,12 @@ namespace nova_engine::core::input {
 			}
 			if (voxel) {
 				world.selectedBlock = { pos.x, pos.y, pos.z };
-				if (state_.destoryBlock) {
-					if (state_.destoryBlock) {
+				if (state_.destroyBlock) {
+					if (state_.destroyBlock) {
 						chunk->SetVoxel(pos.x & 31,
 							pos.y & 31,
 							pos.z & 31, 0);
-						state_.destoryBlock = false;
+						state_.destroyBlock = false;
 					}
 
 					auto layer = context.chunkMesh.GetLayer(Default);

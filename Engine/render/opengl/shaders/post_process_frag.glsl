@@ -4,7 +4,8 @@ out vec4 FragColor;
 
 uniform sampler2D colorTex;
 uniform sampler2D depthTex;
-uniform sampler2D shadowMap;
+//uniform sampler2D shadowMap;
+uniform sampler2DShadow shadowMap;
 
 uniform sampler2D accumTex;
 uniform sampler2D revealTex;
@@ -24,19 +25,20 @@ float ShadowCalculation(vec4 fragPosLightSpace){
 
     float shadow = 0.0;
     vec2 texelSize = 1.0/textureSize(shadowMap,0);
-    float bias = 0.0007;
+    float bias = 0.001;
     int samples = 3;
-    float radius = 0.5;
+    float radius = 1.5;
     for(int x = -samples/2;x <= samples/2;x++){
         for(int y = -samples/2;y <= samples/2;y++){
-            float pcfDepth = texture(shadowMap,projCoords.xy+ vec2(x,y) * texelSize * radius).r;
-            shadow += (projCoords.z - bias) > pcfDepth ? 1.0 :0.0;
+            vec2 offset = vec2(float(x),float(y)) * texelSize * radius;
+            shadow += texture(shadowMap, vec3(projCoords.xy + offset, projCoords.z - bias));
         }
     }
-
+    //float bias = 0.001;
+    //float shadow = 
     
-    return shadow /(samples * samples);
-
+    return 1 - shadow /(samples * samples);
+    //return 1 - shadow;
 }
 
 void main() {
@@ -71,7 +73,7 @@ void main() {
         finalColor = (avgColor * (1.0 - revealage) + color * revealage);
     }
 
-    float shadowIntensity = 0.7;
+    float shadowIntensity = 0.5;
     finalColor *= (1.0 - shadowIntensity * shadowFactor);
 
     FragColor = vec4(finalColor,1.0);

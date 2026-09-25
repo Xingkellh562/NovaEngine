@@ -2,24 +2,28 @@
 #include <utils/spatial/chunk_range_finder.h>
 #include <glm/gtx/norm.hpp>
 #include <voxel/terrain/terrain_generator.h>
+#include <core/config/config.h>
 
 
 namespace nova_engine::voxel::chunk {
 	void ChunkSystem::BuildChunk(ChunkData& chunkData, int x, int y, int z) {
 		static const terrain::TerrainGenerator generator(123);
+		const int MASK = core::config::CHUNK_SIZE - 1;
 		//将转入的绝对坐标修正为区块原点(左下后)(区块大小32)，可处理负数
-		int fx = x & ~31, fy = y & ~31, fz = z & ~31;
+		int fx = x & ~MASK, fy = y & ~MASK, fz = z & ~MASK;
 		//从池中获取一个可供修改的对象
 		std::unique_ptr<Chunk> chunkPtr = chunkData.AcquireChunk();
 
 		if (chunkPtr != nullptr) {
-			generator.BuildChunk(*chunkPtr, x, y, z);
+			generator.BuildChunk(*chunkPtr, x, y, z, core::config::CHUNK_SIZE);
 			//将对象提交给data容器管理
 			chunkData.SubmitChunk(fx, fy, fz, std::move(chunkPtr));
 		}
 	}
 
-	static const std::vector<glm::ivec3> chunksPos = utils::spatial::FindChunkInRange(320);
+	
+
+	static const std::vector<glm::ivec3> chunksPos = utils::spatial::FindChunkInRange(256);
 
 	void ChunkSystem::Update(nova_engine::core::world::World& world) {
 		glm::ivec3 playerPos = world.playerPos;
@@ -33,11 +37,11 @@ namespace nova_engine::voxel::chunk {
 				cz = chunkPos.z + playerPos.z;
 			auto chunk = world.chunkData.FindChunk(cx,cy,cz);
 			const glm::ivec3& cp = chunkPos;
-			if (((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) < 256 * 256) && !chunk) {
+			if (((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) < 160 * 160) && !chunk) {
 				count++;
 				BuildChunk(world.chunkData, cx, cy, cz);
 			}
-			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 280 * 280) && chunk)
+			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 192 * 192) && chunk)
 				world.chunkData.RemoveChunk(cx, cy, cz);
 		}
 

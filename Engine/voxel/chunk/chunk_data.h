@@ -5,6 +5,7 @@
 #include <collection/data_structure/object_pool.h>
 #include <memory>
 #include <unordered_map>
+#include <core/config/config.h>
 
 #include <glm/vec3.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -23,6 +24,8 @@ namespace nova_engine::voxel::chunk {
 
 		//查找指定坐标的块，如果不存在则返回nullptr
 		Chunk* FindChunk(int x, int y, int z) const;
+
+		int GetDepth(int x, int y, int z) const;
 		//转移区块所有权到ChunkData中，ChunkData将负责管理该区块的生命周期
 		void SubmitChunk(int x, int y, int z, std::unique_ptr<Chunk> chunk);
 		//删除指定坐标的块，回收到对象池中，如果不存在则不做任何操作
@@ -39,7 +42,7 @@ namespace nova_engine::voxel::chunk {
 			return chunkPool_.Size();
 		}
 	private:
-		std::unordered_map<glm::ivec3,collection::data_structure::Octree<Chunk, 2048, 32>> chunkMap_;
-		collection::data_structure::ObjectPool<Chunk, 2048> chunkPool_;
+		std::unordered_map<glm::ivec3,collection::data_structure::Octree<Chunk, core::config::OCTREE_SIZE, core::config::CHUNK_SIZE>> chunkMap_;
+		collection::data_structure::ObjectPool<Chunk, core::config::POOL_SIZE> chunkPool_;
 	};
 }

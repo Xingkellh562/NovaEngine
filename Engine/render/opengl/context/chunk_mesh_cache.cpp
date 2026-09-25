@@ -1,14 +1,18 @@
 #include "chunk_mesh_cache.h"
+#include <core/config/config.h>
 
 namespace nova_engine::render::opengl::context {
 	bool ChunkMeshCache::Exist(int x, int y, int z)  const {
-		int fx = x >> 5, fy = y >> 5, fz = z >> 5;
+		const int CHUNK_BIT = core::config::CHUNK_BIT1;
+		int fx = x >> CHUNK_BIT, fy = y >> CHUNK_BIT, fz = z >> CHUNK_BIT;
 
 		return indexMap_.find(glm::vec3(fx, fy, fz)) != indexMap_.end();
 	}
 
 	void ChunkMeshCache::SubmitMesh(int x,int y,int z,const MeshData& data) {
-		int fx = x >> 5, fy = y >> 5, fz = z >> 5;
+		const int CHUNK_BIT = core::config::CHUNK_BIT1;
+		const int CHUNK_MASK = core::config::CHUNK_SIZE - 1;
+		int fx = x >> CHUNK_BIT, fy = y >> CHUNK_BIT, fz = z >> CHUNK_BIT;
 
 		glm::vec3 key(fx, fy, fz);
 
@@ -23,7 +27,8 @@ namespace nova_engine::render::opengl::context {
 			// 已存在：复用现有槽位
 			idx = it->second;
 		}
-		int mx = x & ~31, my = y & ~31, mz = z & ~31;
+
+		int mx = x & ~CHUNK_MASK, my = y & ~CHUNK_MASK, mz = z & ~CHUNK_MASK;
 		meshs_[idx].position.x = mx;
 		meshs_[idx].position.y = my;
 		meshs_[idx].position.z = mz;
@@ -36,10 +41,11 @@ namespace nova_engine::render::opengl::context {
 	}
 
 	void ChunkMeshCache::FreeMesh(int x, int y, int z) {
-		int fx = x >> 5, fy = y >> 5, fz = z >> 5;
+		const int CHUNK_BIT = core::config::CHUNK_BIT1;
+		int fx = x >> CHUNK_BIT, fy = y >> CHUNK_BIT, fz = z >> CHUNK_BIT;
 		glm::vec3 key(fx, fy, fz);
 		auto it = indexMap_.find(key);
-		if (it == indexMap_.end()) {return;} 
+		if (it == indexMap_.end()) {return;}
 		size_t idx = it->second;
 		//边界检查(保险起见)
 		if (idx >= meshs_.size()) return;

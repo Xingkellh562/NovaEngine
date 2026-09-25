@@ -8,14 +8,25 @@ enum MeshLayer
 {
 	Default = 0,
 	Lucency = 1,
-	Liquid = 2
+	Liquid = 2,
+	Lod = 3
+};
+
+enum LodDepth {
+	Lod0 = 0,
+	Lod1 = 1,
+	Lod2 = 2,
+	Lod3 = 3,
+	Lod4 = 4,
+	Lod5 = 5,
+	Lod6 = 6,
 };
 
 namespace nova_engine::render::opengl::context {
 	class StaticMesh {
 	public:
-		StaticMesh() {
-			for (size_t i = 0; i < 2; i++)
+		StaticMesh(int layerSize = 4) {
+			for (size_t i = 0; i < layerSize; i++)
 				caches_.push_back(std::make_unique<ChunkMeshCache>());
 		};
 		~StaticMesh() = default;

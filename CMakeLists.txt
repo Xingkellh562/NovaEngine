@@ -13,19 +13,6 @@ if(CMAKE_GENERATOR MATCHES "Visual Studio")
     set(CMAKE_CONFIGURATION_TYPES "Release;RelWithDebInfo;MinSizeRel" CACHE STRING "" FORCE)
 endif()
 
-if(MSVC)
-    target_compile_options(YOUR_TARGET PRIVATE
-        /O2          # 最大化速度
-        /Ob2         # 强制内联
-        /Oi          # 使用内建函数
-        /Ot          # 优先速度而非大小
-        /arch:AVX2   # 如果 CPU 支持，否则 /arch:SSE2
-        /fp:fast     # 快速浮点运算
-        /GL          # 全程序优化（配合 LTCG）
-    )
-    target_link_options(YOUR_TARGET PRIVATE /LTCG) # 链接时代码生成
-endif()
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

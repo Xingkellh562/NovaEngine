@@ -51,11 +51,11 @@ namespace nova_engine::render::opengl {
 			if (!mainCamera_) return;
 			if (!shadowCamera_) return;
 
-			glm::mat4 view = mainCamera_->GetViewMatrix();
+			glm::mat4 view = mainCamera_->GetRelativeViewMatrix();
 			glm::mat4 projection = mainCamera_->GetTransformMatrix(width_, height_);
 			glm::mat4 invViewProj = glm::inverse(projection * view);
 			
-			glm::mat4 lightView = shadowCamera_->GetViewMatrix();
+			glm::mat4 lightView = shadowCamera_->GetRelativeViewMatrix(mainCamera_->position);
 			glm::mat4 lightProjection = shadowCamera_->GetOrthoMatrix(32);
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

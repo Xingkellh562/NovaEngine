@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <render/opengl/context/chunk_mesh_cache.h>
+#include <render/opengl/context/lod_mesh_cache.h>
 
 
 using namespace nova_engine::render::opengl::context;
@@ -43,7 +44,30 @@ protected:
         glfwTerminate();
     }
 
-    ChunkMeshCache meshs;
+    LodMeshCache meshs;
+
+    nova_engine::render::MeshData data{
+        {
+            // X     Y     Z      NX    NY    NZ
+             0.0f,  0.0f, 0.0f,   // v0 (中心)
+            -1.0f, -1.0f, 0.0f,    // v1 (左下)
+             1.0f, -1.0f, 0.0f,    // v2 (右下)
+             1.0f,  1.0f, 0.0f,    // v3 (右上)
+            -1.0f,  1.0f, 0.0f,     // v4 (左上)
+        },{ 
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f
+        },{
+            1,1,1,1,1
+        },{
+            0, 1, 2,  // 三角形 1 (左下)
+            0, 2, 3,  // 三角形 2 (右下)
+            0, 3, 4,  // 三角形 3 (右上)
+            0, 4, 1   // 三角形 4 (左上)
+        } };
 private:
     static GLFWwindow* window;
 };
