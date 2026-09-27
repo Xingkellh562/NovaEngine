@@ -29,6 +29,8 @@ namespace nova_engine::render::opengl::context {
 
 		bool TryCombine(int x, int y, int z, int depth, const MeshData* data);
 
+		bool TryDeleteOctree(int x, int y, int z);
+
 		auto AllData() const {
 			return datas_
 				| std::views::values
@@ -46,6 +48,10 @@ namespace nova_engine::render::opengl::context {
 					-> const GLMesh& {
 						return *p;
 					});
+		}
+
+		const auto& AllOctree() const {
+			return datas_;
 		}
 	private: 
 		std::unordered_map < glm::ivec3,collection::data_structure::AdaptiveLodOctree

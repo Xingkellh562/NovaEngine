@@ -103,4 +103,16 @@ namespace nova_engine::render::opengl::context {
 		auto [it, insert] = datas_.try_emplace(key);
 		return it->second.TryCombine(x & mask, y & mask, z & mask, std::move(mesh));
 	}
+
+	bool LodMeshCache::TryDeleteOctree(int x, int y, int z) {
+		glm::ivec3 key = GetKeyWithCoo(x, y, z);
+
+		auto it = datas_.find(key);
+		if (it == datas_.end()) {
+			datas_.erase(key);
+			return true;
+		}
+		return false;
+	}
+
 }

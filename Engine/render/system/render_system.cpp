@@ -14,7 +14,6 @@ namespace nova_engine::render::system {
 		static opengl::GLMesh emptyMesh = {};
 		opengl::context::ChunkMeshCache* meshCache = renderContext.chunkMesh.GetLayer(Default);
 		opengl::context::ChunkMeshCache* meshCache2 = renderContext.chunkMesh.GetLayer(Lucency);
-		//opengl::context::ChunkMeshCache* lodMeshCache = renderContext.chunkMesh.GetLayer(Lod);
 		if (!meshCache) return;
 
 		const std::vector<opengl::GLMesh>& meshs = meshCache->GetAllMesh();
@@ -36,8 +35,7 @@ namespace nova_engine::render::system {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glDepthFunc(GL_LESS);
-		//glEnable(GL_POLYGON_OFFSET_FILL);
-		//glPolygonOffset(-2.0f, -4.0f);
+
 		if (renderContext.useShadow) {
 			for (const opengl::GLMesh& mesh : meshs) {
 				if (mesh.Awake()) {
@@ -45,7 +43,6 @@ namespace nova_engine::render::system {
 				}
 			}
 		}
-		//glDisable(GL_POLYGON_OFFSET_FILL);
 		
 		//----------------------------------方块纹理渲染器--------------------------------------
 		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
@@ -68,18 +65,17 @@ namespace nova_engine::render::system {
 				}
 			}
 		}
-		
-		//NE_CORE_DEBUG("RenderSystem","lod mesh count:{}", count);
-
-
-		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			NE_CORE_DEBUG("RenderSystem", "GL error: {}", err);
-		}
 
 		//----------------------------------WBOIT渲染器--------------------------------------
 		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame"))
 			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame")->Bind();
+
+		const opengl::GLTextureArray* textures
+			= opengl::TextureArrayLibrary::GetInstance().GetTextureArray("BlockTextures");
+		if (textures != nullptr) {
+			glBindTexture(GL_TEXTURE_2D_ARRAY, textures->get());
+			glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		}
 		
 		// Accumulation 清 0
 		const GLfloat accumDefault[]{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -113,6 +109,10 @@ namespace nova_engine::render::system {
 			}
 		}
 		
+		if (textures != nullptr) {
+			glBindTexture(GL_TEXTURE_2D_ARRAY, textures->get());
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		}
 		//----------------------------------后处理渲染器--------------------------------------
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -182,7 +182,6 @@ namespace nova_engine::render::system {
 			}
 		}
 
-		//lodSystem_.Update(context.lodMeshCache, world);
 		lodSystem_.Update(context, world.playerPos);
 		
 		

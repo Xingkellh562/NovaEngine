@@ -16,6 +16,8 @@ namespace nova_engine::render::opengl::context {
 		ChunkMeshCache& operator=(const ChunkMeshCache&) = delete;
 		//通过坐标哈希只读查找mesh是否存在，用于一些外部逻辑
 		bool Exist(int x, int y, int z) const;
+		//只读查找Mesh对象
+		const GLMesh* FindMesh(int x, int y, int z) const;
 		//失活对应mesh，索引移入池，如果不存在则不做任何操作
 		void FreeMesh(int x, int y, int z);
 		//清空所有数据

@@ -6,7 +6,18 @@ namespace nova_engine::render::opengl::context {
 		const int CHUNK_BIT = core::config::CHUNK_BIT1;
 		int fx = x >> CHUNK_BIT, fy = y >> CHUNK_BIT, fz = z >> CHUNK_BIT;
 
-		return indexMap_.find(glm::vec3(fx, fy, fz)) != indexMap_.end();
+		return  indexMap_.find(glm::vec3(fx, fy, fz)) != indexMap_.end();
+	}
+
+	const GLMesh* ChunkMeshCache::FindMesh(int x, int y, int z) const {
+		const int CHUNK_BIT = core::config::CHUNK_BIT1;
+		int fx = x >> CHUNK_BIT, fy = y >> CHUNK_BIT, fz = z >> CHUNK_BIT;
+
+		auto it = indexMap_.find(glm::vec3(fx, fy, fz));
+		if (it != indexMap_.end()) {
+			return &meshs_[it->second];
+		}
+		else return nullptr;
 	}
 
 	void ChunkMeshCache::SubmitMesh(int x,int y,int z,const MeshData& data) {

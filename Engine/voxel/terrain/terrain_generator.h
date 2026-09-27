@@ -2,6 +2,7 @@
 
 #include <utils/noise/noise2d.h>
 #include <voxel/chunk/chunk.h>
+#include <voxel/lod/lod_voxel_data.h>
 
 namespace nova_engine::voxel::terrain {
 	//地形生成器
@@ -14,6 +15,7 @@ namespace nova_engine::voxel::terrain {
 		TerrainGenerator& operator=(const TerrainGenerator&) = delete;
 
 		void BuildChunk(chunk::Chunk& chunk,int x,int y,int z, int chunkSize = 32) const;
+		lod::LodVoxelData SampleLodData(int x, int y, int z, int lodSize) const;
 	private:
 		int seed_;
 		utils::noise::Noise2D noise_;

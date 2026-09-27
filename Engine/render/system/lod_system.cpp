@@ -44,7 +44,23 @@ namespace nova_engine::render::system{
             (playerPos.z >> shift) << shift
         };
 
-        int budget = 16;
+        for (const auto& p : coordComTable[maxDepth]) {
+            int x = p.x + anchor.x;
+            int y = p.y + anchor.y;
+            int z = p.z + anchor.z;
+
+            auto lodMesh = context.lodMeshCache.Find(x, y, z, nullptr);
+            auto cMesh = chunkMesh->FindMesh(x, y, z);
+            if (cMesh) {
+                if (lodMesh && cMesh->Awake()) lodMesh->Sleep();
+                else if (lodMesh && !cMesh->Awake()) lodMesh->Wake();
+            }
+            else {
+                if (lodMesh) lodMesh->Wake();
+            }
+        }
+
+        int budget = 2;
         for (int d = 0; d <= maxDepth && budget > 0; ++d) {
             for (const auto& p : coordSubTable[d]) {
                 if (budget <= 0) break;
@@ -62,22 +78,10 @@ namespace nova_engine::render::system{
                     Subdivide(context.lodMeshCache, generator, x, y, z, currentDepth + 1);
                     --budget;
                 }
-
-                if (d == maxDepth)
-                {
-                    auto lodMesh = context.lodMeshCache.Find(x, y, z, nullptr);
-                    if (chunkMesh->Exist(x, y, z)) {
-                        if (lodMesh) lodMesh->Sleep();
-                    }
-                    else {
-                        if (lodMesh) lodMesh->Wake();
-                    }
-                }
-                
             }
         }
 
-        budget = 16;
+        budget = 2;
 
         //坐标检查表：防止上一级遍历误合并下一级坐标
         std::unordered_set<glm::ivec3> existedCoords;
@@ -99,6 +103,18 @@ namespace nova_engine::render::system{
                     --budget;
                 }
                 existedCoords.insert(p);
+            }
+        }
+
+        for (auto& octree : context.lodMeshCache.AllOctree()) {
+            int depth = -1;
+            octree.second.Find(0,0,0,&depth);
+            if (depth == 0) {
+                const int bit = core::config::OCTREE_BIT1;
+                int x = octree.first.x << bit;
+                int y = octree.first.y << bit;
+                int z = octree.first.z << bit;
+                context.lodMeshCache.TryDeleteOctree(x,y,z);
             }
         }
     }
@@ -134,10 +150,9 @@ namespace nova_engine::render::system{
             int fy = py+ NeiOffCoord[i].y * childSize;
             int fz = pz+ NeiOffCoord[i].z * childSize;
             
-            voxel::chunk::Chunk chunk(core::config::CHUNK_SIZE);
-            generator.BuildChunk(chunk, fx, fy, fz, childSize);
+            auto lodData = generator.SampleLodData(fx, fy, fz, childSize);
             data[i] = utils::MeshBuilder::BuildLodMesh(
-                chunk, scale, voxel::block::BlockLibrary::GetInstance());
+                lodData, scale, voxel::block::BlockLibrary::GetInstance());
             dataPtr[i] = &data[i];
         }
 
@@ -159,10 +174,9 @@ namespace nova_engine::render::system{
         int py = y & ~(parentSize - 1);
         int pz = z & ~(parentSize - 1);
 
-        voxel::chunk::Chunk chunk(core::config::CHUNK_SIZE);
-        generator.BuildChunk(chunk, px, py, pz, parentSize);
+        auto lodData = generator.SampleLodData(px, py, pz, parentSize);
         MeshData data = utils::MeshBuilder::BuildLodMesh(
-            chunk, scale, voxel::block::BlockLibrary::GetInstance());
+            lodData, scale, voxel::block::BlockLibrary::GetInstance());
 
         cache.TryCombine(px, py, pz, depth, &data);
     }

@@ -44,8 +44,5 @@ namespace nova_engine::voxel::chunk {
 			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 192 * 192) && chunk)
 				world.chunkData.RemoveChunk(cx, cy, cz);
 		}
-
-		//BuildChunk(world.chunkData, 0, 32, 0);
-		//BuildChunk(world.chunkData, 0, 64, 0);
 	}
 }

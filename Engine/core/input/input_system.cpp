@@ -103,5 +103,8 @@ namespace nova_engine::core::input {
 
 			
 		}
+
+		state_.buildBlock = false;
+		state_.destroyBlock = false;
 	}
 }
