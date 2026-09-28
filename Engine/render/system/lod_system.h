@@ -12,7 +12,7 @@ namespace nova_engine::render::system {
 		void Subdivide(
 			opengl::context::LodMeshCache&,
 			const voxel::terrain::TerrainGenerator& generator, 
-			int x, int y, int z, int depth);
+			int x, int y, int z, int depth, bool generatorMesh);
 
 		void Combine(
 			opengl::context::LodMeshCache&, 

@@ -75,7 +75,7 @@ namespace nova_engine::render::system{
                 //细分
                 if (currentDepth < d) {
                     
-                    Subdivide(context.lodMeshCache, generator, x, y, z, currentDepth + 1);
+                    Subdivide(context.lodMeshCache, generator, x, y, z, currentDepth + 1, currentDepth >= d - 1);
                     --budget;
                 }
             }
@@ -123,7 +123,7 @@ namespace nova_engine::render::system{
     void LodSystem::Subdivide(
         opengl::context::LodMeshCache& cache,
         const voxel::terrain::TerrainGenerator& generator,
-        int x, int y, int z, int depth)
+        int x, int y, int z, int depth,bool generatorMesh)
     {
         static const std::array<glm::ivec3, 8> NeiOffCoord = { {
             {0,0,0},{1,0,0},{0,1,0},{1,1,0},
@@ -150,10 +150,15 @@ namespace nova_engine::render::system{
             int fy = py+ NeiOffCoord[i].y * childSize;
             int fz = pz+ NeiOffCoord[i].z * childSize;
             
-            auto lodData = generator.SampleLodData(fx, fy, fz, childSize);
-            data[i] = utils::MeshBuilder::BuildLodMesh(
-                lodData, scale, voxel::block::BlockLibrary::GetInstance());
-            dataPtr[i] = &data[i];
+            if (generatorMesh) {
+                auto lodData = generator.SampleLodData(fx, fy, fz, childSize);
+                data[i] = utils::MeshBuilder::BuildLodMesh(
+                    lodData, scale, voxel::block::BlockLibrary::GetInstance());
+                dataPtr[i] = &data[i];
+            }
+            else {
+                dataPtr[i] = nullptr;
+            }
         }
 
         cache.TrySubdivide(px, py, pz, depth, dataPtr);

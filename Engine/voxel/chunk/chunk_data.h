@@ -25,7 +25,6 @@ namespace nova_engine::voxel::chunk {
 		//查找指定坐标的块，如果不存在则返回nullptr
 		Chunk* FindChunk(int x, int y, int z) const;
 
-		int GetDepth(int x, int y, int z) const;
 		//转移区块所有权到ChunkData中，ChunkData将负责管理该区块的生命周期
 		void SubmitChunk(int x, int y, int z, std::unique_ptr<Chunk> chunk);
 		//删除指定坐标的块，回收到对象池中，如果不存在则不做任何操作
@@ -42,7 +41,16 @@ namespace nova_engine::voxel::chunk {
 			return chunkPool_.Size();
 		}
 	private:
-		std::unordered_map<glm::ivec3,collection::data_structure::Octree<Chunk, core::config::OCTREE_SIZE, core::config::CHUNK_SIZE>> chunkMap_;
+		std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>> map_;
 		collection::data_structure::ObjectPool<Chunk, core::config::POOL_SIZE> chunkPool_;
+		size_t size_ = 0;
+
+		glm::ivec3 GetKeyWithCoord(int x, int y, int z) const {
+			return {
+				x >> core::config::CHUNK_BIT1,
+				y >> core::config::CHUNK_BIT1,
+				z >> core::config::CHUNK_BIT1
+			};
+		}
 	};
 }
