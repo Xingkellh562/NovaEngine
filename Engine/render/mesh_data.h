@@ -6,10 +6,13 @@ namespace nova_engine::render {
 		std::vector<float> vertices;
 		std::vector<float> uvws;
 		std::vector<float> aos;
+		std::vector<float> normals;
 		std::vector<int> indices;
 
 		bool isValid() const {
 			return !vertices.empty() && !indices.empty();
 		}
+
+
 	};
 }

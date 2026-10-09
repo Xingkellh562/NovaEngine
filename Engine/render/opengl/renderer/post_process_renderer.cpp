@@ -78,6 +78,12 @@ namespace nova_engine::render::opengl {
 				revealTex = oitFrame->FindTexture("RevealTex");
 			}
 
+			auto lightFrame = opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("LightFrame");
+			GLuint lightTex = 0;
+			if(lightFrame) {
+				lightTex = lightFrame->FindTexture("LightTex");
+			}
+
 			shader_->Use();
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, mainColorTex);
@@ -98,11 +104,14 @@ namespace nova_engine::render::opengl {
 			glActiveTexture(GL_TEXTURE5);
 			glBindTexture(GL_TEXTURE_2D, revealTex);
 			shader_->SetTextureUnit("revealTex", 5);
-				
+
+			glActiveTexture(GL_TEXTURE6);
+			glBindTexture(GL_TEXTURE_2D, lightTex);
+			shader_->SetTextureUnit("lightMap", 6);
 
 			shader_->SetMat4("invViewProj", invViewProj);
 			shader_->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-			shader_->SetVec2("screenSize", glm::vec2(width_, height_));
+			//shader_->SetVec2("screenSize", glm::vec2(width_, height_));
 
 			glBindVertexArray(quadVao_);
 			glDrawArrays(GL_TRIANGLES, 0, 6);

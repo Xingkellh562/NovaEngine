@@ -22,6 +22,10 @@ namespace nova_engine::render::opengl {
 		AddShader("AccumPassShader", {
 			{"shaders/accum_pass_vert.glsl", GL_VERTEX_SHADER},
 			{"shaders/accum_pass_frag.glsl",GL_FRAGMENT_SHADER}});
+
+		AddShader("LightShader", {
+			{"shaders/light_vert.glsl", GL_VERTEX_SHADER},
+			{"shaders/light_frag.glsl",GL_FRAGMENT_SHADER} });
 	}
 
 	const Shader* ShaderLibrary::GetShader(const std::string& name) const {

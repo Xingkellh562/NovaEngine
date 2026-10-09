@@ -6,13 +6,13 @@ uniform sampler2D colorTex;
 uniform sampler2D depthTex;
 //uniform sampler2D shadowMap;
 uniform sampler2DShadow shadowMap;
+uniform sampler2D lightMap;
 
 uniform sampler2D accumTex;
 uniform sampler2D revealTex;
 
 uniform mat4 invViewProj;
 uniform mat4 lightSpaceMatrix;
-uniform vec2 screenSize;
 
 float ShadowCalculation(vec4 fragPosLightSpace){
     vec3 projCoords = fragPosLightSpace.xyz/ fragPosLightSpace.w;
@@ -73,8 +73,13 @@ void main() {
         finalColor = (avgColor * (1.0 - revealage) + color * revealage);
     }
 
+    //lightCoe 的输出值
+    vec4 lightMapValue = texture(lightMap, uv);
+
     float shadowIntensity = 0.5;
-    finalColor *= (1.0 - shadowIntensity * shadowFactor);
+    finalColor *= (1.0 - max(lightMapValue.r,shadowIntensity * shadowFactor));
+
+    finalColor += lightMapValue.g * vec3(1.0,1.0,1.0) * (1 - shadowFactor);
 
     FragColor = vec4(finalColor,1.0);
 

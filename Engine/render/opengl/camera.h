@@ -6,7 +6,7 @@
 namespace nova_engine::render::opengl {
 	class Camera {
 	public:
-		Camera(float nearPlane = 0.1f, float farPlane = 5000.0f, float fieldOfView = 3.14f / 4) :
+		Camera(float nearPlane = 0.1f, float farPlane = 5000.0f, float fieldOfView = 3.14f / 3) :
 			nearPlane_(nearPlane), farPlane_(farPlane), fieldOfView_(fieldOfView),
 			position(glm::vec3(0, 0, 0)), rotation(glm::vec3(0, 0, 1))
 		{}

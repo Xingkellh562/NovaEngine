@@ -35,6 +35,13 @@ namespace nova_engine::core::concurrency {
 			return read_.load(std::memory_order_acquire) ==
 				write_.load(std::memory_order_acquire);
 		}
+
+		size_t Size() const {
+			size_t read = read_.load(std::memory_order_acquire);
+			size_t write = write_.load(std::memory_order_acquire);
+			if (write >= read) return write - read;
+			return capacity_ - read + write;
+		}
 	private:
 		std::vector<T> buffer_; //环形缓冲区
 		size_t capacity_;

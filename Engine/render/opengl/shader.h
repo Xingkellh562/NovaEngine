@@ -60,6 +60,7 @@ namespace nova_engine::render::opengl {
 		void SetVec3(const char* name, const glm::vec3& value) const;
 		void SetIVec3(const char* name, const glm::ivec3& value) const;
 		void SetVec4(const char* name, const glm::vec4& value) const;
+		void SetMat3(const char* name, const glm::mat3& value) const;
 		void SetMat4(const char* name, const glm::mat4& value) const;
 
 		void SetTextureUnit(const char* name, int unit) const;

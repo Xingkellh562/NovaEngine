@@ -22,10 +22,11 @@ namespace nova_engine::render::utils {
 			std::vector<float>& vertices,
 			std::vector<float>& uvws,
 			std::vector<float>& aos,
+			std::vector<float>& normals,
 			std::vector<int>& indices,
 			int& vertexCount,
 			const std::array<float, 4>& aoArray,
-			int x, int y, int z, int scale = 1);
+			int x, int y, int z,int nx, int ny, int nz,int scale = 1);
 
 		static inline const std::array<float,4>& GetAOValueForMesh(int idx,int dir);
 	};

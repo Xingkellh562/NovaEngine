@@ -10,6 +10,14 @@ namespace nova_engine::render::opengl {
 			mainFrame->AddTexture("DepthTex", { GL_DEPTH_COMPONENT32F,GL_DEPTH_COMPONENT,GL_FLOAT,GL_DEPTH_ATTACHMENT ,0,0});
 		}
 
+		AddFrameBuffer("LightFrame");
+		FrameBuffer* lightFrame = FindFrameBuffer("LightFrame");
+		if (lightFrame) {
+			//大小0,0表示跟随屏幕窗口大小
+			lightFrame->AddTexture("LightTex", { GL_RGB16F ,GL_RGB,GL_FLOAT,GL_COLOR_ATTACHMENT0 ,0,0});
+			lightFrame->AddTexture("DepthTex", { GL_DEPTH_COMPONENT32F,GL_DEPTH_COMPONENT,GL_FLOAT,GL_DEPTH_ATTACHMENT ,0,0 });
+		}
+
 		AddFrameBuffer("ShadowFrame");
 		FrameBuffer* shadowFrame = FindFrameBuffer("ShadowFrame");
 		if (shadowFrame) {

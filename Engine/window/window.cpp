@@ -9,6 +9,7 @@
 #include <render/system/render_system.h>
 #include <voxel/chunk/chunk_system.h>
 #include <render/opengl/library/frame_buffer_library.h>
+#include <utils/spatial/spherical_transform.h>
 
 namespace rd = nova_engine::render;
 namespace rd_gl = nova_engine::render::opengl;
@@ -33,6 +34,7 @@ namespace nova_engine::window {
 			real.postProcessRenderer.OnResize(width, height);
 			real.parallelLightRenderer.OnResize(width, height);
 			real.semiTranRenderer.OnResize(width, height);
+			real.lightRenderer.OnResize(width, height);
 		}
 
 		rd_gl::FrameBufferLibrary::GetInstance().OnResize(width, height);
@@ -264,7 +266,7 @@ namespace nova_engine::window {
 		
 		glViewport(0, 0, 800, 600);
 		glClearColor(0.4f, 0.5f, 0.9f, 1.0f);
-
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		/*renderer = new render::opengl::BlockRenderer();
 		renderer->OnResize(800, 600);*/
 
@@ -276,21 +278,35 @@ namespace nova_engine::window {
 			context->postProcessRenderer.OnResize(800, 600);
 			context->parallelLightRenderer.OnResize(800, 600);
 			context->semiTranRenderer.OnResize(800, 600);
+			context->lightRenderer.OnResize(800, 600);
 		}
 			
 
 		ui::debug_ui::DebugUIManager::GetInstance().RegisterPanel(
 			"Debug", [this]() {
+				auto& lodSys = render::system::RenderSystem::GetInstance().GetLodSystem();
+				glm::vec2 playerPos = {world.playerPos.x, world.playerPos.z};
+
+				auto spherPos = utils::spatial::PlaneToSphereNormal(playerPos + glm::vec2(0, 32), playerPos, 256.0f, true);
+
 				ImGui::Text("Application average %.3f ms / frame (%.1f FPS) ",
 					1000.0f / fps, fps);
 				ImGui::Text("playerPos: < x: %.2f , y: %.2f , z: %.2f >",
 					world.playerPos.x,world.playerPos.y,world.playerPos.z);
+				ImGui::Text("planetNormal: < x: %.2f , y: %.2f , z: %.2f >",
+					world.planetNormal.x, world.planetNormal.y, world.planetNormal.z);
 				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMesh.GetLayer(Default) ? 
 					context->chunkMesh.GetLayer(Default)->MeshCount() : 0 : 0);
 				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ? 
 					context->chunkMesh.GetLayer(Default)->PoolLength() : 0 : 0);
 				ImGui::Text("Chunk count: %d", world.chunkData.Size());
 				ImGui::Text("Chunk pool length: %d", world.chunkData.PoolSize());
+
+				ImGui::Text("LOD subdivide submit count: %d", lodSys.GetSubSubmitCount());
+				ImGui::Text("LOD subdivide result count: %d", lodSys.GetSubResultCount());
+
+				ImGui::Text("LOD combine submit count: %d", lodSys.GetCobSubmitCount());
+				ImGui::Text("LOD combine result count: %d", lodSys.GetCobResultCount());
 
 				ImGui::Text("Pointed block: <%d,%d,%d> <%s>", 
 					world.selectedBlock.x, world.selectedBlock.y, world.selectedBlock.z, world.blockName.c_str());

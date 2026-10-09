@@ -1,6 +1,7 @@
 #pragma once
 
 #include <voxel/chunk/chunk_data.h>
+#include <voxel/planet/planet_player_data.h>
 #include <string>
 
 namespace nova_engine::core::world {
@@ -11,6 +12,11 @@ namespace nova_engine::core::world {
 		//临时测试用的玩家数据
 		glm::vec3 playerPos = {0,128,0};
 		glm::vec3 playerRot = { 0,0,1 };
+
+		glm::dvec3 planetNormal = { 0.0,0.0,1.0 };
+		glm::dquat planetOrientation = { 1.0,0.0,0.0,0.0 };
+
+		voxel::planet::PlanetPlayerData planetPlayerData;
 
 		glm::ivec3 selectedBlock = { 0,0,0 };
 		std::string blockName = "None";

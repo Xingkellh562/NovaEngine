@@ -40,6 +40,14 @@ namespace nova_engine::core::concurrency {
 		bool TryPopResult(Result<R>& out) {
 			return resultQueue_.TryPop(out);
 		}
+
+		size_t GetSubmitTaskCount() const {
+			return taskQueue_.Size();
+		}
+
+		size_t GetResultCount() const {
+			return resultQueue_.Size();
+		}
 	private:
 		std::string name_;
 		std::thread thread_;

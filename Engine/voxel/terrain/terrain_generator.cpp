@@ -2,6 +2,7 @@
 #include <random>
 #include <algorithm>
 #include <core/config/config.h>
+#include <utils/spatial/spherical_transform.h>
 
 
 namespace nova_engine::voxel::terrain {
@@ -27,6 +28,19 @@ namespace nova_engine::voxel::terrain {
 			detailHeight * Range3) + SeaLevel);
 	}
 
+	int TerrainGenerator::GetHeightNormal(double x, double y, double z) const {
+		const int Range1 = 64, Range2 = 32, Range3 = 8;
+		const int SeaLevel = -64;
+		double mainHeight = samplexNoise_.Noise(x, y,z);
+		double rollingHeight = samplexNoise_.Noise(x * 4.0, y * 4.0, z * 4.0);
+		double detailHeight = samplexNoise_.Noise(x * 16.0, y * 16.0 , z * 16.0);
+		return static_cast<int>(
+			(mainHeight * Range1 +
+			rollingHeight * Range2 +
+			detailHeight * Range3
+			) + SeaLevel);
+	}
+
 	void TerrainGenerator::BuildChunk(chunk::Chunk& chunk, int x, int y, int z,int chunkSize)const {
 		int fixedsize = chunkSize & ~(core::config::CHUNK_SIZE - 1);
 		int MASK = fixedsize - 1;
@@ -48,6 +62,45 @@ namespace nova_engine::voxel::terrain {
 						chunk.SetVoxel(xi, yi, zi, 2);//填充为泥土
 					else 
 						chunk.SetVoxel(xi, yi, zi, 3);//填充为石
+				}
+			}
+		}
+	}
+
+	void TerrainGenerator::BuildChunkNormal(chunk::Chunk& chunk, int x, int y, int z,int r,int worldY,int chunkSize) const {
+		int fixedsize = chunkSize & ~(core::config::CHUNK_SIZE - 1);
+		int MASK = fixedsize - 1;
+		int scale = fixedsize / core::config::CHUNK_SIZE;
+
+		//计算偏移法线获取四个角点的法线
+		glm::dvec3 n00 = glm::dvec3(x, y, z);
+		glm::dvec3 n01 = utils::spatial::OffsetNormal(n00, glm::dvec2(0, fixedsize), static_cast<double>(r));
+		glm::dvec3 n11 = utils::spatial::OffsetNormal(n00, glm::dvec2(fixedsize, fixedsize), static_cast<double>(r));
+		glm::dvec3 n10 = utils::spatial::OffsetNormal(n00, glm::dvec2(fixedsize, 0), static_cast<double>(r));
+
+		int fy = worldY & ~MASK;
+		int size = chunk.Size();
+		for (int i = 0;i < size;i++) {
+			//双线性插值法线
+			double u = static_cast<double>(i) / size;
+			glm::dvec3 c0 = glm::normalize(glm::mix(n00, n10, u));
+			glm::dvec3 c1 = glm::normalize(glm::mix(n01, n11, u));
+			for (int j = 0;j < size;j++) {
+				double v = static_cast<double>(j) / size;
+				glm::dvec3 normal = glm::normalize(glm::mix(c0, c1, v));
+				//获取高度图
+				int height = GetHeightNormal(normal.x, normal.y, normal.z);
+
+				for (int yi = 0; yi < size;yi++) {
+					//简单地形
+					if (fy + yi * scale > height)
+						chunk.SetVoxel(i, yi, j, 0);//填充为空气
+					else if (fy + yi * scale == height)
+						chunk.SetVoxel(i, yi, j, 1);//填充为草方块
+					else if (fy + yi * scale >= height - 3 * scale)
+						chunk.SetVoxel(i, yi, j, 2);//填充为泥土
+					else
+						chunk.SetVoxel(i, yi, j, 3);//填充为石
 				}
 			}
 		}

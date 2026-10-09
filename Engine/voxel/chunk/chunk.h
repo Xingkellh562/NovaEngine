@@ -6,15 +6,16 @@
 namespace nova_engine::voxel::chunk {
 	enum ChunkState {
 		Prepared = 0,
-		Building = 1
+		Building = 1,
+		Meshing = 2
 	};
 	class Chunk {
 	public:
 		Chunk(const unsigned int size) :size_(size), voxels_(size* size* size), offset_(static_cast<int>(std::log2(size))){}
 		~Chunk();
 
-		Chunk(const Chunk&) = delete;
-		Chunk& operator=(const Chunk&) = delete;
+		Chunk(const Chunk&) = default;
+		Chunk& operator=(const Chunk&) = default;
 
 		Chunk(Chunk&&) = default;
 		Chunk& operator=(Chunk&&) = default;
@@ -34,7 +35,7 @@ namespace nova_engine::voxel::chunk {
 		unsigned int offset_;
 		std::vector<int> voxels_;
 
-		ChunkState state_;
+		ChunkState state_ = Prepared;
 
 		inline int GetIndexFromCoo(int x, int y, int z) const {
 			return ((x << offset_) << offset_) + (y << offset_) + z; //x->y->z

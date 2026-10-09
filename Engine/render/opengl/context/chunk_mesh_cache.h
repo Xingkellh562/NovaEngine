@@ -3,6 +3,7 @@
 #include <render/opengl/renderer/block_renderer.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <core/config/config.h>
 
 
 namespace nova_engine::render::opengl::context {
@@ -29,11 +30,29 @@ namespace nova_engine::render::opengl::context {
 		//获取Mesh数组用于渲染遍历
 		const std::vector<GLMesh>& GetAllMesh() const {return meshs_;}
 
+		void RequireMeshUpdate(int x, int y, int z) {
+			const int CHUNK_BIT = core::config::CHUNK_BIT1;
+			int fx = (x >> CHUNK_BIT )<< CHUNK_BIT,
+				fy = (y >> CHUNK_BIT )<< CHUNK_BIT,
+				fz = (z >> CHUNK_BIT )<< CHUNK_BIT;
+
+			needUpdate_.push_back({fx,fy,fz});
+		}
+
+		bool GetUpdateRequirement(glm::ivec3& out) {
+			size_t size = needUpdate_.size();
+			if (size <= 0) return false;
+			out = needUpdate_[size - 1];
+			needUpdate_.pop_back();
+			return true;
+		}
+
 		inline int PoolLength() const { return pool_.size(); }
 		inline int MeshCount() const { return meshs_.size(); }
-	private:
+	private: 
 		std::unordered_map<glm::vec3, size_t> indexMap_;
 		std::vector<GLMesh> meshs_;
+		std::vector<glm::ivec3> needUpdate_;
 		std::vector<size_t> pool_;
 
 		//获取索引

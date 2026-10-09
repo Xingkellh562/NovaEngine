@@ -1,5 +1,6 @@
 #include "chunk_mesh_cache.h"
 #include <core/config/config.h>
+#include <log/logger.h>
 
 namespace nova_engine::render::opengl::context {
 	bool ChunkMeshCache::Exist(int x, int y, int z)  const {
@@ -40,6 +41,11 @@ namespace nova_engine::render::opengl::context {
 		}
 
 		int mx = x & ~CHUNK_MASK, my = y & ~CHUNK_MASK, mz = z & ~CHUNK_MASK;
+		if (idx >= meshs_.size()) {
+			NE_CORE_ERROR("RenderSystem", "ChunkMeshCache::SubmitMesh: Index {} out of bounds (size: {})", idx, meshs_.size());
+			assert(idx < meshs_.size() && "越界了！去查 pool_ 和 indexMap_ 的生命周期！");
+			return;
+		} //边界检查(保险起见)
 		meshs_[idx].position.x = mx;
 		meshs_[idx].position.y = my;
 		meshs_[idx].position.z = mz;

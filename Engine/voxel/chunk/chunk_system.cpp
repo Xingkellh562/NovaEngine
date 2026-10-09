@@ -2,7 +2,9 @@
 #include <utils/spatial/chunk_range_finder.h>
 #include <glm/gtx/norm.hpp>
 #include <voxel/terrain/terrain_generator.h>
+#include <voxel/terrain/planet_terrain_generator.h>
 #include <core/config/config.h>
+#include <utils/spatial/spherical_transform.h>
 
 
 namespace nova_engine::voxel::chunk {
@@ -13,6 +15,8 @@ namespace nova_engine::voxel::chunk {
 
 	void ChunkSystem::BuildChunk(ChunkData& chunkData, int x, int y, int z) {
 		static const terrain::TerrainGenerator generator(123);
+		static const terrain::PlanetTerrainGenerator planetGenerator(123);
+
 		const int MASK = core::config::CHUNK_SIZE - 1;
 		//将转入的绝对坐标修正为区块原点(左下后)(区块大小32)，可处理负数
 		int fx = x & ~MASK, fy = y & ~MASK, fz = z & ~MASK;
@@ -33,6 +37,7 @@ namespace nova_engine::voxel::chunk {
 				};
 
 				existTasks_.insert({ fx,fy,fz });
+
 				bool success = generatorWorker_.TrySubmitTask(core::concurrency::Task<ChunkResult>{
 					.id = 0,.priority = 0,.cancel = cancel,
 					.fn = [task = std::move(task)](core::concurrency::TaskContext<ChunkResult>& ctx) mutable {
@@ -43,6 +48,10 @@ namespace nova_engine::voxel::chunk {
 
 						if (task.chunk) {
 							generator.BuildChunk(*task.chunk, task.x, task.y, task.z);
+							/*planetGenerator.BuildChunkNormal(*task.chunk, playerData, playerPos, 
+								{ static_cast<float>(task.x), 
+								static_cast<float>(task.y), 
+								static_cast<float>(task.z) }, 1024);*/
 						}
 
 						result.chunk = std::move(task.chunk);
@@ -60,7 +69,6 @@ namespace nova_engine::voxel::chunk {
 			catch(const std::exception& e){
 				NE_CORE_ERROR("ChunkSystem", "Failed to submit chunk build task, catch error:{}", e.what());
 			}
-			
 		}
 	}
 
@@ -74,8 +82,6 @@ namespace nova_engine::voxel::chunk {
 		glm::ivec3 playerPos = world.playerPos;
 		const int MAXCOUNT = 6;
 
-
-		
 		int count = 0;
 		for (const glm::ivec3& chunkPos : chunksPos) {
 			if (count >= MAXCOUNT) break;

@@ -7,7 +7,7 @@
 
 namespace nova_engine::render::opengl {
 	enum VaoType {
-		Main = 0,Shadow = 1
+		Main = 0, Shadow = 1, Light = 2
 	};
 
 	class GLMesh {
@@ -39,8 +39,8 @@ namespace nova_engine::render::opengl {
 		bool Awake() const { return awake_; }
 		void Cleanup();
 	private:
-		GLuint vao_ = 0, shadowVao_ = 0;
-		GLuint verVbo_ = 0,uvVbo_ = 0,aoVbo_ = 0;
+		GLuint vao_ = 0, shadowVao_ = 0, lightVao_ = 0;
+		GLuint verVbo_ = 0,uvVbo_ = 0,aoVbo_ = 0,normalVbo_ = 0;
 		GLuint ebo_ = 0;
 
 		int elementLength_;

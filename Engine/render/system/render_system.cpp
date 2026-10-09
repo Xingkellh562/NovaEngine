@@ -43,6 +43,30 @@ namespace nova_engine::render::system {
 				}
 			}
 		}
+
+		//----------------------------------冯氏光照渲染器--------------------------------------
+		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("LightFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("LightFrame")->Bind();
+		GLfloat clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glDepthFunc(GL_LESS);
+		for (const opengl::GLMesh& mesh : meshs) {
+			if (mesh.Awake()) {
+				renderContext.lightRenderer.Render(mesh);
+			}
+		}
+		if (renderContext.lodMesh) {
+			for (const auto& lodMesh : renderContext.lodMeshCache.AllData()) {
+				if (lodMesh.Awake()) {
+					renderContext.lightRenderer.Render(lodMesh);
+				}
+			}
+		}
+		glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 		
 		//----------------------------------方块纹理渲染器--------------------------------------
 		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
@@ -168,8 +192,10 @@ namespace nova_engine::render::system {
 					if (!build) continue;
 					int i = 0;
 
-					auto defaultMesh = utils::MeshBuilder::BuildMeshFromChunk(*chunk, nei, voxel::block::BlockLibrary::GetInstance());
+					//多线程异步提交
+					//SubmitMeshRequire(chunk,nei,cx,cy,cz);
 
+					auto defaultMesh = utils::MeshBuilder::BuildMeshFromChunk(*chunk, nei, voxel::block::BlockLibrary::GetInstance());
 					const MeshData& mesh = defaultMesh[0].value();
 					const MeshData& mesh2 = defaultMesh[1].value();
 
@@ -180,6 +206,34 @@ namespace nova_engine::render::system {
 
 				if (count >= MAXCOUNT) break;
 			}
+
+
+			glm::ivec3 out;
+			while (meshCache->GetUpdateRequirement(out)) {
+				int cx = out.x;
+				int cy = out.y;
+				int cz = out.z;
+
+				auto chunk = world.chunkData.FindChunk(cx, cy, cz);
+				const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
+
+				if (chunk)
+					SubmitMeshRequire(chunk, nei, cx, cy, cz);
+			}
+		}
+
+		
+
+		core::concurrency::Result<MeshBuildResult> out;
+		while (meshBuildWorker_.TryPopResult(out)) {
+			const MeshData& mesh = out.value.value[0].value();
+			const MeshData& mesh2 = out.value.value[1].value();
+			int cx = out.value.x,cy =  out.value.y, cz = out.value.z;
+			
+
+			meshCache->SubmitMesh(cx, cy, cz, mesh);
+			meshCache2->SubmitMesh(cx, cy, cz, mesh2);
+			existTasks_.erase({ cx,cy,cz });
 		}
 
 		lodSystem_.Update(context, world.playerPos);
@@ -214,6 +268,36 @@ namespace nova_engine::render::system {
 
 			shadowCamera->position = alignedTarget + lightDir * distance;
 			shadowCamera->rotation = -lightDir;
+		}
+	}
+
+	void RenderSystem::SubmitMeshRequire(voxel::chunk::Chunk* chunk, 
+		const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei,
+		int cx,int cy,int cz){
+		if (existTasks_.find({ cx, cy, cz }) != existTasks_.end()) return;
+
+		auto cancel = std::make_shared<core::concurrency::CancelToken>();
+		existTasks_.insert({ cx, cy, cz });
+
+		try {
+			bool success = meshBuildWorker_.TrySubmitTask(core::concurrency::Task<MeshBuildResult>{
+				.id = 0, .priority = 0, .cancel = cancel,
+					.fn = [chunk, nei, cx, cy, cz](core::concurrency::TaskContext<MeshBuildResult>& ctx) mutable {
+					MeshBuildResult result;
+					result.x = cx;
+					result.y = cy;
+					result.z = cz;
+
+					auto defaultMesh = utils::MeshBuilder::BuildMeshFromChunk(*chunk, nei, voxel::block::BlockLibrary::GetInstance());
+					result.value = std::move(defaultMesh);
+					ctx.emit(std::move(result));
+					}
+			});
+
+			if (!success) existTasks_.erase({ cx,cy,cz });
+		}
+		catch (const std::exception& e) {
+			NE_CORE_ERROR("RenderSystem", "Failed to submit chunk build task, catch error:{}", e.what());
 		}
 	}
 }

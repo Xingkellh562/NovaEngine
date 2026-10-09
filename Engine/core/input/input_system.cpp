@@ -4,6 +4,7 @@
 #include <log/logger.h>
 #include <utils/spatial/analyzer.h>
 #include <voxel/block/block_library.h>
+#include <utils/spatial/spherical_transform.h>
 
 
 using namespace nova_engine::render::opengl;
@@ -15,7 +16,16 @@ namespace nova_engine::core::input {
 
 	const float SPEED = 10.0f;
 	void InputSystem::Update(double time,world::World& world,context::RenderContext& context) {
-		world.playerPos += MoveUpdate(time, SPEED, world.playerRot, glm::vec3(0,1,0), state_);
+		auto deltaMove = MoveUpdate(time, SPEED, world.playerRot, glm::vec3(0, 1, 0), state_);
+		world.playerPos += deltaMove;
+
+		world.planetPlayerData.orientation = glm::normalize(
+			utils::spatial::ComputeRollQuaternion({ deltaMove.x,deltaMove.z}, 256.0) 
+			* world.planetPlayerData.orientation
+		);
+
+		world.planetPlayerData.normal = glm::normalize(world.planetPlayerData.orientation * glm::dvec3(0, 1, 0));
+
 		world.playerRot = UpdateRotation(time, world.playerRot, 40, state_);
 
 		auto voxelInfos = utils::spatial::EmitDDARay(7,world.playerPos, world.playerRot);
@@ -51,14 +61,15 @@ namespace nova_engine::core::input {
 
 					auto layer = context.chunkMesh.GetLayer(Default);
 					auto layer2 = context.chunkMesh.GetLayer(Lucency);
-					if (layer && layer2) {
-						layer->FreeMesh(pos.x, pos.y, pos.z);
-						layer2->FreeMesh(pos.x, pos.y, pos.z);
+					if (layer) {
+						//&& layer2
+						layer->RequireMeshUpdate(pos.x, pos.y, pos.z);
+						//layer2->RequireMeshUpdate(pos.x, pos.y, pos.z);
 
 						for (size_t i = 0; i < 6; i++)
 						{
-							layer->FreeMesh(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
-							layer2->FreeMesh(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
+							layer->RequireMeshUpdate(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
+							//layer2->RequireMeshUpdate(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
 						}
 					}
 				}
@@ -78,14 +89,15 @@ namespace nova_engine::core::input {
 
 					auto layer = context.chunkMesh.GetLayer(Default);
 					auto layer2 = context.chunkMesh.GetLayer(Lucency);
-					if (layer && layer2) {
-						layer->FreeMesh(x, y, z);
-						layer2->FreeMesh(x, y, z);
+					if (layer) {
+						//&& layer2
+						layer->RequireMeshUpdate(x, y, z);
+						//layer2->RequireMeshUpdate(x, y, z);
 
 						for (size_t i = 0; i < 6; i++)
 						{
-							layer->FreeMesh(x + NeighBours[i][0], y + NeighBours[i][1], z + NeighBours[i][2]);
-							layer2->FreeMesh(x + NeighBours[i][0], y + NeighBours[i][1],z + NeighBours[i][2]);
+							layer->RequireMeshUpdate(x + NeighBours[i][0], y + NeighBours[i][1], z + NeighBours[i][2]);
+							//layer2->RequireMeshUpdate(x + NeighBours[i][0], y + NeighBours[i][1],z + NeighBours[i][2]);
 						}
 					}
 				}

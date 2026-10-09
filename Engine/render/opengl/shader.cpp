@@ -127,6 +127,10 @@ namespace nova_engine::render::opengl {
 		glUniform4fv(GetVarLocation(name), 1, glm::value_ptr(value));
 	}
 
+	void Shader::SetMat3(const char* name, const glm::mat3& value) const {
+		glUniformMatrix3fv(GetVarLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+	}
+
 	void Shader::SetMat4(const char* name, const glm::mat4& value) const {
 		glUniformMatrix4fv(GetVarLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 	}
