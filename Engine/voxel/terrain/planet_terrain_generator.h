@@ -21,7 +21,7 @@ namespace nova_engine::voxel::terrain {
 		playerPos为玩家的世界坐标，
 		playerData为玩家在星球上的数据, 
 		sampleSize为采样区域的大小*/
-		void BuildChunkNormal(chunk::Chunk& chunk,
+		void BuildChunkNormal(chunk::Chunk<int>& chunk,
 			const planet::PlanetPlayerData& playerData,
 			glm::vec3 playerPos, glm::vec3 chunkPos, int R,int sampleSize = 32) const;
 	private:

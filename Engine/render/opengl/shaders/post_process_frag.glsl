@@ -64,20 +64,20 @@ void main() {
     vec4 accum = texture(accumTex, uv);
     float revealage = texture(revealTex, uv).r;
 
+    //lightCoe 的输出值
+    vec4 lightMapValue = texture(lightMap, uv);
+
     vec3 finalColor;
+    float shadowIntensity = 0.5;
     if (accum.a < 1e-5) {
         finalColor = color;
+        finalColor *= (1.0 - max(lightMapValue.r,shadowIntensity * shadowFactor));
     }
     else{
         vec3 avgColor = accum.rgb / accum.a;
         finalColor = (avgColor * (1.0 - revealage) + color * revealage);
+        finalColor *= (1.0 - max(lightMapValue.r * revealage,shadowIntensity * shadowFactor));
     }
-
-    //lightCoe 的输出值
-    vec4 lightMapValue = texture(lightMap, uv);
-
-    float shadowIntensity = 0.5;
-    finalColor *= (1.0 - max(lightMapValue.r,shadowIntensity * shadowFactor));
 
     finalColor += lightMapValue.g * vec3(1.0,1.0,1.0) * (1 - shadowFactor);
 

@@ -12,7 +12,5 @@ namespace nova_engine::render {
 		bool isValid() const {
 			return !vertices.empty() && !indices.empty();
 		}
-
-
 	};
 }

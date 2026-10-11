@@ -16,8 +16,8 @@ namespace nova_engine::voxel::terrain {
 		TerrainGenerator(const TerrainGenerator&) = delete;
 		TerrainGenerator& operator=(const TerrainGenerator&) = delete;
 
-		void BuildChunk(chunk::Chunk& chunk,int x,int y,int z, int chunkSize = 32) const;
-		void BuildChunkNormal(chunk::Chunk& chunk, int x, int y, int z, int r, int worldY, int chunkSize = 32) const;
+		void BuildChunk(chunk::Chunk<int>& chunk,int x,int y,int z, int chunkSize = 32) const;
+		void BuildChunkNormal(chunk::Chunk<int>& chunk, int x, int y, int z, int r, int worldY, int chunkSize = 32) const;
 		lod::LodVoxelData SampleLodData(int x, int y, int z, int lodSize) const;
 	private:
 		int seed_;

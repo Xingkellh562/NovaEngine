@@ -9,9 +9,9 @@ namespace nova_engine::render::utils {
 	class MeshBuilder {
 	public:
 		//支持邻居,传入的邻居顺序必须严格按照映射表
-		static std::array<std::optional<MeshData>, 2> BuildMeshFromChunk(const voxel::chunk::Chunk& chunk,const std::array<voxel::chunk::Chunk*,6> neighbours,const voxel::block::BlockLibrary& library);
+		static std::array<std::optional<MeshData>, 2> BuildMeshFromChunk(const voxel::chunk::Chunk<int>& chunk,const std::array<voxel::chunk::Chunk<int>*,6> neighbours,const voxel::block::BlockLibrary& library);
 
-		static MeshData BuildLodMesh(const voxel::chunk::Chunk& chunk, size_t scale,const voxel::block::BlockLibrary& library);
+		static MeshData BuildLodMesh(const voxel::chunk::Chunk<int>& chunk, size_t scale,const voxel::block::BlockLibrary& library);
 
 		static MeshData BuildLodMesh(const voxel::lod::LodVoxelData& lodData, size_t scale, const voxel::block::BlockLibrary& library);
 	private:

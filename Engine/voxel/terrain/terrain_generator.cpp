@@ -41,7 +41,7 @@ namespace nova_engine::voxel::terrain {
 			) + SeaLevel);
 	}
 
-	void TerrainGenerator::BuildChunk(chunk::Chunk& chunk, int x, int y, int z,int chunkSize)const {
+	void TerrainGenerator::BuildChunk(chunk::Chunk<int>& chunk, int x, int y, int z,int chunkSize)const {
 		int fixedsize = chunkSize & ~(core::config::CHUNK_SIZE - 1);
 		int MASK = fixedsize - 1;
 		int scale = fixedsize / core::config::CHUNK_SIZE;
@@ -67,7 +67,7 @@ namespace nova_engine::voxel::terrain {
 		}
 	}
 
-	void TerrainGenerator::BuildChunkNormal(chunk::Chunk& chunk, int x, int y, int z,int r,int worldY,int chunkSize) const {
+	void TerrainGenerator::BuildChunkNormal(chunk::Chunk<int>& chunk, int x, int y, int z,int r,int worldY,int chunkSize) const {
 		int fixedsize = chunkSize & ~(core::config::CHUNK_SIZE - 1);
 		int MASK = fixedsize - 1;
 		int scale = fixedsize / core::config::CHUNK_SIZE;

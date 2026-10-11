@@ -51,8 +51,8 @@ namespace nova_engine::render::utils {
 	}
 
 	std::array<std::optional<MeshData>,2> MeshBuilder::BuildMeshFromChunk(
-		const voxel::chunk::Chunk& chunk, 
-		const std::array<voxel::chunk::Chunk*, 6> neighbours,
+		const voxel::chunk::Chunk<int>& chunk,
+		const std::array<voxel::chunk::Chunk<int>*, 6> neighbours,
 		const voxel::block::BlockLibrary& library) 
 	{
 		const int CHUNK_LENGTH = 32768;
@@ -269,7 +269,7 @@ namespace nova_engine::render::utils {
 	}
 
 
-	MeshData MeshBuilder::BuildLodMesh(const voxel::chunk::Chunk& chunk,size_t scale, const voxel::block::BlockLibrary& library) {
+	MeshData MeshBuilder::BuildLodMesh(const voxel::chunk::Chunk<int>& chunk,size_t scale, const voxel::block::BlockLibrary& library) {
 		std::vector<float> vertices;
 		std::vector<float> uvws;
 		std::vector<float> aos;

@@ -10,6 +10,7 @@
 #include <voxel/chunk/chunk_system.h>
 #include <render/opengl/library/frame_buffer_library.h>
 #include <utils/spatial/spherical_transform.h>
+#include <render/utils/smooth_mesher.h>
 
 namespace rd = nova_engine::render;
 namespace rd_gl = nova_engine::render::opengl;
@@ -86,6 +87,12 @@ namespace nova_engine::window {
 				if (context != std::nullopt) {
 					auto& real = *context;
 					real.lodMesh = !real.lodMesh;
+				}
+				break;
+			case GLFW_KEY_F4:
+				if (context != std::nullopt) {
+					auto& real = *context;
+					real.debugUI = !real.debugUI;
 				}
 				break;
 			default:
@@ -261,6 +268,13 @@ namespace nova_engine::window {
 	// 调用：int x = rnd(1, 100);
 
 	float fps = 1.0f;
+	
+	render::opengl::GLMesh* mesh1;
+	
+	static int randInt(int min, int max) {
+		static std::mt19937 gen(std::random_device{}());
+		return std::uniform_int_distribution<>(min, max)(gen);
+	}
 
 	void Window::Load() {
 		
@@ -285,19 +299,19 @@ namespace nova_engine::window {
 		ui::debug_ui::DebugUIManager::GetInstance().RegisterPanel(
 			"Debug", [this]() {
 				auto& lodSys = render::system::RenderSystem::GetInstance().GetLodSystem();
-				glm::vec2 playerPos = {world.playerPos.x, world.playerPos.z};
+				glm::vec2 playerPos = { world.playerPos.x, world.playerPos.z };
 
 				auto spherPos = utils::spatial::PlaneToSphereNormal(playerPos + glm::vec2(0, 32), playerPos, 256.0f, true);
 
 				ImGui::Text("Application average %.3f ms / frame (%.1f FPS) ",
 					1000.0f / fps, fps);
 				ImGui::Text("playerPos: < x: %.2f , y: %.2f , z: %.2f >",
-					world.playerPos.x,world.playerPos.y,world.playerPos.z);
+					world.playerPos.x, world.playerPos.y, world.playerPos.z);
 				ImGui::Text("planetNormal: < x: %.2f , y: %.2f , z: %.2f >",
 					world.planetNormal.x, world.planetNormal.y, world.planetNormal.z);
-				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMesh.GetLayer(Default) ? 
+				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMesh.GetLayer(Default) ?
 					context->chunkMesh.GetLayer(Default)->MeshCount() : 0 : 0);
-				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ? 
+				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ?
 					context->chunkMesh.GetLayer(Default)->PoolLength() : 0 : 0);
 				ImGui::Text("Chunk count: %d", world.chunkData.Size());
 				ImGui::Text("Chunk pool length: %d", world.chunkData.PoolSize());
@@ -308,34 +322,66 @@ namespace nova_engine::window {
 				ImGui::Text("LOD combine submit count: %d", lodSys.GetCobSubmitCount());
 				ImGui::Text("LOD combine result count: %d", lodSys.GetCobResultCount());
 
-				ImGui::Text("Pointed block: <%d,%d,%d> <%s>", 
+				ImGui::Text("Pointed block: <%d,%d,%d> <%s>",
 					world.selectedBlock.x, world.selectedBlock.y, world.selectedBlock.z, world.blockName.c_str());
 
 				ImGui::Text("Seleted block: <%s>", world.heldBlock.c_str());
-
+					
 			},true
 		);
 
+		voxel::chunk::Chunk<float> chunk(32);
+		for(int x = 0;x< 32;x++)
+			for (int y = 0;y < 32;y++)
+				for (int z = 0;z < 32;z++) {
+					if(!(x == 6 && z == 6) && x > 0 && y > 0 && z > 0 && x > y)
+					/*int rad = randInt(0, 200);
+					if (rad < 100)*/
+						chunk.SetVoxel(x,y,z,-1.0);
+					else chunk.SetVoxel(x, y, z, 1.0f);
+				}
 
+		voxel::chunk::Chunk<float> neiChunk(32);
+		for (int x = 0;x < 32;x++)
+			for (int y = 0;y < 32;y++)
+				for (int z = 0;z < 32;z++) {
+					neiChunk.SetVoxel(x, y, z, 1.0f);
+				}
+		std::array<const voxel::chunk::Chunk<float>*, 7> neis = {
+			&neiChunk,&neiChunk ,&neiChunk ,&neiChunk ,&neiChunk ,&neiChunk,& neiChunk
+		};
 
+		render::MeshData data = render::utils::BuildSNMeshFromChunk(chunk, neis, 1);
+		mesh1 = new rd_gl::GLMesh();
+		mesh1->GetOrUpdateData(data);
+		mesh1->rotation = glm::vec3(0.0, 0.0, -1.0);
+		mesh1->position = glm::vec3(0, 128, 0);
 	}
 
 	void Window::Render(double time) {
 
 		//我渲染:
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
 
 		glfwPollEvents();
+
+		fps = ImGui::GetIO().Framerate;
 
 		if (context != std::nullopt) {
 			auto& real = *context;
 			render::system::RenderSystem::GetInstance().Render(real);
+
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glDepthFunc(GL_LESS);
+			real.blockRenderer.Render({});
+			real.blockRenderer.Render(*mesh1);
+
+			if (real.debugUI) {
+				ui::debug_ui::DebugUIManager::GetInstance().BeginFrame();
+				ui::debug_ui::DebugUIManager::GetInstance().EndFrame();
+			}
 		}
-
-		fps = ImGui::GetIO().Framerate;
-
-		ui::debug_ui::DebugUIManager::GetInstance().BeginFrame();
-		ui::debug_ui::DebugUIManager::GetInstance().EndFrame();
 
 		glfwSwapBuffers(window_);//交换前后缓冲区
 	}

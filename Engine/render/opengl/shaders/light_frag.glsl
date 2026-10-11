@@ -5,6 +5,7 @@ in vec3 vWorldPos;
 
 //平行光光照方向
 uniform vec3 lightDir;
+uniform sampler2DArray uTextureArray;
 
 layout(location = 0) out vec3 lightCoe;
 
@@ -22,6 +23,8 @@ void main(){
 
     // 背光面不应该有高光，乘上 step 消除漏光
     spec *= step(0.0, dot(N, -L));
+
+    float alpha = texture(uTextureArray, vec3(vWorldPos.xy, 0)).a;
 
     // ---------- 合并成单通道系数 ----------
     lightCoe = vec3(diff * 1.0 ,spec * 0.2,0.0);

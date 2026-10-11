@@ -38,8 +38,8 @@ namespace nova_engine::render::system {
 			meshBuildWorker_.Start();
 		}
 
-		void SubmitMeshRequire(voxel::chunk::Chunk*, 
-			const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei,
+		void SubmitMeshRequire(voxel::chunk::Chunk<int>*,
+			const std::array<nova_engine::voxel::chunk::Chunk<int>*, 6>& nei,
 			int cx, int cy, int cz);
 
 

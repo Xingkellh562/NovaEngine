@@ -10,7 +10,7 @@
 namespace nova_engine::voxel::chunk {
 	struct ChunkSubmitTask {
 		int x, y, z;
-		std::unique_ptr<Chunk> chunk;
+		std::unique_ptr<Chunk<int>> chunk;
 	};
 
 	void ChunkSystem::BuildChunk(ChunkData& chunkData, int x, int y, int z) {
@@ -24,7 +24,7 @@ namespace nova_engine::voxel::chunk {
 		if (existTasks_.find({ fx,fy,fz }) != existTasks_.end()) return;
 
 		//从池中获取一个可供修改的对象
-		std::unique_ptr<Chunk> chunkPtr = chunkData.AcquireChunk();
+		std::unique_ptr<Chunk<int>> chunkPtr = chunkData.AcquireChunk();
 
 		if (chunkPtr != nullptr) {
 			//提交任务

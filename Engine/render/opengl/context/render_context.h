@@ -18,6 +18,6 @@ namespace nova_engine::render::opengl::context {
 		SemiTransparentRenderer semiTranRenderer;
 		LightRenderer lightRenderer;
 
-		bool useShadow = true,lucencyMesh = true,lodMesh = true;
+		bool useShadow = true,lucencyMesh = true,lodMesh = true,debugUI = true;
 	};
 }

@@ -16,6 +16,7 @@ namespace nova_engine::render::opengl {
 		shader_->SetMat4("projection", projection_);
 		shader_->SetMat3("normalMatrix", normalMatrix);
 		shader_->SetVec3("lightDir", glm::normalize(glm::vec3(0.3, 0.8, 0.5)));
+		shader_->SetTextureUnit("uTextureArray", 0);
 
 		mesh.Bind(Light);
 		glDrawElements(GL_TRIANGLES, mesh.GetElementLength(), GL_UNSIGNED_INT, 0);

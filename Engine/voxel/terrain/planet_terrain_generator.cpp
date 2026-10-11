@@ -17,7 +17,7 @@ namespace nova_engine::voxel::terrain {
 				) + SeaLevel);
 	}
 
-	void PlanetTerrainGenerator::BuildChunkNormal(chunk::Chunk& chunk,
+	void PlanetTerrainGenerator::BuildChunkNormal(chunk::Chunk<int>& chunk,
 		const planet::PlanetPlayerData& playerData,
 		glm::vec3 playerPos, glm::vec3 chunkPos, int R,int sampleSize) const {
 		int fixedsize = sampleSize & ~(core::config::CHUNK_SIZE - 1);

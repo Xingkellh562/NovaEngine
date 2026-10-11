@@ -43,6 +43,28 @@ namespace nova_engine::render::system {
 				}
 			}
 		}
+		
+		//----------------------------------方块纹理渲染器--------------------------------------
+		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
+			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame")->Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glDepthFunc(GL_LESS);
+		renderContext.blockRenderer.Render(emptyMesh);
+		for (const opengl::GLMesh& mesh : meshs) {
+			if (mesh.Awake()) {
+				renderContext.blockRenderer.Render(mesh);
+			}
+		}
+
+		if (renderContext.lodMesh) {
+			for (const auto& lodMesh : renderContext.lodMeshCache.AllData()) {
+				if (lodMesh.Awake()) {
+					renderContext.blockRenderer.Render(lodMesh);
+				}
+			}
+		}
 
 		//----------------------------------冯氏光照渲染器--------------------------------------
 		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("LightFrame"))
@@ -67,28 +89,6 @@ namespace nova_engine::render::system {
 			}
 		}
 		glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-		
-		//----------------------------------方块纹理渲染器--------------------------------------
-		if(opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame"))
-			opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("MainFrame")->Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glDepthFunc(GL_LESS);
-		renderContext.blockRenderer.Render(emptyMesh);
-		for (const opengl::GLMesh& mesh : meshs) {
-			if (mesh.Awake()) {
-				renderContext.blockRenderer.Render(mesh);
-			}
-		}
-
-		if (renderContext.lodMesh) {
-			for (const auto& lodMesh : renderContext.lodMeshCache.AllData()) {
-				if (lodMesh.Awake()) {
-					renderContext.blockRenderer.Render(lodMesh);
-				}
-			}
-		}
 
 		//----------------------------------WBOIT渲染器--------------------------------------
 		if (opengl::FrameBufferLibrary::GetInstance().FindFrameBuffer("OITFrame"))
@@ -180,10 +180,10 @@ namespace nova_engine::render::system {
 				bool exist = meshCache->Exist(cx, cy, cz);
 				const glm::ivec3& cp = chunkPos;
 				if (chunk && !exist) {
-					const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
+					const std::array<nova_engine::voxel::chunk::Chunk<int>*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
 					//只要有邻居不存在，不构建网格
 					bool build = true;
-					for (const nova_engine::voxel::chunk::Chunk* c : nei) {
+					for (const nova_engine::voxel::chunk::Chunk<int>* c : nei) {
 						if (!c) {
 							build = false;
 							break;
@@ -215,7 +215,7 @@ namespace nova_engine::render::system {
 				int cz = out.z;
 
 				auto chunk = world.chunkData.FindChunk(cx, cy, cz);
-				const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
+				const std::array<nova_engine::voxel::chunk::Chunk<int>*, 6>& nei = world.chunkData.GetChunkNeighbours(cx, cy, cz);
 
 				if (chunk)
 					SubmitMeshRequire(chunk, nei, cx, cy, cz);
@@ -271,8 +271,8 @@ namespace nova_engine::render::system {
 		}
 	}
 
-	void RenderSystem::SubmitMeshRequire(voxel::chunk::Chunk* chunk, 
-		const std::array<nova_engine::voxel::chunk::Chunk*, 6>& nei,
+	void RenderSystem::SubmitMeshRequire(voxel::chunk::Chunk<int>* chunk,
+		const std::array<nova_engine::voxel::chunk::Chunk<int>*, 6>& nei,
 		int cx,int cy,int cz){
 		if (existTasks_.find({ cx, cy, cz }) != existTasks_.end()) return;
 

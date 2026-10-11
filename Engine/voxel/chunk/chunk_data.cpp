@@ -3,7 +3,7 @@
 
 namespace nova_engine::voxel::chunk {
 	//这里统一传入绝对世界坐标
-	Chunk* ChunkData::FindChunk(int x, int y, int z) const{
+	Chunk<int>* ChunkData::FindChunk(int x, int y, int z) const{
 		auto key = GetKeyWithCoord(x,y,z);
 
 		auto it = map_.find(key);
@@ -13,11 +13,11 @@ namespace nova_engine::voxel::chunk {
 		return nullptr;
 	}
 
-	std::unique_ptr<Chunk> ChunkData::AcquireChunk() {
+	std::unique_ptr<Chunk<int>> ChunkData::AcquireChunk() {
 		return chunkPool_.Acquire(32);
 	}
 
-	void ChunkData::SubmitChunk(int x,int y,int z, std::unique_ptr<Chunk> chunk) {
+	void ChunkData::SubmitChunk(int x,int y,int z, std::unique_ptr<Chunk<int>> chunk) {
 		if (!chunk) return;
 
 		//chunk-> std::unique_ptr<>
@@ -44,14 +44,14 @@ namespace nova_engine::voxel::chunk {
 		}
 	}
 
-	const std::array<Chunk*, 6> ChunkData::GetChunkNeighbours(int x, int y, int z) const {
+	const std::array<Chunk<int>*, 6> ChunkData::GetChunkNeighbours(int x, int y, int z) const {
 		static const std::array<std::array<int, 3>, 6> NeighBours = {
 		{{-1,0,0},{1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}
 		};
 
 		const int CHUNK_BIT1 = core::config::CHUNK_BIT1;
 
-		std::array<Chunk*, 6> results{};
+		std::array<Chunk<int>*, 6> results{};
 
 		for (int i = 0;i < 6;i++) {
 			std::array<int, 3> nei = NeighBours[i];

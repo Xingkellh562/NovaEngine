@@ -8,7 +8,7 @@ namespace nova_engine::voxel::chunk {
 	
 	struct ChunkResult {
 		int x, y, z;
-		std::unique_ptr<Chunk> chunk;
+		std::unique_ptr<Chunk<int>> chunk;
 	};
 
 	
