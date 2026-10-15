@@ -3,8 +3,6 @@
 
 #include <fstream>
 #include <filesystem>
-#include <utils/loaders/model_loader.h>
-#include <render/opengl/library/texture_array_library.h>
 
 using json = nlohmann::json;
 
@@ -67,9 +65,10 @@ namespace nova_engine::voxel::block
 				continue;
 			}
 
-			BlockMesh mesh = utils::loader::ModelLoader::LoadBlockModelFromJsonPath(
+			BlockMesh mesh{ {},0 };
+			/*= utils::loader::ModelLoader::LoadBlockModelFromJsonPath(
 				modelPath.string().c_str(),
-				render::opengl::TextureArrayLibrary::GetInstance().GetTextureArray("BlockTextures"));
+				render::opengl::TextureArrayLibrary::GetInstance().GetTextureArray("BlockTextures"));*/
 
 			AddBlock(meta.blockId, meta.name,mesh);
 		}

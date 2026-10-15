@@ -1,44 +1,40 @@
 #include "window.h"
-#include <log/logger.h>
-#include <core/input/input_system.h>
-#include <render/utils/mesh_builder.h>
-#include <iostream>
-#include <ui/debug_ui/debug_ui_manager.h>
-#include <random>
-#include <core/world/world.h>
+
+#include <render/gl/gl_context.h>       // ← 唯一 include render/gl 的地方（组装点）
+#include <render/gl/imgui_gl_backend.h>
 #include <render/system/render_system.h>
+#include <ui/debug_ui/debug_ui_manager.h>
+#include <render/device/render_device.h>   
+
 #include <voxel/chunk/chunk_system.h>
-#include <render/opengl/library/frame_buffer_library.h>
-#include <utils/spatial/spherical_transform.h>
-#include <render/utils/smooth_mesher.h>
+#include <core/input/input_system.h>
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
 namespace rd = nova_engine::render;
-namespace rd_gl = nova_engine::render::opengl;
 
 namespace nova_engine::window {
-
 	constexpr double FIXED_STEP_MS = 1000.0 / 60.0;  // 16.666...
 	constexpr double MAX_ACCUM_MS = 100.0;
 
-	core::world::World world;
-	std::optional<rd_gl::context::RenderContext> context;
+	Window::Window() = default;
+	Window::~Window() = default;
+
+	Window& Window::GetInstance() {
+		static Window instance;
+		return instance;
+	}
 
 	void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
-		if (width == 0 || height == 0)
-			return;
-		glViewport(0, 0, width, height);
-		
-		if (context != std::nullopt) {
-			auto& real = *context;
-			real.blockRenderer.OnResize(width, height);
-			real.postProcessRenderer.OnResize(width, height);
-			real.parallelLightRenderer.OnResize(width, height);
-			real.semiTranRenderer.OnResize(width, height);
-			real.lightRenderer.OnResize(width, height);
-		}
-
-		rd_gl::FrameBufferLibrary::GetInstance().OnResize(width, height);
+		if (width == 0 || height == 0) return;
+		Window& self = Window::GetInstance();
+		if (!self.device_) return;
+		Window::GetInstance().device_->OnResize(
+			static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+		self.width_ = width;
+		self.height_ = height;
 	}
 
 	void Window::processInput(GLFWwindow* window)
@@ -50,6 +46,7 @@ namespace nova_engine::window {
 
 	void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		nova_engine::core::input::InputState* state = &nova_engine::core::input::InputSystem::GetInstance().GetState();
+		Window& self = Window::GetInstance();
 		if (action == GLFW_REPEAT || action == GLFW_PRESS) {
 			switch (key)
 			{
@@ -72,28 +69,16 @@ namespace nova_engine::window {
 				state->down = true;
 				break;
 			case GLFW_KEY_F1:
-				if (context != std::nullopt) {
-					auto& real = *context;
-					real.useShadow = !real.useShadow;
-				}
+				self.settings_.useShadow = !self.settings_.useShadow;
 				break;
 			case GLFW_KEY_F2:
-				if (context != std::nullopt) {
-					auto& real = *context;
-					real.lucencyMesh = !real.lucencyMesh;
-				}
+				self.settings_.useLucency= !self.settings_.useLucency;
 				break;
 			case GLFW_KEY_F3:
-				if (context != std::nullopt) {
-					auto& real = *context;
-					real.lodMesh = !real.lodMesh;
-				}
+				self.settings_.useLod = !self.settings_.useLod;
 				break;
 			case GLFW_KEY_F4:
-				if (context != std::nullopt) {
-					auto& real = *context;
-					real.debugUI = !real.debugUI;
-				}
+				self.settings_.debugUI = !self.settings_.debugUI;
 				break;
 			default:
 				break;
@@ -222,188 +207,138 @@ namespace nova_engine::window {
 	}
 
 	void Window::Init() {
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  //指定openGL版本号
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//指定openGL渲染模式为立即模式
-		glfwWindowHint(GLFW_SAMPLES,0);
 
-		//创建一个大小为800*600的窗口
-		window_ = glfwCreateWindow(800, 600, "GANGLV", NULL, NULL);
-		if (window_ == NULL)
-		{
-			NE_CORE_ERROR("RenderSystem","Failed to create window!");
+		
+		glfwInit();
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_SAMPLES, 0);
+
+		window_ = glfwCreateWindow(800, 600, "NovaEngine", nullptr, nullptr);
+		if (window_ == nullptr) {
+			NE_CORE_ERROR("GameCore", "Failed to create window");
 			glfwTerminate();
 			return;
 		}
 
-		glfwMakeContextCurrent(window_);
-		//初始化glad以使用openGL函数
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		{
-			NE_CORE_ERROR("RenderSystem", "Failed to initialize GLAD!");
+		// ← 取代原来的 glfwMakeContextCurrent + gladLoadGLLoader
+		//    （window.cpp:240-246），GL 相关代码全部收进 render/gl
+		//device_ = rd::gl::CreateDevice(window_);
+		device_ = render::gl::CreateDevice(window_);
+
+		if (!device_) {
+			NE_CORE_ERROR("GameCore", "Failed to create render device");
 			return;
 		}
 
 		glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
-		glfwSetKeyCallback(window_,keyCallback);
+		glfwSetKeyCallback(window_, keyCallback);
 		glfwSetCursorPosCallback(window_, mouseMoveCallBack);
 		glfwSetMouseButtonCallback(window_, mouseButtonCallBack);
-		glfwSetScrollCallback(window_,scrollCallBack);
+		glfwSetScrollCallback(window_, scrollCallBack);
 
 		glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetCursorPos(window_, 400, 300);
 		glfwSwapInterval(0);
 		glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glEnable(GL_MULTISAMPLE);
+		// ← 删除 glEnable(GL_DEPTH_TEST) / glDepthMask / glEnable(GL_CULL_FACE)
+		//    / glCullFace / glEnable(GL_MULTISAMPLE)（window.cpp:259-263）
+		//    这些都已成为 PipelineState 的一部分
 
-		//创建ImGui上下文
-		ui::debug_ui::DebugUIManager::GetInstance().Init(window_,"#version 330");
+		// ImGui 初始化：先建核心上下文，再交给后端
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		ImGui::StyleColorsDark();
+
+		uiBackend_ = std::make_unique<rd::gl::ImguiGLBackend>(window_);
+		if (!uiBackend_->Init()) {
+			NE_CORE_ERROR("GameCore", "Failed to init UI backend");
+		}
+		ui::debug_ui::DebugUIManager::GetInstance().Init(*uiBackend_);
+
+		
 	}
 	// 调用：int x = rnd(1, 100);
 
 	float fps = 1.0f;
-	
-	render::opengl::GLMesh* mesh1;
-	
-	static int randInt(int min, int max) {
-		static std::mt19937 gen(std::random_device{}());
-		return std::uniform_int_distribution<>(min, max)(gen);
-	}
 
 	void Window::Load() {
-		
-		glViewport(0, 0, 800, 600);
-		glClearColor(0.4f, 0.5f, 0.9f, 1.0f);
-		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		/*renderer = new render::opengl::BlockRenderer();
-		renderer->OnResize(800, 600);*/
+		device_->OnResize(width_, height_);
+		resources_ = rd::framework::CreateRenderResources(*device_, 800, 600);
 
-		context.emplace();
-		
-		rd_gl::FrameBufferLibrary::GetInstance().OnResize(800, 600);
-		if (context != std::nullopt) {
-			context->blockRenderer.OnResize(800, 600);
-			context->postProcessRenderer.OnResize(800, 600);
-			context->parallelLightRenderer.OnResize(800, 600);
-			context->semiTranRenderer.OnResize(800, 600);
-			context->lightRenderer.OnResize(800, 600);
-		}
-			
+		rd::system::RenderSystem::GetInstance().Init(*device_);
 
+		// ... 调试面板注册
 		ui::debug_ui::DebugUIManager::GetInstance().RegisterPanel(
 			"Debug", [this]() {
-				auto& lodSys = render::system::RenderSystem::GetInstance().GetLodSystem();
-				glm::vec2 playerPos = { world.playerPos.x, world.playerPos.z };
-
-				auto spherPos = utils::spatial::PlaneToSphereNormal(playerPos + glm::vec2(0, 32), playerPos, 256.0f, true);
-
+				auto& chunkMeshs = render::system::RenderSystem::GetInstance().GetChunkMesh();
+				size_t meshCount = chunkMeshs.Layer(render::scene::MeshLayer::Default)->MeshCount();
+				size_t poolSize = chunkMeshs.Layer(render::scene::MeshLayer::Default)->PoolLength();
+				size_t subCount = render::system::RenderSystem::GetInstance().GetMeshRequireCount();
+				glm::vec3 playerPos = world_.playerPos;
 				ImGui::Text("Application average %.3f ms / frame (%.1f FPS) ",
 					1000.0f / fps, fps);
 				ImGui::Text("playerPos: < x: %.2f , y: %.2f , z: %.2f >",
-					world.playerPos.x, world.playerPos.y, world.playerPos.z);
-				ImGui::Text("planetNormal: < x: %.2f , y: %.2f , z: %.2f >",
-					world.planetNormal.x, world.planetNormal.y, world.planetNormal.z);
-				ImGui::Text("Chunk mesh count: %d", context ? context->chunkMesh.GetLayer(Default) ?
-					context->chunkMesh.GetLayer(Default)->MeshCount() : 0 : 0);
-				ImGui::Text("Pool length: %d", context ? context->chunkMesh.GetLayer(Default) ?
-					context->chunkMesh.GetLayer(Default)->PoolLength() : 0 : 0);
-				ImGui::Text("Chunk count: %d", world.chunkData.Size());
-				ImGui::Text("Chunk pool length: %d", world.chunkData.PoolSize());
+					playerPos.x, playerPos.y, playerPos.z);
 
-				ImGui::Text("LOD subdivide submit count: %d", lodSys.GetSubSubmitCount());
-				ImGui::Text("LOD subdivide result count: %d", lodSys.GetSubResultCount());
+				ImGui::Text("Chunk mesh count: %d", meshCount);
+				ImGui::Text("Pool length: %d", poolSize);
 
-				ImGui::Text("LOD combine submit count: %d", lodSys.GetCobSubmitCount());
-				ImGui::Text("LOD combine result count: %d", lodSys.GetCobResultCount());
+				ImGui::Text("Chunk count: %d", world_.planet.chunkData.Size());
+				ImGui::Text("Chunk pool length: %d", world_.planet.chunkData.PoolSize());
+
+				ImGui::Text("Chunk mesh build submit count: %d", subCount);
 
 				ImGui::Text("Pointed block: <%d,%d,%d> <%s>",
-					world.selectedBlock.x, world.selectedBlock.y, world.selectedBlock.z, world.blockName.c_str());
+					world_.selectedBlock.x, world_.selectedBlock.y, world_.selectedBlock.z, world_.blockName.c_str());
 
-				ImGui::Text("Seleted block: <%s>", world.heldBlock.c_str());
+				ImGui::Text("Seleted block: <%s>", world_.heldBlock.c_str());
 					
 			},true
 		);
 
-		voxel::chunk::Chunk<float> chunk(32);
-		for(int x = 0;x< 32;x++)
-			for (int y = 0;y < 32;y++)
-				for (int z = 0;z < 32;z++) {
-					if(!(x == 6 && z == 6) && x > 0 && y > 0 && z > 0 && x > y)
-					/*int rad = randInt(0, 200);
-					if (rad < 100)*/
-						chunk.SetVoxel(x,y,z,-1.0);
-					else chunk.SetVoxel(x, y, z, 1.0f);
-				}
-
-		voxel::chunk::Chunk<float> neiChunk(32);
-		for (int x = 0;x < 32;x++)
-			for (int y = 0;y < 32;y++)
-				for (int z = 0;z < 32;z++) {
-					neiChunk.SetVoxel(x, y, z, 1.0f);
-				}
-		std::array<const voxel::chunk::Chunk<float>*, 7> neis = {
-			&neiChunk,&neiChunk ,&neiChunk ,&neiChunk ,&neiChunk ,&neiChunk,& neiChunk
-		};
-
-		render::MeshData data = render::utils::BuildSNMeshFromChunk(chunk, neis, 1);
-		mesh1 = new rd_gl::GLMesh();
-		mesh1->GetOrUpdateData(data);
-		mesh1->rotation = glm::vec3(0.0, 0.0, -1.0);
-		mesh1->position = glm::vec3(0, 128, 0);
+		view_ = rd::system::RenderSystem::GetInstance().BuildView(world_, settings_);
 	}
 
 	void Window::Render(double time) {
+		
+		auto& cmd = device_->Commands();
 
-		//我渲染:
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//清除颜色缓冲(使用清屏色)
+		device_->BeginFrame({ static_cast<unsigned int>(width_), static_cast<unsigned int>(height_), 0.0 });
 
-		glfwPollEvents();
+		frameRenderer_.Execute(view_, resources_, cmd);
 
 		fps = ImGui::GetIO().Framerate;
 
-		if (context != std::nullopt) {
-			auto& real = *context;
-			render::system::RenderSystem::GetInstance().Render(real);
-
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
-			glDepthFunc(GL_LESS);
-			real.blockRenderer.Render({});
-			real.blockRenderer.Render(*mesh1);
-
-			if (real.debugUI) {
-				ui::debug_ui::DebugUIManager::GetInstance().BeginFrame();
-				ui::debug_ui::DebugUIManager::GetInstance().EndFrame();
-			}
+		if (settings_.debugUI) {
+			ui::debug_ui::DebugUIManager::GetInstance().BeginFrame();
+			ui::debug_ui::DebugUIManager::GetInstance().EndFrame();
 		}
 
-		glfwSwapBuffers(window_);//交换前后缓冲区
+		glfwSwapBuffers(window_);   // ← 唯一的 platform 调用
 	}
 
 	void Window::Update(double time) {
-		if (context != std::nullopt) {
-			auto& real = *context;
-			nova_engine::core::input::InputSystem::GetInstance().Update(time, world, real);
-		}
+		nova_engine::core::input::InputSystem::GetInstance().Update(time, world_);   // ← 少一个参数
+		glfwPollEvents();
+		voxel::chunk::ChunkSystem::GetInstance().Update(world_);
 
-		voxel::chunk::ChunkSystem::GetInstance().Update(world);
-
-		if (context != std::nullopt) {
-			auto& realContext = *context;
-			render::system::RenderSystem::GetInstance().Update(world, realContext);
-		}
+		view_ = rd::system::RenderSystem::GetInstance().BuildView(world_, settings_);
+		view_.viewportWidth = width_;
+		view_.viewportHeight = height_;
 	}
 
 	void Window::Unload() {
-		glfwTerminate();
+		rd::system::RenderSystem::GetInstance().Shutdown();
+		rd::framework::DestroyRenderResources(*device_, resources_);
 		ui::debug_ui::DebugUIManager::GetInstance().Shutdown();
-		//delete(renderer);
+		ImGui::DestroyContext();
+		uiBackend_.reset();
+		device_.reset();
+		glfwTerminate();
 		NE_CORE_INFO("GameCore", "Unload game.");
 	}
 }

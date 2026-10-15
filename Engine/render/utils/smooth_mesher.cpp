@@ -8,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <mutex>
+#include <utils/assist/des_packer.h>
 
 namespace nova_engine::render::utils {
 	//Marching Cubes查找表。表格本身是从标准表重新生成的，
@@ -340,7 +341,7 @@ namespace nova_engine::render::utils {
 	//	std::vector<int> indices;
 	//};
 	//neighbours顺序为：左、右、上、下、前、后
-	MeshData BuildMeshFromChunk(
+	core::MeshData BuildMeshFromChunk(
 		const voxel::chunk::Chunk<float>& chunk,
 		const std::array<voxel::chunk::Chunk<float>*, 6> neighbours,
 		int scale) {
@@ -356,11 +357,11 @@ namespace nova_engine::render::utils {
 		//既不会漏出破洞，也不会凭空多出一层朝里的假面；
 		//等邻居加载进来重新构建时，这层收口自然消失，和邻居的面拼上。
 
-		constexpr int SIZE = static_cast<int>(core::config::CHUNK_SIZE);//32
+		constexpr int SIZE = static_cast<int>(nova_engine::core::config::CHUNK_SIZE);//32
 		constexpr int SIDE = SIZE + 1;//33，采样网格每边的角点数
 		constexpr int VOLUME = SIZE * SIZE * SIZE;//32768
 		const std::vector<float>& voxels = chunk.GetVoxelSpan();
-		if (voxels.size() < static_cast<size_t>(VOLUME)) return MeshData{};
+		if (voxels.size() < static_cast<size_t>(VOLUME)) return core::MeshData{};
 
 		//采样表：下标 = x * SIDE * SIDE + y * SIDE + z，x/y/z在0..CHUNK_SIZE
 		//known为0表示这个角点取不到(面邻居缺失或方向上有两个轴同时越界)
@@ -444,7 +445,7 @@ namespace nova_engine::render::utils {
 			}
 		}
 
-		MeshData mesh;
+		core::MeshData mesh;
 		const float voxelScale = static_cast<float>(scale);
 		const float inverseExtent = 1.0f / (static_cast<float>(SIZE) * voxelScale);
 
@@ -563,28 +564,30 @@ namespace nova_engine::render::utils {
 			}
 		}
 
-		return std::move(mesh);
+		return mesh;
 	}
 
-	MeshData BuildSNMeshFromChunk(
+	core::MeshData BuildSNMeshFromChunk(
 		const voxel::chunk::Chunk<float>& chunk,
-		const std::array<const voxel::chunk::Chunk<float>*, 7> neighbours, int scale) {
+		const std::array<const voxel::chunk::Chunk<float>*, 7>& neighbours, int scale) {
 
-		constexpr size_t SIZE = core::config::CHUNK_SIZE;
+		constexpr size_t SIZE = nova_engine::core::config::CHUNK_SIZE + 1;
 		constexpr size_t SIDE = SIZE + 1;
-		static voxel::chunk::Chunk<float> emptyChunk(SIZE);
+		static voxel::chunk::Chunk<float> emptyChunk(nova_engine::core::config::CHUNK_SIZE);
 		static std::once_flag flag;
 		std::call_once(flag, []() {
-			for(int x = 0;x <SIZE;x++)
-				for (int y = 0;y < SIZE;y++)
-					for (int z = 0;z < SIZE;z++) {
-						emptyChunk.SetVoxel(x, y, z, 1.0f);
+			for(int x = 0;x < nova_engine::core::config::CHUNK_SIZE;x++)
+				for (int y = 0;y < nova_engine::core::config::CHUNK_SIZE;y++)
+					for (int z = 0;z < nova_engine::core::config::CHUNK_SIZE;z++) {
+						emptyChunk.SetVoxel(x, y, z, nova_engine::utils::assist::PackAir());
 					}
 		});
 		
 		//棱缓存表，用于缓存所有的棱上交点情况
 		thread_local std::unique_ptr<glm::vec3[]> edgeVerCaches = std::make_unique<glm::vec3[]>(SIDE * SIDE * SIZE * 3);
-		thread_local std::unique_ptr<bool[]> edgeNormalCaches = std::make_unique<bool[]>(SIDE * SIDE * SIZE * 3);
+		thread_local std::unique_ptr<glm::vec3[]> edgeNormalCaches = std::make_unique<glm::vec3[]>(SIDE * SIDE * SIZE * 3);
+			thread_local std::unique_ptr<uint32_t[]> edgeTexCaches = std::make_unique<uint32_t[]>(SIDE * SIDE * SIZE * 3);
+		thread_local std::unique_ptr<uint8_t[]> edgeOriCaches = std::make_unique<uint8_t[]>(SIDE * SIDE * SIZE * 3);
 		size_t index = 0;
 		//按方向分别采样所有的棱
 		//这一步解决所有边界问题
@@ -594,49 +597,79 @@ namespace nova_engine::render::utils {
 			if (neighbours[i - 1] == nullptr) chunks[i] = &emptyChunk;
 			else chunks[i] = (neighbours[i - 1]);
 		}
-			
 
+		auto sampleData = [&](int sx, int sy, int sz) -> float {
+			if (sx < 0) sx = 0;
+			if (sy < 0) sy = 0;
+			if (sz < 0) sz = 0;
+
+			int idx = 0;
+			int lx = sx, ly = sy, lz = sz;
+			if (lx >= nova_engine::core::config::CHUNK_SIZE) { idx |= 1;lx -= nova_engine::core::config::CHUNK_SIZE; }
+			if (ly >= nova_engine::core::config::CHUNK_SIZE) { idx |= 2;ly -= nova_engine::core::config::CHUNK_SIZE; }
+			if (lz >= nova_engine::core::config::CHUNK_SIZE) { idx |= 4;lz -= nova_engine::core::config::CHUNK_SIZE; }
+
+			return chunks[idx]->GetVoxel(lx, ly, lz);
+		};
+
+		auto sampleDensity = [&](int sx, int sy, int sz) -> float {
+			return nova_engine::utils::assist::UnpackDensity(sampleData(sx,sy,sz));
+		};
+
+		auto sampleTex = [&](int sx, int sy, int sz) -> float {
+			return nova_engine::utils::assist::UnpackTexIdx(sampleData(sx, sy, sz));
+			};
+			
 		int dirMask[4] = { 1,0,0,0 };
 		for (int dir = 0;dir < 3;dir++) {
-			//每个方向遍历33*33*32个数据
+			//每个方向遍历34*34*33个数据
 			for (int x = 0;x < SIDE - dirMask[0];x++) {
 				for (int y = 0;y < SIDE - dirMask[1];y++) {
 					for (int z = 0;z < SIDE - dirMask[2];z++) {
 						int nx = x + dirMask[0], ny = y + dirMask[1], nz = z + dirMask[2];
 
-						int fx = x, fy = y, fz = z;
-						int fnx = nx, fny = ny, fnz = nz;
-
 						//分别获取自身与邻居密度值
-						int idx = 0;
-						if (fx >= SIZE) { idx |= 1; fx -= SIZE; }
-						if (fy >= SIZE) { idx |= 2; fy -= SIZE; }
-						if (fz >= SIZE) { idx |= 4; fz -= SIZE; }
-						float d1 = chunks[idx]->GetVoxel(fx,fy,fz);
-
-						idx = 0;
-						if (fnx >= SIZE) { idx |= 1; fnx -= SIZE; }
-						if (fny >= SIZE) { idx |= 2; fny -= SIZE; }
-						if (fnz >= SIZE) { idx |= 4; fnz -= SIZE; }
-						float d2 = chunks[idx]->GetVoxel(fnx, fny, fnz);
+						float d1 = sampleDensity(x, y, z);
+						float d2 = sampleDensity(nx, ny, nz);
 
 						//判断是否与交界面相交
 						//负数为内部，正数为外部
-						if (d1 < 0 && d2 >= 0 || d1 >= 0 && d2 < 0) {
+						if (d1 < 0 && d2 >= 0 || d1 >= 0 && d2 < 0 ) {
 							//线性插值收集顶点与法线数据
 							glm::vec3 v1 = { x,y,z };
 							glm::vec3 v2 = { nx,ny,nz };
 							float t = d1 / (d1 - d2);
-							//法线默认由当前点指向邻居点
-							//bool标记值表示是否反转当前棱上法线
-							edgeVerCaches[index] = glm::mix(v1, v2, t);
-							edgeNormalCaches[index] = d1 >= 0 && d2 < 0;
+							glm::vec3 p = glm::mix(v1, v2, t);
+							edgeVerCaches[index] = p;
+
+							int px = static_cast<int>(std::round(p.x));
+							int py = static_cast<int>(std::round(p.y));
+							int pz = static_cast<int>(std::round(p.z));
+
+							//从顶点梯度计算光照法线
+							glm::vec3 grad;
+							grad.x = sampleDensity(px + 1, py, pz) - sampleDensity(px, py, pz);
+							grad.y = sampleDensity(px, py + 1, pz) - sampleDensity(px, py, pz);
+							grad.z = sampleDensity(px, py, pz + 1) - sampleDensity(px, py, pz);
+							if (glm::length(grad) >= 1e-6)
+								edgeNormalCaches[index] = glm::normalize(grad);
+							else
+								edgeNormalCaches[index] = (d1 >= 0 && d2 < 0 ? v1 : v2) - edgeVerCaches[index];
+
+							uint32_t t1 = sampleTex(x, y, z);
+							uint32_t t2 = sampleTex(nx, ny, nz);
+							//拓扑翻转标记
+							edgeOriCaches[index] = (d1 < 0) ? 1 : 2;
+							//始终使用内部实心方块的材质
+							edgeTexCaches[index] = (d1 < 0) ? t1 : t2;
 						}
 						else {
 							//使用占位标记
 							edgeVerCaches[index] = { -1,-1,-1 };
 							//当棱与交界面没有交点时，法线无意义，随便填啥都无所谓
-							edgeNormalCaches[index] = false;
+							edgeNormalCaches[index] = glm::vec3(0.0f);
+							edgeOriCaches[index] = 0;
+							edgeTexCaches[index] = 0;
 						}
 						index++;
 					}
@@ -677,20 +710,16 @@ namespace nova_engine::render::utils {
 
 			for (int j = 0;j < 12;j++) {
 				size_t eidx = 0;
-				if (j < 4) eidx = eidxs[j] + x * SIDE * SIZE + y * SIZE + z;//dirZ: 33-33-32
-				else if (j < 8) eidx = eidxs[j] + x * SIZE * SIDE + y * SIDE + z;//dirY: 33-32-33
-				else eidx = eidxs[j] + x * SIDE * SIDE + y * SIDE + z;//dirX: 32-33-33
+				if (j < 4) eidx = eidxs[j] + x * SIDE * SIZE + y * SIZE + z;//dirZ: 34-34-33
+				else if (j < 8) eidx = eidxs[j] + x * SIZE * SIDE + y * SIDE + z;//dirY: 34-33-34
+				else eidx = eidxs[j] + x * SIDE * SIDE + y * SIDE + z;//dirX: 33-34-34
 
 				glm::vec3 edgeVer = edgeVerCaches[eidx];
-				bool edgeNorRe = edgeNormalCaches[eidx];
+				glm::vec3 edgeNorRe = edgeNormalCaches[eidx];
 
 				if (edgeVer != glm::vec3(-1,-1,-1)) {
 					vertex += edgeVer;
-					//构造法线
-					if (j < 4) normal += glm::vec3(0, 0, 1) * (edgeNorRe ? -1.0f : 1.0f);
-					else if (j < 8) normal += glm::vec3(0, 1, 0) * (edgeNorRe ? -1.0f : 1.0f);
-					else normal += glm::vec3(1, 0, 0) * (edgeNorRe ? -1.0f : 1.0f);
-
+					normal += edgeNorRe;
 					verCount++;
 				}
 				else {}
@@ -709,7 +738,7 @@ namespace nova_engine::render::utils {
 		}
 
 		//按顺序连接顶点，产生真正的网格数据
-		MeshData data{};
+		core::MeshData data{};
 
 		//注意这里全部是逆时针顺序
 		static size_t meshBuildTable[3][4][3] = {
@@ -718,10 +747,11 @@ namespace nova_engine::render::utils {
 			{{0,0,0},{0,1,0},{0,1,1},{0,0,1}}
 		};
 
-		for (size_t i = 0; i < SIZE * SIZE * SIZE; i++){
-			size_t x = i / (SIZE * SIZE);
-			size_t y = (i % (SIZE * SIZE)) / (SIZE);
-			size_t z = i % SIZE;
+		int subSize = SIZE - 1;
+		for (size_t i = 0; i < subSize * subSize * subSize; i++){
+			size_t x = i / (subSize * subSize);
+			size_t y = (i % (subSize * subSize)) / (subSize);
+			size_t z = i % subSize;
 
 			for (int dir = 0;dir < 3;dir++) {
 				//先判断共享棱是否存在
@@ -762,7 +792,7 @@ namespace nova_engine::render::utils {
 						data.uvws.push_back(meshBuildTable[0][ii][0]);
 						data.uvws.push_back(meshBuildTable[0][ii][1]);
 						//w暂时填固定值，aos同理
-						data.uvws.push_back(6.0f);
+						data.uvws.push_back(edgeTexCaches[eIdx]);
 						data.normals.push_back(quadNors[ii].x);
 						data.normals.push_back(quadNors[ii].y);
 						data.normals.push_back(quadNors[ii].z);
@@ -770,17 +800,15 @@ namespace nova_engine::render::utils {
 						normal += quadNors[ii];
 					}
 					int indices[6] = {0,1,2,0,2,3};
-					normal /= 4.0f;
-					//如果法线指向正：翻转顺序，使顶点逆时针旋转
-					bool reverse = 
-						(dir == 0 && normal.z < 0) || 
-						(dir == 1 && normal.y > 0) || 
-						(dir == 2 && normal.x < 0);
 
-					bool zero = (dir == 0 && normal.z == 0) ||
-						(dir == 1 && normal.y == 0) ||
-						(dir == 2 && normal.x == 0);
 					uint32_t base = static_cast<uint32_t>(data.vertices.size() / 3 - 4);
+					//如果法线指向正：翻转顺序，使顶点逆时针旋转
+					uint8_t orient = edgeOriCaches[eIdx];
+					bool reverse = 
+						(dir == 0 && orient == 2) ||
+						(dir == 1 && orient == 1) ||
+						(dir == 2 && orient == 2);
+					
 					if (reverse) {
 						for (int ii = 5;ii >= 0;ii--)
 							data.indices.push_back(indices[ii] + base);

@@ -11,8 +11,6 @@ namespace nova_engine::voxel::chunk {
 		std::unique_ptr<Chunk<int>> chunk;
 	};
 
-	
-
 	//ChunkSystem是一个管理区块数据的系统，负责区块的加载、卸载、更新等操作
 	//但它不持有任何区块数据与状态，所有的区块数据与状态都应该存储在World中，ChunkSystem只负责操作World中的区块数据
 	class ChunkSystem {

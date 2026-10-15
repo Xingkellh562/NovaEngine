@@ -13,7 +13,7 @@ namespace nova_engine::voxel::terrain {
 		PlanetTerrainGenerator(const PlanetTerrainGenerator&) = delete;
 		PlanetTerrainGenerator& operator=(const PlanetTerrainGenerator&) = delete;
 
-		int GetHeightNormal(double x, double y, double z) const;
+		float GetDensity(double x, double y, double z) const;
 
 		/*
 		向传入区块容器引用中填充体素数据，
@@ -21,9 +21,7 @@ namespace nova_engine::voxel::terrain {
 		playerPos为玩家的世界坐标，
 		playerData为玩家在星球上的数据, 
 		sampleSize为采样区域的大小*/
-		void BuildChunkNormal(chunk::Chunk<int>& chunk,
-			const planet::PlanetPlayerData& playerData,
-			glm::vec3 playerPos, glm::vec3 chunkPos, int R,int sampleSize = 32) const;
+		void BuildChunk(chunk::Chunk<float>& chunk,glm::ivec3 chunkPos, glm::ivec3 planetCenter, int R, int sampleSize = 32) const;
 	private:
 		utils::noise::SamplexNoise samplexNoise_;
 	};

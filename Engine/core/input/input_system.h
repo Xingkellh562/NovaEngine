@@ -2,7 +2,6 @@
 
 #include "input_state.h"
 #include <core/world/world.h>
-#include <render/opengl/context/render_context.h>
 
 namespace nova_engine::core::input {
 	class InputSystem {
@@ -14,7 +13,7 @@ namespace nova_engine::core::input {
 
 		InputState& GetState() { return state_; }
 
-		void Update(double time, world::World& world, render::opengl::context::RenderContext& context);
+		void Update(double time, world::World& world);
 
 		InputSystem(const InputSystem&) = delete;
 		InputSystem& operator=(const InputSystem&) = delete;

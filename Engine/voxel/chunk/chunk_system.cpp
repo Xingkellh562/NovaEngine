@@ -5,6 +5,7 @@
 #include <voxel/terrain/planet_terrain_generator.h>
 #include <core/config/config.h>
 #include <utils/spatial/spherical_transform.h>
+#include <voxel/planet/planet_chunk_system.h>
 
 
 namespace nova_engine::voxel::chunk {
@@ -79,30 +80,32 @@ namespace nova_engine::voxel::chunk {
 	
 
 	void ChunkSystem::Update(nova_engine::core::world::World& world) {
-		glm::ivec3 playerPos = world.playerPos;
-		const int MAXCOUNT = 6;
+		//glm::ivec3 playerPos = world.playerPos;
+		//const int MAXCOUNT = 6;
 
-		int count = 0;
-		for (const glm::ivec3& chunkPos : chunksPos) {
-			if (count >= MAXCOUNT) break;
-			int cx = chunkPos.x + playerPos.x, 
-				cy = chunkPos.y + playerPos.y, 
-				cz = chunkPos.z + playerPos.z;
-			auto chunk = world.chunkData.FindChunk(cx,cy,cz);
-			const glm::ivec3& cp = chunkPos;
-			if (((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) < 160 * 160) && !chunk) {
-				//count++;
-				//这里改成发布区块构建任务
-				BuildChunk(world.chunkData, cx, cy, cz);
-			}
-			else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 192 * 192) && chunk)
-				world.chunkData.RemoveChunk(cx, cy, cz);
-		}
+		//int count = 0;
+		//for (const glm::ivec3& chunkPos : chunksPos) {
+		//	if (count >= MAXCOUNT) break;
+		//	int cx = chunkPos.x + playerPos.x, 
+		//		cy = chunkPos.y + playerPos.y, 
+		//		cz = chunkPos.z + playerPos.z;
+		//	auto chunk = world.chunkData.FindChunk(cx,cy,cz);
+		//	const glm::ivec3& cp = chunkPos;
+		//	if (((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) < 160 * 160) && !chunk) {
+		//		//count++;
+		//		//这里改成发布区块构建任务
+		//		BuildChunk(world.chunkData, cx, cy, cz);
+		//	}
+		//	else if(((cp.x * cp.x + cp.y * cp.y + cp.z * cp.z) >= 192 * 192) && chunk)
+		//		world.chunkData.RemoveChunk(cx, cy, cz);
+		//}
 
-		core::concurrency::Result<ChunkResult> out;
-		while (generatorWorker_.TryPopResult(out)) {
-			world.chunkData.SubmitChunk(out.value.x, out.value.y, out.value.z, std::move(out.value.chunk));
-			existTasks_.erase({ out.value.x, out.value.y, out.value.z });
-		}
+		//core::concurrency::Result<ChunkResult> out;
+		//while (generatorWorker_.TryPopResult(out)) {
+		//	world.chunkData.SubmitChunk(out.value.x, out.value.y, out.value.z, std::move(out.value.chunk));
+		//	existTasks_.erase({ out.value.x, out.value.y, out.value.z });
+		//}
+
+		planet::PlanetChunkSystem::GetInstance().Update(world.planet,world.playerPos);
 	}
 }

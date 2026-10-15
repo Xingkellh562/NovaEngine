@@ -23,8 +23,7 @@ endif()
 enable_testing()
 
 set(TEST_SOURCES
-    main_test.cpp          # 你自己的 main 入口
-	test_file/mesh_cache.cpp
+    main_test.cpp          
 )
 
 add_executable(EngineCoreTests ${TEST_SOURCES})

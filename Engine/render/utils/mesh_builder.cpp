@@ -21,7 +21,7 @@ namespace nova_engine::render::utils {
 								std::vector<float>& uvws,
 								std::vector<float>& aos,
 								std::vector<float>& normals,
-								std::vector<int>& indices,
+								std::vector<uint32_t>& indices,
 								int& vertexCount,
 								const std::array<float, 4>& aoArray,
 								int x, int y, int z, int nx, int ny, int nz, int scale)
@@ -50,7 +50,7 @@ namespace nova_engine::render::utils {
 		const int MASK = 31;
 	}
 
-	std::array<std::optional<MeshData>,2> MeshBuilder::BuildMeshFromChunk(
+	std::array<std::optional<core::MeshData>,2> MeshBuilder::BuildMeshFromChunk(
 		const voxel::chunk::Chunk<int>& chunk,
 		const std::array<voxel::chunk::Chunk<int>*, 6> neighbours,
 		const voxel::block::BlockLibrary& library) 
@@ -141,7 +141,7 @@ namespace nova_engine::render::utils {
 		std::vector<float> uvws, lucencyUvws;
 		std::vector<float> aos, lucencyAos;
 		std::vector<float> normals, lucencyNormals;
-		std::vector<int> indices , lucencyIdx;
+		std::vector<uint32_t> indices , lucencyIdx;
 
 		constexpr int MAX_VERTS_FLOATS = 32 * 32 * 32 * 6 * 4; // 6个float/顶点
 		constexpr int MAX_INDICES = 32 * 32 * 32 * 6 * 6; // 最多6个面，每个面6个索引
@@ -269,12 +269,12 @@ namespace nova_engine::render::utils {
 	}
 
 
-	MeshData MeshBuilder::BuildLodMesh(const voxel::chunk::Chunk<int>& chunk,size_t scale, const voxel::block::BlockLibrary& library) {
+	core::MeshData MeshBuilder::BuildLodMesh(const voxel::chunk::Chunk<int>& chunk,size_t scale, const voxel::block::BlockLibrary& library) {
 		std::vector<float> vertices;
 		std::vector<float> uvws;
 		std::vector<float> aos;
 		std::vector<float> normals;
-		std::vector<int> indices;
+		std::vector<uint32_t> indices;
 
 		const int CHUNK_LENGTH = 32768;
 		const int SIZE = 32;
@@ -364,12 +364,12 @@ namespace nova_engine::render::utils {
 		return { std::move(vertices), std::move(uvws), std::move(aos), std::move(normals),std::move(indices) };
 	}
 
-	MeshData MeshBuilder::BuildLodMesh(const voxel::lod::LodVoxelData& lodData, size_t scale, const voxel::block::BlockLibrary& library) {
+	core::MeshData MeshBuilder::BuildLodMesh(const voxel::lod::LodVoxelData& lodData, size_t scale, const voxel::block::BlockLibrary& library) {
 		std::vector<float> vertices;
 		std::vector<float> uvws;
 		std::vector<float> aos;
 		std::vector<float> normals;
-		std::vector<int> indices;
+		std::vector<uint32_t> indices;
 
 		const int CHUNK_LENGTH = 32768;
 		const int SIZE = 32;

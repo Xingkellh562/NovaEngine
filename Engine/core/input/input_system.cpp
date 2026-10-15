@@ -1,30 +1,20 @@
 #include "input_system.h"
 #include "input_behavior.h"
-#include <render/opengl/library//camera_library.h>
 #include <log/logger.h>
 #include <utils/spatial/analyzer.h>
 #include <voxel/block/block_library.h>
 #include <utils/spatial/spherical_transform.h>
-
-
-using namespace nova_engine::render::opengl;
+#include<utils/assist/des_packer.h>
 
 namespace nova_engine::core::input {
-	const std::array<std::array<int, 3>, 6> NeighBours = {
-		{{-1,0,0},{1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}
+	static const std::array<std::array<int, 3>, 7> NeighBours = {
+		{{1,0,0},{0,1,0},{1,1,0},{0,0,1},{1,0,1},{0,1,1},{1,1,1}}
 	};
 
-	const float SPEED = 10.0f;
-	void InputSystem::Update(double time,world::World& world,context::RenderContext& context) {
+	const float SPEED = 30.0f;
+	void InputSystem::Update(double time,world::World& world) {
 		auto deltaMove = MoveUpdate(time, SPEED, world.playerRot, glm::vec3(0, 1, 0), state_);
 		world.playerPos += deltaMove;
-
-		world.planetPlayerData.orientation = glm::normalize(
-			utils::spatial::ComputeRollQuaternion({ deltaMove.x,deltaMove.z}, 256.0) 
-			* world.planetPlayerData.orientation
-		);
-
-		world.planetPlayerData.normal = glm::normalize(world.planetPlayerData.orientation * glm::dvec3(0, 1, 0));
 
 		world.playerRot = UpdateRotation(time, world.playerRot, 40, state_);
 
@@ -42,36 +32,30 @@ namespace nova_engine::core::input {
 
 		for (int i = 0;i < voxelInfos.size();i++) {
 			auto pos = voxelInfos[i].position;
-			auto chunk = world.chunkData.FindChunk(pos.x, pos.y, pos.z);
-			int voxel = 0;
+			auto chunk = world.planet.chunkData.FindChunk(pos.x, pos.y, pos.z);
+			if (!chunk) continue;
+			float data = 0;
 			if (chunk) {
-				voxel = chunk->GetVoxel(pos.x & 31,
+				data = chunk->GetVoxel(pos.x & 31,
 								pos.y & 31,
 								pos.z & 31);
 			}
-			if (voxel) {
+			float voxel = utils::assist::UnpackDensity(data);
+			if (voxel < 0.0f) {
 				world.selectedBlock = { pos.x, pos.y, pos.z };
 				if (state_.destroyBlock) {
 					if (state_.destroyBlock) {
 						chunk->SetVoxel(pos.x & 31,
 							pos.y & 31,
-							pos.z & 31, 0);
+							pos.z & 31, utils::assist::Pack(1.0,0));
 						state_.destroyBlock = false;
 					}
-
-					auto layer = context.chunkMesh.GetLayer(Default);
-					auto layer2 = context.chunkMesh.GetLayer(Lucency);
-					if (layer) {
-						//&& layer2
-						layer->RequireMeshUpdate(pos.x, pos.y, pos.z);
-						//layer2->RequireMeshUpdate(pos.x, pos.y, pos.z);
-
-						for (size_t i = 0; i < 6; i++)
-						{
-							layer->RequireMeshUpdate(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
-							//layer2->RequireMeshUpdate(pos.x + NeighBours[i][0], pos.y + NeighBours[i][1], pos.z + NeighBours[i][2]);
-						}
-					}
+					int size = config::CHUNK_SIZE;
+					for (int nx = -1;nx <= 1;nx++)
+						for (int ny = -1;ny <= 1;ny++)
+							for (int nz = -1;nz <= 1;nz++) {
+								world.planet.chunkData.SignDirty({ pos.x + nx * 2, pos.y + ny * 2, pos.z + nz * 2 });
+							}
 				}
 
 				if (state_.buildBlock) {
@@ -80,26 +64,18 @@ namespace nova_engine::core::input {
 					int y = pos.y + normal.y;
 					int z = pos.z + normal.z;
 
-					auto chunkBuild = world.chunkData.FindChunk(x, y, z);
+					auto chunkBuild = world.planet.chunkData.FindChunk(x, y, z);
 					if (chunkBuild) {
 						chunkBuild->SetVoxel(x & 31,y & 31,z & 31,
-							state_.nowBlock);
+							utils::assist::Pack(-1.0f,state_.nowBlock));
 						state_.buildBlock = false;
 					}
 
-					auto layer = context.chunkMesh.GetLayer(Default);
-					auto layer2 = context.chunkMesh.GetLayer(Lucency);
-					if (layer) {
-						//&& layer2
-						layer->RequireMeshUpdate(x, y, z);
-						//layer2->RequireMeshUpdate(x, y, z);
-
-						for (size_t i = 0; i < 6; i++)
-						{
-							layer->RequireMeshUpdate(x + NeighBours[i][0], y + NeighBours[i][1], z + NeighBours[i][2]);
-							//layer2->RequireMeshUpdate(x + NeighBours[i][0], y + NeighBours[i][1],z + NeighBours[i][2]);
-						}
-					}
+					for (int nx = -1;nx <= 1;nx++)
+						for (int ny = -1;ny <= 1;ny++)
+							for (int nz = -1;nz <= 1;nz++) {
+								world.planet.chunkData.SignDirty({ pos.x + nx * 2, pos.y + ny * 2, pos.z + nz * 2 });
+							}
 				}
 
 				auto block = 
@@ -108,12 +84,8 @@ namespace nova_engine::core::input {
 					world.blockName = block->GetName();
 				else
 					world.blockName = "None";
-
-				
 				break;
 			}
-
-			
 		}
 
 		state_.buildBlock = false;

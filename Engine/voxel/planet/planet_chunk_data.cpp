@@ -45,22 +45,53 @@ namespace nova_engine::voxel::planet {
 		}
 	}
 
-	const std::array<chunk::Chunk<float>*, 6> PlanetChunkData::GetChunkNeighbours(int x, int y, int z) const {
-		static const std::array<std::array<int, 3>, 6> NeighBours = {
-		{{-1,0,0},{1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}
+	const std::array<const chunk::Chunk<float>*, 7> PlanetChunkData::GetChunkNeighbours(int x, int y, int z) const {
+		static const std::array<std::array<int, 3>, 7> NeighBours = {
+		{{1,0,0},{0,1,0},{1,1,0},{0,0,1},{1,0,1},{0,1,1},{1,1,1}}
 		};
 
 		const int CHUNK_BIT1 = core::config::CHUNK_BIT1;
 
-		std::array<chunk::Chunk<float>*, 6> results{};
+		std::array<const chunk::Chunk<float>*, 7> results{};
 
-		for (int i = 0;i < 6;i++) {
+		for (int i = 0;i < 7;i++) {
 			std::array<int, 3> nei = NeighBours[i];
 
 			results[i] = FindChunk((nei[0] << CHUNK_BIT1) + x, (nei[1] << CHUNK_BIT1) + y, (nei[2] << CHUNK_BIT1) + z);
 		}
 
 		return results;
+	}
+
+	bool PlanetChunkData::NeighboursExist(int x, int y, int z) const {
+		const int CHUNK_BIT1 = core::config::CHUNK_BIT1;
+		for(int nx = -1;nx <= 1;nx++)
+			for (int ny = -1;ny <= 1;ny++)
+				for (int nz = -1;nz <= 1;nz++) {
+					bool exist = (FindChunk((nx << CHUNK_BIT1) + x, (ny << CHUNK_BIT1) + y, (nz << CHUNK_BIT1) + z) != nullptr);
+					if (!exist) { return false; }
+				}
+
+		return true;
+	}
+
+	void PlanetChunkData::SignDirty(glm::ivec3 pos) {
+		glm::ivec3 key = GetKeyWithCoord(pos.x, pos.y, pos.z);
+		dirtyChunks_.push_back(key);
+	}
+	bool PlanetChunkData::GetDirtyChunks(glm::ivec3& pos) {
+		bool empty = dirtyChunks_.empty();
+		pos = glm::ivec3(0.0);
+		if (!empty) {
+			auto chunkPos = dirtyChunks_.back();
+			pos = {
+				chunkPos.x << core::config::CHUNK_BIT1,
+				chunkPos.y << core::config::CHUNK_BIT1,
+				chunkPos.z << core::config::CHUNK_BIT1
+			};
+			dirtyChunks_.pop_back();
+		}
+		return !empty;
 	}
 
 	size_t PlanetChunkData::Size() const {

@@ -27,8 +27,10 @@ namespace nova_engine::voxel::planet {
 		void SubmitChunk(int x, int y, int z, std::unique_ptr<chunk::Chunk<float>> chunk);
 		//删除指定坐标的块，回收到对象池中，如果不存在则不做任何操作
 		void RemoveChunk(int x, int y, int z);
-		//返回指定坐标区块的六个邻居的临时指针，若邻居不存在则填充nullptr
-		const std::array<chunk::Chunk<float>*, 6> GetChunkNeighbours(int x, int y, int z) const;
+		//返回指定坐标区块的七个邻居的临时指针，若邻居不存在则填充nullptr
+		const std::array<const chunk::Chunk<float>*, 7> GetChunkNeighbours(int x, int y, int z) const;
+
+		bool NeighboursExist(int x, int y, int z) const;
 		//清空所有块数据
 		void Clear();
 		//从对象池中获取一个块，如果对象池中没有，则创建一个新的块
@@ -38,9 +40,15 @@ namespace nova_engine::voxel::planet {
 		size_t PoolSize() const {
 			return chunkPool_.Size();
 		}
+
+		void SignDirty(glm::ivec3 pos);
+		bool GetDirtyChunks(glm::ivec3& pos);
+
 	private:
 		std::unordered_map<glm::ivec3, std::unique_ptr<chunk::Chunk<float>>> map_;
 		collection::data_structure::ObjectPool<chunk::Chunk<float>, core::config::POOL_SIZE> chunkPool_;
+
+		std::vector<glm::ivec3> dirtyChunks_;
 		size_t size_ = 0;
 
 		glm::ivec3 GetKeyWithCoord(int x, int y, int z) const {
@@ -50,5 +58,14 @@ namespace nova_engine::voxel::planet {
 				z >> core::config::CHUNK_BIT1
 			};
 		}
+
+		using const_iterator = std::unordered_map<glm::ivec3, std::unique_ptr<chunk::Chunk<float>>>::const_iterator;
+
+	public:
+		const_iterator begin() const noexcept { return map_.begin(); }
+		const_iterator end() const noexcept { return map_.end(); }
+
+		const_iterator cbegin() const noexcept { return map_.cbegin(); }
+		const_iterator cend() const noexcept { return map_.cend(); }
 	};
 }

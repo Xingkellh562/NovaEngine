@@ -28,7 +28,7 @@ target_link_libraries(NovaEngine PUBLIC NovaEngineCore)
 
 
 #拷贝着色器文件
-set(SHADER_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/render/opengl/shaders")
+set(SHADER_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/render/gl/shaders")
 
 add_custom_command(TARGET NovaEngine POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
