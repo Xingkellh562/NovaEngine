@@ -2,12 +2,15 @@
 
 #include <vector>
 #include <cmath>
+#include <atomic>
 
 namespace nova_engine::voxel::chunk {
-	enum ChunkState {
-		Prepared = 0,
-		Building = 1,
-		Meshing = 2
+	enum class ChunkState : uint32_t
+	{
+		None = 0,
+		Complete = 1,
+		Meshing = 2,
+		InPool = 3,
 	};
 	template<typename T = int>
 	class Chunk {
@@ -30,13 +33,19 @@ namespace nova_engine::voxel::chunk {
 
 		T operator[](size_t i) { return voxels_[i]; }
 
-		ChunkState& State() { return state_; }
+		ChunkState GetState() { 
+			ChunkState s = state_.load(std::memory_order_acquire);
+			return s;
+		}
+		void SetState(ChunkState state) {
+			state_.store(state,std::memory_order_release);
+		}
 	private:
 		unsigned int size_;
 		unsigned int offset_;
 		std::vector<T> voxels_;
 
-		ChunkState state_ = Prepared;
+		std::atomic<ChunkState> state_ = ChunkState::None;
 
 		inline int GetIndexFromCoo(int x, int y, int z) const {
 			return ((x << offset_) << offset_) + (y << offset_) + z; //x->y->z

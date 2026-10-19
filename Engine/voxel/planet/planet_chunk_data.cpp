@@ -1,6 +1,7 @@
 #include "planet_chunk_data.h"
 #include <algorithm>
 #include <array>
+#include <utils/assist/des_packer.h>
 
 namespace nova_engine::voxel::planet {
 	//这里统一传入绝对世界坐标
@@ -14,18 +15,37 @@ namespace nova_engine::voxel::planet {
 		return nullptr;
 	}
 
+	float PlanetChunkData::GetVoxelDensity(int x, int y, int z) const {
+		auto chunkPtr = FindChunk(x, y, z);
+		if (!chunkPtr) return 1.0f;
+		static const int MASK = core::config::CHUNK_SIZE - 1;
+		float packed = chunkPtr->GetVoxel(x & MASK,y & MASK,z & MASK);
+		return utils::assist::UnpackDensity(packed);
+	}
+
 	std::unique_ptr<chunk::Chunk<float>> PlanetChunkData::AcquireChunk() {
-		return chunkPool_.Acquire(32);
+		auto chunk = chunkPool_.Acquire(32);
+		if (chunk) chunk->SetState(chunk::ChunkState::None);
+		return chunk;
+	}
+
+	void PlanetChunkData::RecycleChunk(std::unique_ptr<chunk::Chunk<float>> chunkPtr) {
+		if (chunkPtr != nullptr) {
+			chunkPtr->SetState(chunk::ChunkState::InPool);
+			chunkPool_.Recycle(std::move(chunkPtr));
+		}
+			
 	}
 
 	void PlanetChunkData::SubmitChunk(int x, int y, int z, std::unique_ptr<chunk::Chunk<float>> chunk) {
 		if (!chunk) return;
-
+		chunk->SetState(chunk::ChunkState::Complete);
 		//chunk-> std::unique_ptr<>
 		auto key = GetKeyWithCoord(x, y, z);
 		auto it = map_.find(key);
 		if (it != map_.end()) {
 			//原数据入池
+			it->second.get()->SetState(chunk::ChunkState::InPool);
 			chunkPool_.Recycle(std::move(it->second));
 			it->second = std::move(chunk);
 		}
@@ -38,21 +58,26 @@ namespace nova_engine::voxel::planet {
 	void PlanetChunkData::RemoveChunk(int x, int y, int z) {
 		auto key = GetKeyWithCoord(x, y, z);
 		auto it = map_.find(key);
-		if (it != map_.end()) {
-			//数据入池
-			chunkPool_.Recycle(std::move(it->second));
-			size_--;
+		if (it != map_.end()
+			&& it->second
+			&& it->second->GetState() == chunk::ChunkState::Complete) {
+			auto chunk = std::move(it->second);
+			map_.erase(it);
+			--size_;
+
+			chunk->SetState(chunk::ChunkState::InPool);
+			chunkPool_.Recycle(std::move(chunk));
 		}
 	}
 
-	const std::array<const chunk::Chunk<float>*, 7> PlanetChunkData::GetChunkNeighbours(int x, int y, int z) const {
+	const std::array<chunk::Chunk<float>*, 7> PlanetChunkData::GetChunkNeighbours(int x, int y, int z) const {
 		static const std::array<std::array<int, 3>, 7> NeighBours = {
 		{{1,0,0},{0,1,0},{1,1,0},{0,0,1},{1,0,1},{0,1,1},{1,1,1}}
 		};
 
 		const int CHUNK_BIT1 = core::config::CHUNK_BIT1;
 
-		std::array<const chunk::Chunk<float>*, 7> results{};
+		std::array<chunk::Chunk<float>*, 7> results{};
 
 		for (int i = 0;i < 7;i++) {
 			std::array<int, 3> nei = NeighBours[i];
@@ -102,5 +127,6 @@ namespace nova_engine::voxel::planet {
 	void PlanetChunkData::Clear() {
 		map_.clear();
 		chunkPool_.Shrink();
+		size_ = 0;
 	}
 }

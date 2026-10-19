@@ -20,9 +20,6 @@ namespace nova_engine::core::input {
 
 		auto voxelInfos = utils::spatial::EmitDDARay(7,world.playerPos, world.playerRot);
 
-		world.selectedBlock = {0,0,0};
-		world.blockName = "None";
-
 		auto heldBlock =
 			voxel::block::BlockLibrary::GetInstance().FindBlock(state_.nowBlock);
 		if (heldBlock)
@@ -30,6 +27,72 @@ namespace nova_engine::core::input {
 		else
 			world.heldBlock = "Null";
 
+		auto rayPos = utils::spatial::EmitRayInSDF(32, world.playerPos, world.playerRot,world.planet.chunkData);
+
+		if (state_.destroyBlock) {
+			auto pos = rayPos.position;
+			for (int fx = -2;fx <= 2;fx++)
+				for (int fy = -2;fy <= 2;fy++)
+					for (int fz = -2;fz <= 2;fz++) {
+						float offx = std::floor(pos.x) + fx;
+						float offy = std::floor(pos.y) + fy;
+						float offz = std::floor(pos.z) + fz;
+
+						float dis = glm::length(glm::vec3(offx, offy, offz) - pos);
+
+						auto chunk = world.planet.chunkData.FindChunk(offx, offy, offz);
+						if (!chunk) continue;
+
+						float density = std::clamp(1.0 - dis / 6.0,0.0,1.0);
+
+						chunk->SetVoxel(((int)offx) & 31,
+							((int)offy) & 31,
+							((int)offz) & 31, utils::assist::Pack(density, 0));
+
+						world.planet.chunkData.SignDirty({ std::floor(pos.x) + fx * 2,
+							std::floor(pos.y) + fy * 2,
+							std::floor(pos.z) + fz * 2 });
+					}
+			state_.destroyBlock = false;
+		}
+
+		if (state_.buildBlock){
+			auto pos = rayPos.position;
+			for (int fx = -2;fx <= 2;fx++)
+				for (int fy = -2;fy <= 2;fy++)
+					for (int fz = -2;fz <= 2;fz++) {
+						float offx = std::floor(pos.x) + fx;
+						float offy = std::floor(pos.y) + fy;
+						float offz = std::floor(pos.z) + fz;
+
+						float dis = glm::length(glm::vec3(offx, offy, offz) - pos);
+
+						auto chunk = world.planet.chunkData.FindChunk(offx, offy, offz);
+						if (!chunk) continue;
+
+						float density = std::clamp(-1.0 + dis / 6.0, -1.0, 0.0);
+
+						chunk->SetVoxel(((int)offx) & 31,
+							((int)offy) & 31,
+							((int)offz) & 31, utils::assist::Pack(density, state_.nowBlock));
+
+						world.planet.chunkData.SignDirty({ std::floor(pos.x) + fx * 2,
+							std::floor(pos.y) + fy * 2,
+							std::floor(pos.z) + fz * 2 });
+					}
+			state_.buildBlock = false;
+		}
+
+		float data = world.planet.chunkData.GetVoxelDensity(rayPos.position.x, rayPos.position.y, rayPos.position.z);
+		auto block =
+			voxel::block::BlockLibrary::GetInstance().FindBlock(utils::assist::UnpackTexIdx(data));
+		if (block)
+			world.blockName = block->GetName();
+		else
+			world.blockName = "None";
+
+		world.selectedBlock = { rayPos.position.x, rayPos.position.y, rayPos.position.z };
+		/*
 		for (int i = 0;i < voxelInfos.size();i++) {
 			auto pos = voxelInfos[i].position;
 			auto chunk = world.planet.chunkData.FindChunk(pos.x, pos.y, pos.z);
@@ -79,7 +142,7 @@ namespace nova_engine::core::input {
 				}
 
 				auto block = 
-					voxel::block::BlockLibrary::GetInstance().FindBlock(voxel);
+					voxel::block::BlockLibrary::GetInstance().FindBlock(utils::assist::UnpackTexIdx(data));
 				if (block)
 					world.blockName = block->GetName();
 				else
@@ -87,7 +150,7 @@ namespace nova_engine::core::input {
 				break;
 			}
 		}
-
+		*/
 		state_.buildBlock = false;
 		state_.destroyBlock = false;
 	}

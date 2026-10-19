@@ -58,10 +58,6 @@ namespace nova_engine::render::gl {
 			glTexParameteri(target_, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		}
 
-		if (desc.defaultSampler.depthCompareMode) {
-
-		}
-
 		if (desc.generateMipmaps) glGenerateMipmap(target_);
 
 		glBindTexture(target_, 0);

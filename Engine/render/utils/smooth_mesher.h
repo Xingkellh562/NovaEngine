@@ -13,7 +13,10 @@ namespace nova_engine::render::utils {
 	//chunk：包含密度场采样数据，中心点采样
 	//neighbours：正方向上的7个邻居
 	//scale：区块大小缩放
-	core::MeshData BuildSNMeshFromChunk( //<-这个就是出问题的函数，本来是重载函数我改了个名以防混淆，cpp名称同步修改
+	core::MeshData BuildSNMeshFromChunk( 
 		const voxel::chunk::Chunk<float>& chunk,
-		const std::array<const voxel::chunk::Chunk<float>*, 7>& neighbours, int scale = 1);
+		const std::array<voxel::chunk::Chunk<float>*, 7>& neighbours, int scale = 1);
+
+	core::MeshData BuildSNLodMesh( 
+		const voxel::chunk::Chunk<float>& chunk,int scale = 1);
 }

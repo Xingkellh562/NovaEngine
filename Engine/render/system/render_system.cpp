@@ -89,7 +89,7 @@ namespace nova_engine::render::system {
 				//只要有邻居不存在，不构建网格
 				bool neiExist = world.planet.chunkData.NeighboursExist(cx, cy, cz);
 				if (!neiExist) continue;
-				const std::array<const nova_engine::voxel::chunk::Chunk<float>*, 7>& nei = world.planet.chunkData.GetChunkNeighbours(cx, cy, cz);
+				const std::array<nova_engine::voxel::chunk::Chunk<float>*, 7>& nei = world.planet.chunkData.GetChunkNeighbours(cx, cy, cz);
 
 				//多线程异步提交
 				SubmitMeshRequire(chunk,nei,cx,cy,cz);
@@ -103,7 +103,7 @@ namespace nova_engine::render::system {
 			int cz = outChunk.z;
 
 			auto chunk = world.planet.chunkData.FindChunk(cx, cy, cz);
-			const std::array<const nova_engine::voxel::chunk::Chunk<float>*, 7>& nei = world.planet.chunkData.GetChunkNeighbours(cx, cy, cz);
+			const std::array<nova_engine::voxel::chunk::Chunk<float>*, 7>& nei = world.planet.chunkData.GetChunkNeighbours(cx, cy, cz);
 
 			if (chunk)
 				SubmitMeshRequire(chunk, nei, cx, cy, cz);
@@ -141,9 +141,14 @@ namespace nova_engine::render::system {
 	}
 
 	void RenderSystem::SubmitMeshRequire(voxel::chunk::Chunk<float>* chunk,
-		const std::array<const nova_engine::voxel::chunk::Chunk<float>*, 7>& nei,
+		const std::array<nova_engine::voxel::chunk::Chunk<float>*, 7>& nei,
 		int cx,int cy,int cz){
 		if (existTasks_.find({ cx, cy, cz }) != existTasks_.end()) return;
+
+		chunk->SetState(voxel::chunk::ChunkState::Meshing);
+		for (int i = 0;i < nei.size();i++) {
+			nei[i]->SetState(voxel::chunk::ChunkState::Meshing);
+		}
 
 		auto cancel = std::make_shared<nova_engine::core::concurrency::CancelToken>();
 		existTasks_.insert({ cx, cy, cz });
@@ -160,6 +165,10 @@ namespace nova_engine::render::system {
 					auto defaultMesh = utils::BuildSNMeshFromChunk(*chunk, nei);
 					result.value = std::move(defaultMesh);
 					ctx.emit(std::move(result));
+					chunk->SetState(voxel::chunk::ChunkState::Complete);
+					for (int i = 0;i < nei.size();i++) {
+						nei[i]->SetState(voxel::chunk::ChunkState::Complete);
+					}
 					}
 			});
 

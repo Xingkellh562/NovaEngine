@@ -63,7 +63,7 @@ namespace nova_engine::render::system {
 		RenderSystem() { meshBuildWorker_.Start(); }
 
 		void SubmitMeshRequire(voxel::chunk::Chunk<float>*,
-			const std::array<const nova_engine::voxel::chunk::Chunk<float>*, 7>& nei,
+			const std::array<nova_engine::voxel::chunk::Chunk<float>*, 7>& nei,
 			int cx, int cy, int cz);
 
 		void UpdateShadowCamera(const nova_engine::core::world::World& world,

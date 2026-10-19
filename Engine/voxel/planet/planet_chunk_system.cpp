@@ -17,44 +17,40 @@ namespace nova_engine::voxel::planet {
 		if (existTasks_.find({ fx,fy,fz }) != existTasks_.end()) return;
 
 		//从池中获取一个可供修改的对象
-		std::unique_ptr<chunk::Chunk<float>> chunkPtr = chunkData.AcquireChunk();
+		
+		//提交任务
+		try {
+			auto cancel = std::make_shared<core::concurrency::CancelToken>();
 
-		if (chunkPtr != nullptr) {
-			//提交任务
-			try {
-				auto cancel = std::make_shared<core::concurrency::CancelToken>();
+			std::unique_ptr<chunk::Chunk<float>> chunkPtr = chunkData.AcquireChunk();
+			if (!chunkPtr) return;
 
-				existTasks_.insert({ fx,fy,fz });
+			existTasks_.insert({ fx,fy,fz });
 
-				bool success = generatorWorker_.TrySubmitTask(core::concurrency::Task<ChunkResult>{
-					.id = 0, .priority = 0, .cancel = cancel,
-						.fn = [chunk = std::move(chunkPtr),fx,fy,fz](core::concurrency::TaskContext<ChunkResult>& ctx) mutable {
-						ChunkResult result;
-						result.x = fx;
-						result.y = fy;
-						result.z = fz;
+			bool success = generatorWorker_.TrySubmitTask(core::concurrency::Task<ChunkResult>{
+				.id = 0, .priority = 0, .cancel = cancel,
+					.fn = [chunk = std::move(chunkPtr), fx, fy, fz](core::concurrency::TaskContext<ChunkResult>& ctx) mutable {
+					ChunkResult result;
+					result.x = fx;
+					result.y = fy;
+					result.z = fz;
 
-						if (chunk) {
-							generator.BuildChunk(*chunk, { fx, fy, fz },{0,0,0},1024);
-							/*planetGenerator.BuildChunkNormal(*task.chunk, playerData, playerPos,
-								{ static_cast<float>(task.x),
-								static_cast<float>(task.y),
-								static_cast<float>(task.z) }, 1024);*/
-						}
+					if (chunk) {
+						generator.BuildChunk(*chunk, { fx, fy, fz }, { 0,0,0 }, 1024);
+					}
 
-						result.chunk = std::move(chunk);
-						ctx.emit(std::move(result));
-						}
-				});
+					result.chunk = std::move(chunk);
+					ctx.emit(std::move(result));
+					}
+			});
 
-				if (!success) {
-					existTasks_.erase({ fx,fy,fz });
-				}
-
+			if (!success) {
+				existTasks_.erase({ fx,fy,fz });
+				chunkData.RecycleChunk(std::move(chunkPtr));
 			}
-			catch (const std::exception& e) {
-				NE_CORE_ERROR("ChunkSystem", "Failed to submit chunk build task, catch error:{}", e.what());
-			}
+		}
+		catch (const std::exception& e) {
+			NE_CORE_ERROR("ChunkSystem", "Failed to submit chunk build task, catch error:{}", e.what());
 		}
 	}
 

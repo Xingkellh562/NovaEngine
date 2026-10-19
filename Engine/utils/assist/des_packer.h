@@ -35,5 +35,6 @@ namespace nova_engine::utils::assist {
 	}
 
 	inline float PackAir() { return Pack(1.0f, 0); }
+	inline float PackSoild() { return Pack(-1.0f, 0); }
 	inline bool  IsPacked(float stored) { return stored >= 1.0f && stored < 2.0f; }
 }

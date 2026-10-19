@@ -33,7 +33,6 @@ namespace nova_engine::utils::spatial {
 
 		return result;
 	}
-
 	//获取晶格坐标集合，要求size必须是二的幂
     const std::vector<glm::ivec3> GetLatticeCooInRange(int range, int size) {
         std::vector<glm::ivec3> result;
