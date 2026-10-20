@@ -825,251 +825,279 @@ namespace nova_engine::render::utils {
 	}
 
 	core::MeshData BuildSNLodMesh(
-		const voxel::chunk::Chunk<float>& chunk, int scale) {
-		constexpr size_t SIZE = nova_engine::core::config::CHUNK_SIZE;
-		constexpr size_t SIDE = SIZE + 1;
-		static voxel::chunk::Chunk<float> emptyChunk(nova_engine::core::config::CHUNK_SIZE);
-		static std::once_flag flag;
-		std::call_once(flag, []() {
-			for (int x = 0;x < nova_engine::core::config::CHUNK_SIZE;x++)
-				for (int y = 0;y < nova_engine::core::config::CHUNK_SIZE;y++)
-					for (int z = 0;z < nova_engine::core::config::CHUNK_SIZE;z++) {
-						emptyChunk.SetVoxel(x, y, z, nova_engine::utils::assist::Pack(0.0,0));
-					}
-			});
+		const voxel::lod::LodVoxelSDFData& lodData, int scale) {
 
-		//棱缓存表，用于缓存所有的棱上交点情况
-		thread_local std::unique_ptr<glm::vec3[]> edgeVerCaches = std::make_unique<glm::vec3[]>(SIDE * SIDE * SIZE * 3);
-		thread_local std::unique_ptr<glm::vec3[]> edgeNormalCaches = std::make_unique<glm::vec3[]>(SIDE * SIDE * SIZE * 3);
-		thread_local std::unique_ptr<uint32_t[]> edgeTexCaches = std::make_unique<uint32_t[]>(SIDE * SIDE * SIZE * 3);
-		thread_local std::unique_ptr<uint8_t[]> edgeOriCaches = std::make_unique<uint8_t[]>(SIDE * SIDE * SIZE * 3);
-		size_t index = 0;
-		//按方向分别采样所有的棱
-		//这一步解决所有边界问题
-		//先收集所有的体素数据
-		std::array<const voxel::chunk::Chunk<float>*, 8> chunks{ &chunk };
-		for (int i = 1;i < 8;i++) {
-			chunks[i] = &emptyChunk;
+		constexpr int N = static_cast<int>(nova_engine::core::config::CHUNK_SIZE) + 2; // 34
+		constexpr int SIZE = N - 1; // 33 条棱区间
+
+		const std::vector<float>& rawData = lodData.datas_;
+		if (rawData.size() < static_cast<size_t>(N) * N * N) return {};
+
+		auto idx3 = [](int x, int y, int z) -> size_t {
+			return (static_cast<size_t>(x) * N + y) * N + z;
+			};
+
+		auto safeDensity = [&](int x, int y, int z) -> float {
+			if (x < 0 || x >= N || y < 0 || y >= N || z < 0 || z >= N) return 1.0f;
+			return nova_engine::utils::assist::UnpackDensity(rawData[idx3(x, y, z)]);
+			};
+
+		auto safeTex = [&](int x, int y, int z) -> float {
+			if (x < 0 || x >= N || y < 0 || y >= N || z < 0 || z >= N) return 1.0f;
+			return nova_engine::utils::assist::UnpackTexIdx(rawData[idx3(x, y, z)]);
+			};
+
+		// ---- 法线：密度场中心差分 ----
+		std::vector<glm::vec3> normals(static_cast<size_t>(N) * N * N, glm::vec3(0.0f));
+		auto safeNormal = [&](int x, int y, int z) -> glm::vec3 {
+			if (x < 0 || x >= N || y < 0 || y >= N || z < 0 || z >= N) return glm::vec3(0.0f);
+			return normals[idx3(x, y, z)];
+			};
+
+		for (int x = 0; x < N; x++) {
+			for (int y = 0; y < N; y++) {
+				for (int z = 0; z < N; z++) {
+					glm::vec3 g(0.0f);
+					if (x > 0 && x + 1 < N) g.x = (safeDensity(x + 1, y, z) - safeDensity(x - 1, y, z)) * 0.5f;
+					else if (x + 1 < N)     g.x = safeDensity(x + 1, y, z) - safeDensity(x, y, z);
+					else if (x > 0)         g.x = safeDensity(x, y, z) - safeDensity(x - 1, y, z);
+
+					if (y > 0 && y + 1 < N) g.y = (safeDensity(x, y + 1, z) - safeDensity(x, y - 1, z)) * 0.5f;
+					else if (y + 1 < N)     g.y = safeDensity(x, y + 1, z) - safeDensity(x, y, z);
+					else if (y > 0)         g.y = safeDensity(x, y, z) - safeDensity(x, y - 1, z);
+
+					if (z > 0 && z + 1 < N) g.z = (safeDensity(x, y, z + 1) - safeDensity(x, y, z - 1)) * 0.5f;
+					else if (z + 1 < N)     g.z = safeDensity(x, y, z + 1) - safeDensity(x, y, z);
+					else if (z > 0)         g.z = safeDensity(x, y, z) - safeDensity(x, y, z - 1);
+
+					float len = glm::length(g);
+					normals[idx3(x, y, z)] = (len > 1e-6f) ? g / len : glm::vec3(0.0f);
+				}
+			}
 		}
 
-		auto sampleData = [&](int sx, int sy, int sz) -> float {
-			if (sx < 0) sx = 0;
-			if (sy < 0) sy = 0;
-			if (sz < 0) sz = 0;
+		// ---- 棱缓存 ----
+		// 沿 X: ex∈[0,SIZE), ey,ez∈[0,N)  大小 SIZE*N*N
+		// 沿 Y: ey∈[0,SIZE), ex,ez∈[0,N)  大小 N*SIZE*N
+		// 沿 Z: ez∈[0,SIZE), ex,ey∈[0,N)  大小 N*N*SIZE
+		const size_t szX = static_cast<size_t>(SIZE) * N * N;
+		const size_t szY = static_cast<size_t>(N) * SIZE * N;
+		const size_t szZ = static_cast<size_t>(N) * N * SIZE;
 
-			int idx = 0;
-			int lx = sx, ly = sy, lz = sz;
-			if (lx >= nova_engine::core::config::CHUNK_SIZE) { idx |= 1;lx -= nova_engine::core::config::CHUNK_SIZE; }
-			if (ly >= nova_engine::core::config::CHUNK_SIZE) { idx |= 2;ly -= nova_engine::core::config::CHUNK_SIZE; }
-			if (lz >= nova_engine::core::config::CHUNK_SIZE) { idx |= 4;lz -= nova_engine::core::config::CHUNK_SIZE; }
+		std::vector<glm::vec3> edgePosX(szX, glm::vec3(-1.0f));
+		std::vector<glm::vec3> edgePosY(szY, glm::vec3(-1.0f));
+		std::vector<glm::vec3> edgePosZ(szZ, glm::vec3(-1.0f));
+		std::vector<glm::vec3> edgeNormX(szX, glm::vec3(0.0f));
+		std::vector<glm::vec3> edgeNormY(szY, glm::vec3(0.0f));
+		std::vector<glm::vec3> edgeNormZ(szZ, glm::vec3(0.0f));
+		std::vector<uint8_t>   edgeOriX(szX, 0);
+		std::vector<uint8_t>   edgeOriY(szY, 0);
+		std::vector<uint8_t>   edgeOriZ(szZ, 0);
 
-			return chunks[idx]->GetVoxel(lx, ly, lz);
+		auto eidxX = [](int ex, int ey, int ez) -> size_t {
+			return (static_cast<size_t>(ex) * N + ey) * N + ez;
+			};
+		auto eidxY = [](int ex, int ey, int ez) -> size_t {
+			return static_cast<size_t>(ex) * SIZE * N + static_cast<size_t>(ey) * N + ez;
+			};
+		auto eidxZ = [](int ex, int ey, int ez) -> size_t {
+			return static_cast<size_t>(ex) * N * SIZE + static_cast<size_t>(ey) * SIZE + ez;
 			};
 
-		auto sampleDensity = [&](int sx, int sy, int sz) -> float {
-			return nova_engine::utils::assist::UnpackDensity(sampleData(sx, sy, sz));
-			};
-
-		auto sampleTex = [&](int sx, int sy, int sz) -> float {
-			return nova_engine::utils::assist::UnpackTexIdx(sampleData(sx, sy, sz));
-			};
-
-		int dirMask[4] = { 1,0,0,0 };
-		for (int dir = 0;dir < 3;dir++) {
-			//每个方向遍历34*34*33个数据
-			for (int x = 0;x < SIDE - dirMask[0];x++) {
-				for (int y = 0;y < SIDE - dirMask[1];y++) {
-					for (int z = 0;z < SIDE - dirMask[2];z++) {
-						int nx = x + dirMask[0], ny = y + dirMask[1], nz = z + dirMask[2];
-
-						//分别获取自身与邻居密度值
-						float d1 = sampleDensity(x, y, z);
-						float d2 = sampleDensity(nx, ny, nz);
-
-						//判断是否与交界面相交
-						//负数为内部，正数为外部
-						if (d1 < 0 && d2 >= 0 || d1 >= 0 && d2 < 0) {
-							//线性插值收集顶点与法线数据
-							glm::vec3 v1 = { x,y,z };
-							glm::vec3 v2 = { nx,ny,nz };
-							float t = d1 / (d1 - d2);
-							glm::vec3 p = glm::mix(v1, v2, t);
-							edgeVerCaches[index] = p;
-
-							int px = static_cast<int>(std::round(p.x));
-							int py = static_cast<int>(std::round(p.y));
-							int pz = static_cast<int>(std::round(p.z));
-
-							//从顶点梯度计算光照法线
-							glm::vec3 grad;
-							grad.x = sampleDensity(px + 1, py, pz) - sampleDensity(px, py, pz);
-							grad.y = sampleDensity(px, py + 1, pz) - sampleDensity(px, py, pz);
-							grad.z = sampleDensity(px, py, pz + 1) - sampleDensity(px, py, pz);
-							if (glm::length(grad) >= 1e-6)
-								edgeNormalCaches[index] = glm::normalize(grad);
-							else
-								edgeNormalCaches[index] = (d1 >= 0 && d2 < 0 ? v1 : v2) - edgeVerCaches[index];
-
-							uint32_t t1 = sampleTex(x, y, z);
-							uint32_t t2 = sampleTex(nx, ny, nz);
-							//拓扑翻转标记
-							edgeOriCaches[index] = (d1 < 0) ? 1 : 2;
-							//始终使用内部实心方块的材质
-							edgeTexCaches[index] = (d1 < 0) ? t1 : t2;
-						}
-						else {
-							//使用占位标记
-							edgeVerCaches[index] = { -1,-1,-1 };
-							//当棱与交界面没有交点时，法线无意义，随便填啥都无所谓
-							edgeNormalCaches[index] = glm::vec3(0.0f);
-							edgeOriCaches[index] = 0;
-							edgeTexCaches[index] = 0;
-						}
-						index++;
+		// 沿 X
+		for (int ex = 0; ex < SIZE; ex++) {
+			for (int ey = 0; ey < N; ey++) {
+				for (int ez = 0; ez < N; ez++) {
+					float d1 = safeDensity(ex, ey, ez);
+					float d2 = safeDensity(ex + 1, ey, ez);
+					if ((d1 < 0) != (d2 < 0)) {
+						float t = d1 / (d1 - d2);
+						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex + 1, ey, ez), t);
+						glm::vec3 n = glm::mix(safeNormal(ex, ey, ez), safeNormal(ex + 1, ey, ez), t);
+						float len = glm::length(n);
+						if (len > 1e-6f) n /= len;
+						size_t i = eidxX(ex, ey, ez);
+						edgePosX[i] = p; edgeNormX[i] = n;
+						edgeOriX[i] = (d1 < 0) ? 1 : 2;
 					}
 				}
 			}
-			std::swap(dirMask[dir], dirMask[dir + 1]);
 		}
 
+		// 沿 Y
+		for (int ex = 0; ex < N; ex++) {
+			for (int ey = 0; ey < SIZE; ey++) {
+				for (int ez = 0; ez < N; ez++) {
+					float d1 = safeDensity(ex, ey, ez);
+					float d2 = safeDensity(ex, ey + 1, ez);
+					if ((d1 < 0) != (d2 < 0)) {
+						float t = d1 / (d1 - d2);
+						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex, ey + 1, ez), t);
+						glm::vec3 n = glm::mix(safeNormal(ex, ey, ez), safeNormal(ex, ey + 1, ez), t);
+						float len = glm::length(n);
+						if (len > 1e-6f) n /= len;
+						size_t i = eidxY(ex, ey, ez);
+						edgePosY[i] = p; edgeNormY[i] = n;
+						edgeOriY[i] = (d1 < 0) ? 1 : 2;
+					}
+				}
+			}
+		}
 
-		//遍历每个体素空间，产生空间内平均顶点与法线
+		// 沿 Z
+		for (int ex = 0; ex < N; ex++) {
+			for (int ey = 0; ey < N; ey++) {
+				for (int ez = 0; ez < SIZE; ez++) {
+					float d1 = safeDensity(ex, ey, ez);
+					float d2 = safeDensity(ex, ey, ez + 1);
+					if ((d1 < 0) != (d2 < 0)) {
+						float t = d1 / (d1 - d2);
+						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex, ey, ez + 1), t);
+						glm::vec3 n = glm::mix(safeNormal(ex, ey, ez), safeNormal(ex, ey, ez + 1), t);
+						float len = glm::length(n);
+						if (len > 1e-6f) n /= len;
+						size_t i = eidxZ(ex, ey, ez);
+						edgePosZ[i] = p; edgeNormZ[i] = n;
+						edgeOriZ[i] = (d1 < 0) ? 1 : 2;
+					}
+				}
+			}
+		}
 
-		thread_local std::unique_ptr<glm::vec3[]> voxelVerCaches = std::make_unique<glm::vec3[]>(SIZE * SIZE * SIZE);
-		thread_local std::unique_ptr<glm::vec3[]> voxelNormalCaches = std::make_unique<glm::vec3[]>(SIZE * SIZE * SIZE);
+		// ---- 体素顶点：单元格 [1, N-1] 即 1..33 ----
+		// 单元格 33 使用越界采样 34 时回退为空气(1.0)
+		struct CellVert {
+			glm::vec3 pos = glm::vec3(-1.0f);
+			glm::vec3 normal = glm::vec3(0.0f);
+		};
+		std::vector<CellVert> cellVerts(static_cast<size_t>(N) * N * N);
 
-		constexpr size_t edgeDirX = 0;
-		constexpr size_t edgeDirY = SIDE * SIDE * SIZE;
-		constexpr size_t edgeDirZ = 2 * SIDE * SIDE * SIZE;
-
-		std::array<size_t, 12> eidxs{
-				edgeDirZ, edgeDirZ + SIZE,
-				edgeDirZ + SIDE * SIZE,edgeDirZ + SIDE * SIZE + SIZE,
-				edgeDirY, edgeDirY + 1,
-				edgeDirY + SIDE * SIZE,edgeDirY + SIDE * SIZE + 1,
-				edgeDirX, edgeDirX + 1,
-				edgeDirX + SIDE,edgeDirX + SIDE + 1,
+		constexpr int cornerOff[8][3] = {
+			{ 0,0,0 },{ 1,0,0 },{ 1,1,0 },{ 0,1,0 },
+			{ 0,0,1 },{ 1,0,1 },{ 1,1,1 },{ 0,1,1 }
+		};
+		// (dir, cornerA, cornerB) 对应立方体 12 条棱
+		constexpr int cellEdges[12][3] = {
+			{ 0,4,0 },{ 1,5,0 },{ 2,6,0 },{ 3,7,0 },   // Z 方向
+			{ 0,3,1 },{ 1,2,1 },{ 4,7,1 },{ 5,6,1 },   // Y 方向
+			{ 0,1,2 },{ 2,3,2 },{ 4,5,2 },{ 6,7,2 }    // X 方向
 		};
 
-		//对于每个体素区域，收集其十二条棱边,计算平均值点与法线
-		for (size_t i = 0;i < SIZE * SIZE * SIZE;i++) {
-			//第i个体素
-			glm::vec3 vertex{ 0,0,0 };
-			glm::vec3 normal{ 0,0,0 };
-			int verCount = 0;
+		for (int x = 1; x < N; x++) {
+			for (int y = 1; y < N; y++) {
+				for (int z = 1; z < N; z++) {
+					glm::vec3 sum(0.0f), sumN(0.0f);
+					int count = 0;
 
-			size_t x = i / (SIZE * SIZE);
-			size_t y = (i % (SIZE * SIZE)) / (SIZE);
-			size_t z = i % SIZE;
+					for (int e = 0; e < 12; e++) {
+						int c1 = cellEdges[e][0];
+						int c2 = cellEdges[e][1];
+						int x1 = x + cornerOff[c1][0], y1 = y + cornerOff[c1][1], z1 = z + cornerOff[c1][2];
+						int x2 = x + cornerOff[c2][0], y2 = y + cornerOff[c2][1], z2 = z + cornerOff[c2][2];
 
-			for (int j = 0;j < 12;j++) {
-				size_t eidx = 0;
-				if (j < 4) eidx = eidxs[j] + x * SIDE * SIZE + y * SIZE + z;//dirZ: 34-34-33
-				else if (j < 8) eidx = eidxs[j] + x * SIZE * SIDE + y * SIDE + z;//dirY: 34-33-34
-				else eidx = eidxs[j] + x * SIDE * SIDE + y * SIDE + z;//dirX: 33-34-34
+						float d1 = safeDensity(x1, y1, z1);
+						float d2 = safeDensity(x2, y2, z2);
+						if ((d1 < 0) != (d2 < 0)) {
+							float t = d1 / (d1 - d2);
+							glm::vec3 p = glm::mix(glm::vec3(x1, y1, z1), glm::vec3(x2, y2, z2), t);
+							glm::vec3 n = glm::mix(safeNormal(x1, y1, z1), safeNormal(x2, y2, z2), t);
+							float len = glm::length(n);
+							if (len > 1e-6f) n /= len;
+							sum += p; sumN += n; count++;
+						}
+					}
 
-				glm::vec3 edgeVer = edgeVerCaches[eidx];
-				glm::vec3 edgeNorRe = edgeNormalCaches[eidx];
-
-				if (edgeVer != glm::vec3(-1, -1, -1)) {
-					vertex += edgeVer;
-					normal += edgeNorRe;
-					verCount++;
+					if (count > 0) {
+						size_t ci = idx3(x, y, z);
+						cellVerts[ci].pos = sum / static_cast<float>(count);
+						sumN /= static_cast<float>(count);
+						float len = glm::length(sumN);
+						cellVerts[ci].normal = (len > 1e-6f) ? sumN / len : glm::vec3(0.0f);
+					}
 				}
-				else {}
-			}
-			if (verCount != 0) {
-				voxelVerCaches[i] = vertex / static_cast<float>(verCount);
-				if (normal != glm::vec3(0, 0, 0))
-					voxelNormalCaches[i] = glm::normalize(normal / static_cast<float>(verCount));
-				else
-					voxelNormalCaches[i] = glm::vec3(0.0f);
-			}
-			else {
-				voxelVerCaches[i] = { -1.0f,-1.0f,-1.0f };
-				voxelNormalCaches[i] = { 0.0f,0.0f,0.0f };
 			}
 		}
 
-		//按顺序连接顶点，产生真正的网格数据
+		// ---- 连接四边形（仅内部单元格 1..32） ----
+		constexpr int meshBuildTable[3][4][3] = {
+			{ { 0,0,0 },{ 1,0,0 },{ 1,1,0 },{ 0,1,0 } },   // dir 0: 沿 Z 共享棱的 4 个周围单元格
+			{ { 0,0,0 },{ 1,0,0 },{ 1,0,1 },{ 0,0,1 } },   // dir 1: 沿 Y
+			{ { 0,0,0 },{ 0,1,0 },{ 0,1,1 },{ 0,0,1 } }    // dir 2: 沿 X
+		};
+
 		core::MeshData data{};
 
-		//注意这里全部是逆时针顺序
-		static size_t meshBuildTable[3][4][3] = {
-			{ { 0,0,0 },{ 1,0,0 },{ 1,1,0 },{ 0,1,0 } },
-			{ { 0,0,0 },{ 1,0,0 },{ 1,0,1 },{ 0,0,1 } },
-			{ { 0,0,0 },{ 0,1,0 },{ 0,1,1 },{ 0,0,1 } }
-		};
+		for (int x = 1; x < N - 1; x++) {
+			for (int y = 1; y < N - 1; y++) {
+				for (int z = 1; z < N - 1; z++) {
+					for (int dir = 0; dir < 3; dir++) {
+						size_t eIdx;
+						glm::vec3 ePos;
+						uint8_t   eOri;
 
-		int subSize = SIZE;
-		for (size_t i = 0; i < subSize * subSize * subSize; i++) {
-			size_t x = i / (subSize * subSize);
-			size_t y = (i % (subSize * subSize)) / (subSize);
-			size_t z = i % subSize;
+						if (dir == 2) {                       // 沿 X 共享棱在 (x, y+1, z+1)
+							if (x >= SIZE) continue;
+							eIdx = eidxX(x, y + 1, z + 1);
+							ePos = edgePosX[eIdx]; eOri = edgeOriX[eIdx];
+							if (x == 0) continue;             // -x 边界跳过沿 X 的共享棱
+						}
+						else if (dir == 1) {                  // 沿 Y 共享棱在 (x+1, y, z+1)
+							if (x + 1 >= N || y >= SIZE || z + 1 >= N) continue;
+							eIdx = eidxY(x + 1, y, z + 1);
+							ePos = edgePosY[eIdx]; eOri = edgeOriY[eIdx];
+							if (y == 0) continue;             // -y 边界跳过沿 Y 的共享棱
+						}
+						else {                                // dir == 0 沿 Z 共享棱在 (x+1, y+1, z)
+							if (x + 1 >= N || y + 1 >= N || z >= SIZE) continue;
+							eIdx = eidxZ(x + 1, y + 1, z);
+							ePos = edgePosZ[eIdx]; eOri = edgeOriZ[eIdx];
+							if (z == 0) continue;             // -z 边界跳过沿 Z 的共享棱
+						}
 
-			for (int dir = 0;dir < 3;dir++) {
-				//先判断共享棱是否存在
-				int eIdx = 0;
-				if (dir == 0) eIdx = edgeDirZ + SIDE * SIZE + SIZE + x * SIDE * SIZE + y * SIZE + z;//z
-				else if (dir == 1) eIdx = edgeDirY + SIDE * SIZE + 1 + x * SIZE * SIDE + y * SIDE + z;//y
-				else eIdx = edgeDirX + SIDE + 1 + x * SIDE * SIDE + y * SIDE + z;//x
-				bool hasCrossEdge = edgeVerCaches[eIdx] != glm::vec3(-1.0, -1.0, -1.0);
-				if (!hasCrossEdge) continue;
+						if (ePos.x == -1.0f) continue;
 
-				//收集四个顶点
-				std::array<glm::vec3, 4> quadVers{};
-				std::array<glm::vec3, 4> quadNors{};
-				bool hasQuad = true;
-				for (int off = 0;off < 4;off++) {
-					size_t fx = x + meshBuildTable[dir][off][0];
-					size_t fy = y + meshBuildTable[dir][off][1];
-					size_t fz = z + meshBuildTable[dir][off][2];
+						bool ok = true;
+						glm::vec3 qp[4], qn[4];
+						for (int off = 0; off < 4; off++) {
+							int fx = x + meshBuildTable[dir][off][0];
+							int fy = y + meshBuildTable[dir][off][1];
+							int fz = z + meshBuildTable[dir][off][2];
+							if (fx < 0 || fx >= N || fy < 0 || fy >= N || fz < 0 || fz >= N) { ok = false; break; }
+							size_t ci = idx3(fx, fy, fz);
+							if (cellVerts[ci].pos.x == -1.0f) { ok = false; break; }
+							qp[off] = cellVerts[ci].pos;
+							qn[off] = cellVerts[ci].normal;
+						}
+						if (!ok) continue;
 
-					if (fx >= SIZE || fy >= SIZE || fz >= SIZE) {
-						hasQuad = false; break;
-					}
+						uint32_t base = static_cast<uint32_t>(data.vertices.size() / 3);
+						for (int ii = 0; ii < 4; ii++) {
+							data.vertices.push_back(qp[ii].x * scale);
+							data.vertices.push_back(qp[ii].y * scale);
+							data.vertices.push_back(qp[ii].z * scale);
+							data.uvws.push_back(meshBuildTable[0][ii][0]);
+							data.uvws.push_back(meshBuildTable[0][ii][1]);
+							data.uvws.push_back(3.0f);      // w 暂设为 0
+							data.normals.push_back(qn[ii].x);
+							data.normals.push_back(qn[ii].y);
+							data.normals.push_back(qn[ii].z);
+							data.aos.push_back(1.0f);
+						}
 
-					int vidx = fx * SIZE * SIZE + fy * SIZE + fz;
-					glm::vec3 ver = voxelVerCaches[vidx];
-					if (ver == glm::vec3(-1.0f, -1.0f, -1.0f)) { hasQuad = false; break; }
-					quadVers[off] = ver;
-					quadNors[off] = voxelNormalCaches[vidx];
-				}
-				//如果包含四个顶点全在：向MeshData中填充信息
-				if (hasQuad) {
-					glm::vec3 normal = { 0,0,0 };
-					for (int ii = 0;ii < 4;ii++) {
-						data.vertices.push_back(quadVers[ii].x * scale);
-						data.vertices.push_back(quadVers[ii].y * scale);
-						data.vertices.push_back(quadVers[ii].z * scale);
-						//uv与方向无关，只要顺序与顶点顺序相同即可
-						data.uvws.push_back(meshBuildTable[0][ii][0]);
-						data.uvws.push_back(meshBuildTable[0][ii][1]);
-						//w暂时填固定值，aos同理
-						data.uvws.push_back(edgeTexCaches[eIdx]);
-						data.normals.push_back(quadNors[ii].x);
-						data.normals.push_back(quadNors[ii].y);
-						data.normals.push_back(quadNors[ii].z);
-						data.aos.push_back(1.0);
-						normal += quadNors[ii];
-					}
-					int indices[6] = { 0,1,2,0,2,3 };
+						bool reverse =
+							(dir == 0 && eOri == 2) ||
+							(dir == 1 && eOri == 1) ||
+							(dir == 2 && eOri == 2);
 
-					uint32_t base = static_cast<uint32_t>(data.vertices.size() / 3 - 4);
-					//如果法线指向正：翻转顺序，使顶点逆时针旋转
-					uint8_t orient = edgeOriCaches[eIdx];
-					bool reverse =
-						(dir == 0 && orient == 2) ||
-						(dir == 1 && orient == 1) ||
-						(dir == 2 && orient == 2);
-
-					if (reverse) {
-						for (int ii = 5;ii >= 0;ii--)
-							data.indices.push_back(indices[ii] + base);
-					}
-					else {
-						for (int ii = 0;ii < 6;ii++)
-							data.indices.push_back(indices[ii] + base);
+						static const int baseIndices[6] = { 0,1,2,0,2,3 };
+						if (reverse) {
+							for (int ii = 5; ii >= 0; ii--)
+								data.indices.push_back(baseIndices[ii] + base);
+						}
+						else {
+							for (int ii = 0; ii < 6; ii++)
+								data.indices.push_back(baseIndices[ii] + base);
+						}
 					}
 				}
 			}

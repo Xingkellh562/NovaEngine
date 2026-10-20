@@ -12,4 +12,9 @@ namespace nova_engine::voxel::lod {
 			neighbours_.fill(std::vector<bool>(size * size));
 		}
 	};
+
+	struct LodVoxelSDFData {
+		std::vector<float> datas_;
+		LodVoxelSDFData(size_t size) :datas_(size* size* size) {}
+	};
 }

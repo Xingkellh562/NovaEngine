@@ -38,14 +38,14 @@ namespace nova_engine::voxel::chunk {
 			return s;
 		}
 		void SetState(ChunkState state) {
-			state_.store(state,std::memory_order_release);
+			//state_.store(state,std::memory_order_release);
 		}
 	private:
 		unsigned int size_;
 		unsigned int offset_;
 		std::vector<T> voxels_;
 
-		std::atomic<ChunkState> state_ = ChunkState::None;
+		std::atomic<ChunkState> state_ = ChunkState::Complete;
 
 		inline int GetIndexFromCoo(int x, int y, int z) const {
 			return ((x << offset_) << offset_) + (y << offset_) + z; //x->y->z

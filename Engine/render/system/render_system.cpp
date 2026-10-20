@@ -5,6 +5,7 @@
 #include <log/logger.h>
 #include <voxel/terrain/terrain_generator.h>
 #include <render/utils/smooth_mesher.h>
+#include <voxel/terrain/planet_terrain_generator.h>
 
 namespace nova_engine::render::system {
 	void RenderSystem::Init(device::IRenderDevice& device) {
@@ -50,10 +51,12 @@ namespace nova_engine::render::system {
 		shadowCamera_.rotation = -lightDir;
 	}
 
-	static const std::vector<glm::ivec3> chunksPos = nova_engine::utils::spatial::FindChunkInRange(384);
+	static const std::vector<glm::ivec3> chunksPos = nova_engine::utils::spatial::FindChunkInRange(256);
 
 	scene::RenderView RenderSystem::BuildView(nova_engine::core::world::World& world,
 		const RenderSettings& settings) {
+		static const voxel::terrain::PlanetTerrainGenerator generator(123);
+
 		// ---- 1. 消费脏区域（取代 input 系统反向调用 RequireMeshUpdate）----
 		scene::ChunkMeshRegistry* meshCache = chunkMesh_->Layer(scene::MeshLayer::Default);
 		scene::ChunkMeshRegistry* meshCache2 = chunkMesh_->Layer(scene::MeshLayer::Lucency);
@@ -121,6 +124,8 @@ namespace nova_engine::render::system {
 		mainCamera_.position = world.playerPos;
 		mainCamera_.rotation = world.playerRot;
 		UpdateShadowCamera(world, settings);
+
+		lodSystem.UpdateLod(world.playerPos, *meshCache, *lodMesh_, generator);
 
 		// ---- 6. 产出渲染视图 ----
 		view_.camera = &mainCamera_;

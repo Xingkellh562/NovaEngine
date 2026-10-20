@@ -36,7 +36,7 @@ namespace nova_engine::voxel::planet {
 					result.z = fz;
 
 					if (chunk) {
-						generator.BuildChunk(*chunk, { fx, fy, fz }, { 0,0,0 }, 1024);
+						generator.BuildChunk(*chunk, { fx, fy, fz }, { 0,1024,{0,0,0} });
 					}
 
 					result.chunk = std::move(chunk);
@@ -56,7 +56,7 @@ namespace nova_engine::voxel::planet {
 
 
 	void PlanetChunkSystem::Update(Planet& planet,glm::vec3 playerPos) {
-		static const std::vector<glm::ivec3> chunksPos = utils::spatial::FindChunkInRange(384);
+		static const std::vector<glm::ivec3> chunksPos = utils::spatial::FindChunkInRange(128);
 
 		for (const glm::ivec3& chunkPos : chunksPos) {
 			int cx = chunkPos.x + playerPos.x,
@@ -76,7 +76,7 @@ namespace nova_engine::voxel::planet {
 
 		std::vector<glm::ivec3> needRemove{};
 		for (const auto& [pos,chunk] : planet.chunkData) {
-			if (chunk && (glm::length(static_cast<glm::vec3>(pos << nova_engine::core::config::CHUNK_BIT1) - playerPos)) > 384 + 64) {
+			if (chunk && (glm::length(static_cast<glm::vec3>(pos << nova_engine::core::config::CHUNK_BIT1) - playerPos)) > 128 + 32) {
 				needRemove.push_back(pos << nova_engine::core::config::CHUNK_BIT1);
 			}
 		}

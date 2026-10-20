@@ -23,6 +23,7 @@ endif()
 enable_testing()
 
 set(TEST_SOURCES
+	test_file/meshing_build_test.cpp
     main_test.cpp          
 )
 

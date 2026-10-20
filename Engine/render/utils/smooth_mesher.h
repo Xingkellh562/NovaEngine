@@ -2,6 +2,7 @@
 
 #include <voxel/chunk/chunk.h>
 #include <render/core/mesh_data.h>
+#include <voxel/lod/lod_voxel_data.h>
 
 namespace nova_engine::render::utils {
 	//从有符号密度场中构建网格，使用MC算法
@@ -18,5 +19,5 @@ namespace nova_engine::render::utils {
 		const std::array<voxel::chunk::Chunk<float>*, 7>& neighbours, int scale = 1);
 
 	core::MeshData BuildSNLodMesh( 
-		const voxel::chunk::Chunk<float>& chunk,int scale = 1);
+		const voxel::lod::LodVoxelSDFData& lodData,int scale = 1);
 }

@@ -6,6 +6,7 @@
 #include <render/scene/chunk_mesh_registry.h>
 #include <render/scene/lod_mesh_registry.h>
 #include <render/scene/render_view.h>
+#include "chunk_lod_system.h"
 
 #include <core/concurrency/worker.h>
 
@@ -53,6 +54,8 @@ namespace nova_engine::render::system {
 
 		std::unique_ptr<scene::ChunkMeshSet>     chunkMesh_;
 		std::unique_ptr<scene::LodMeshRegistry>  lodMesh_;
+
+		ChunkLodSystem lodSystem;
 
 		// 取代改动前 CameraLibrary 的 "MainCamera" / "ShadowCamera" 两个字符串键条目
 		core::Camera mainCamera_;
