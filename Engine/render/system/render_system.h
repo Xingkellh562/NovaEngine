@@ -55,7 +55,7 @@ namespace nova_engine::render::system {
 		std::unique_ptr<scene::ChunkMeshSet>     chunkMesh_;
 		std::unique_ptr<scene::LodMeshRegistry>  lodMesh_;
 
-		ChunkLodSystem lodSystem;
+		ChunkLodSystem lodSystem = ChunkLodSystem(3);
 
 		// 取代改动前 CameraLibrary 的 "MainCamera" / "ShadowCamera" 两个字符串键条目
 		core::Camera mainCamera_;

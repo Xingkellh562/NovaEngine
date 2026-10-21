@@ -6,6 +6,7 @@
 class MeshBuildTest : public ::testing::Test {
 protected:
 	nova_engine::voxel::chunk::Chunk<float> chunk{32};
+	nova_engine::voxel::chunk::Chunk<float> emptyChunk{ 32 };
 	void SetUp() override {
 		// 在每个测试之前运行的代码
 		for(int x = 0;x<32;x++)
@@ -14,6 +15,7 @@ protected:
 					int r = RandomInt(0, 100);
 					float density = 2.0f / r - 1.0f;
 					chunk.SetVoxel(x,y,z,nova_engine::utils::assist::Pack(density,0));
+					emptyChunk.SetVoxel(x, y, z, nova_engine::utils::assist::Pack(1.0f, 0));
 				}
 	}
 	void TearDown() override {
@@ -29,21 +31,27 @@ protected:
 };
 
 TEST_F(MeshBuildTest, BuildOneSNMesh) {
-	nova_engine::render::utils::BuildMeshFromChunk(chunk, {});
+	nova_engine::render::utils::BuildSNMeshFromChunk(chunk, {});
 }
 
 TEST_F(MeshBuildTest, BuildTwoSNMesh) {
 	for (int i = 0;i < 2;i++)
-		nova_engine::render::utils::BuildMeshFromChunk(chunk, {});
+		nova_engine::render::utils::BuildSNMeshFromChunk(chunk, {});
 }
 
 TEST_F(MeshBuildTest, BuildFiftySNMesh) {
 	for(int i = 0;i<50;i++)
-		nova_engine::render::utils::BuildMeshFromChunk(chunk, {});
+		nova_engine::render::utils::BuildSNMeshFromChunk(chunk, {});
 }
 
 TEST_F(MeshBuildTest, BuildHundredSNMesh) {
 	for (int i = 0;i < 100;i++)
-		nova_engine::render::utils::BuildMeshFromChunk(chunk, {});
+		nova_engine::render::utils::BuildSNMeshFromChunk(chunk, {});
 }
+
+TEST_F(MeshBuildTest, BuildHundredEmptySNMesh) {
+	for (int i = 0;i < 100;i++)
+		nova_engine::render::utils::BuildSNMeshFromChunk(emptyChunk, {});
+}
+
 

@@ -15,7 +15,7 @@ void main(){
     vec3 V = normalize(-vWorldPos);    // 指向摄像机
 
     //漫反射
-    float diff = max(dot(N, L) * 0.5 + 0.3,0.0);
+    float diff = max(dot(N, L) * 0.5 + 0.5,0.0);
 
     // ---------- Blinn-Phong 镜面反射（单色高光） ----------
     vec3 H = normalize(-L + V);                  // 半程向量
@@ -27,5 +27,5 @@ void main(){
     float alpha = texture(uTextureArray, vec3(vWorldPos.xy, 0)).a;
 
     // ---------- 合并成单通道系数 ----------
-    lightCoe = vec3(diff * 1.0 ,spec * 0.2,0.0);
+    lightCoe = vec3(diff * 1.0 ,spec * 0.1,0.0);
 }

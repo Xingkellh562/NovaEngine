@@ -38,6 +38,7 @@ namespace nova_engine::voxel::chunk {
 			return s;
 		}
 		void SetState(ChunkState state) {
+			return;
 			//state_.store(state,std::memory_order_release);
 		}
 	private:

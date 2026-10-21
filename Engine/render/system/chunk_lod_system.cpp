@@ -117,34 +117,40 @@ namespace nova_engine::render::system {
             lodMeshRegistry.TryDeleteOctree(p.x, p.y, p.z);
 
         nova_engine::core::concurrency::Result <SubdivideResult> out;
-        while (subdivideWorker_.TryPopResult(out)) {
-            int px = out.value.x;
-            int py = out.value.y;
-            int pz = out.value.z;
-            int depth = out.value.depth;
-            std::array<core::MeshData*, 8> dataPtr{};
-            for (int i = 0;i < 8;i++) {
-                //如果顶点数量为零->空网格->传空指针->不分配索引，减小开销
-                if (out.value.datas[i].vertices.size())
-                    dataPtr[i] = &out.value.datas[i];
-                else dataPtr[i] = nullptr;
+        for (size_t i = 0;i < subdivideWorkers_.size();i++) {
+            while (subdivideWorkers_[i].TryPopResult(out)) {
+                int px = out.value.x;
+                int py = out.value.y;
+                int pz = out.value.z;
+                int depth = out.value.depth;
+                std::array<core::MeshData*, 8> dataPtr{};
+                for (int i = 0;i < 8;i++) {
+                    //如果顶点数量为零->空网格->传空指针->不分配索引，减小开销
+                    if (out.value.datas[i].vertices.size())
+                        dataPtr[i] = &out.value.datas[i];
+                    else dataPtr[i] = nullptr;
+                }
+                lodMeshRegistry.TrySubdivide(px, py, pz, depth, dataPtr);
+                subdivideExists_.erase({ px,py,pz });
             }
-            lodMeshRegistry.TrySubdivide(px, py, pz, depth, dataPtr);
-            subdivideExists_.erase({ px,py,pz });
         }
+        
 
         nova_engine::core::concurrency::Result<CombineResult> out2;
-        while (combineWorker_.TryPopResult(out2)) {
-            int px = out2.value.x;
-            int py = out2.value.y;
-            int pz = out2.value.z;
-            int depth = out2.value.depth;
-            if (out2.value.data.vertices.size())
-                lodMeshRegistry.TryCombine(px, py, pz, depth, &out2.value.data);
-            else
-                lodMeshRegistry.TryCombine(px, py, pz, depth, nullptr);
-            combineExists_.erase({ px,py,pz });
+        for (size_t i = 0;i < subdivideWorkers_.size();i++) {
+            while (combineWorkers_[i].TryPopResult(out2)) {
+                int px = out2.value.x;
+                int py = out2.value.y;
+                int pz = out2.value.z;
+                int depth = out2.value.depth;
+                if (out2.value.data.vertices.size())
+                    lodMeshRegistry.TryCombine(px, py, pz, depth, &out2.value.data);
+                else
+                    lodMeshRegistry.TryCombine(px, py, pz, depth, nullptr);
+                combineExists_.erase({ px,py,pz });
+            }
         }
+        
 	}
 
     struct SubmitTask {
@@ -160,6 +166,8 @@ namespace nova_engine::render::system {
             { 0,0,0 },{ 1,0,0 },{ 0,1,0 },{ 1,1,0 },
             { 0,0,1 },{ 1,0,1 },{ 0,1,1 },{ 1,1,1 }
         } };
+
+        static size_t useCount = 0;
 
         const int maxDepth = nova_engine::core::config::OCTREE_BIT1 - nova_engine::core::config::CHUNK_BIT1;
         if (depth <= 0 || depth > maxDepth) return;
@@ -183,7 +191,7 @@ namespace nova_engine::render::system {
 
             SubmitTask submit{ px,py,pz,childSize,depth,scale,generator };
 
-            bool success = subdivideWorker_.TrySubmitTask(nova_engine::core::concurrency::Task<SubdivideResult>{
+            bool success = subdivideWorkers_[useCount].TrySubmitTask(nova_engine::core::concurrency::Task<SubdivideResult>{
                 .id = 0, .priority = 0, .cancel = cancel,
                     .fn = [submit](nova_engine::core::concurrency::TaskContext<SubdivideResult>& ctx) {
                     try {
@@ -204,7 +212,7 @@ namespace nova_engine::render::system {
                         ctx.emit({ submit.px, submit.py, submit.pz, submit.depth,{} });
                     }
 
-                    }
+                }
             });
 
             if (!success) subdivideExists_.erase({ px,py,pz });
@@ -213,6 +221,8 @@ namespace nova_engine::render::system {
             NE_CORE_ERROR("LodSystem", "Failed to submit LOD mesh build task, catch error:{}", e.what());
             subdivideExists_.erase({ px,py,pz });
         }
+        
+        useCount = std::clamp(++useCount,(size_t)0,subdivideWorkers_.size() - 1);
 	}
 
 	void ChunkLodSystem::SubmitCombine(
@@ -220,6 +230,7 @@ namespace nova_engine::render::system {
 		const voxel::terrain::PlanetTerrainGenerator& generator,
 		int x, int y, int z, int depth) {
         const int maxDepth = nova_engine::core::config::OCTREE_BIT1 - nova_engine::core::config::CHUNK_BIT1;
+        static size_t useCount = 0;
         if (depth < 0 || depth >= maxDepth) return;
 
         int parentSize = nova_engine::core::config::OCTREE_SIZE >> depth;
@@ -239,7 +250,7 @@ namespace nova_engine::render::system {
 
             SubmitTask submit{ px,py,pz,parentSize,depth,scale,generator };
 
-            bool success = combineWorker_.TrySubmitTask(nova_engine::core::concurrency::Task<CombineResult>{
+            bool success = combineWorkers_[useCount].TrySubmitTask(nova_engine::core::concurrency::Task<CombineResult>{
                 .id = 0, .priority = 0, .cancel = cancel,
                     .fn = [submit](nova_engine::core::concurrency::TaskContext<CombineResult>& ctx) {
                     try {
@@ -263,5 +274,7 @@ namespace nova_engine::render::system {
             NE_CORE_ERROR("LodSystem", "Failed to submit LOD mesh build task, catch error:{}", e.what());
             combineExists_.erase({ px,py,pz });
         }
+
+        useCount = std::clamp(++useCount, (size_t)0, combineWorkers_.size() - 1);
 	}
 }

@@ -570,6 +570,7 @@ namespace nova_engine::render::utils {
 	core::MeshData BuildSNMeshFromChunk(
 		const voxel::chunk::Chunk<float>& chunk,
 		const std::array<voxel::chunk::Chunk<float>*, 7>& neighbours, int scale) {
+		
 
 		constexpr size_t SIZE = nova_engine::core::config::CHUNK_SIZE + 1;
 		constexpr size_t SIDE = SIZE + 1;
@@ -619,6 +620,29 @@ namespace nova_engine::render::utils {
 		auto sampleTex = [&](int sx, int sy, int sz) -> float {
 			return nova_engine::utils::assist::UnpackTexIdx(sampleData(sx, sy, sz));
 			};
+
+		//预先采样密度
+		std::vector<float> datas;
+		bool inside = sampleDensity(0, 0, 0) < 0;
+		bool hasNoMesh = true;
+
+		datas.reserve((SIDE + 1) * (SIDE + 1) * (SIDE + 1));
+		size_t dataIdx = 0;
+		for (int x = 0;x < (SIDE + 1);x++) {
+			for (int y = 0;y < (SIDE + 1);y++) {
+				for (int z = 0;z < (SIDE + 1);z++) {
+					float d = sampleDensity(x, y, z);
+					hasNoMesh = (inside == (d < 0)) && hasNoMesh;
+					datas[dataIdx++] = d;
+				}
+			}
+		}
+
+		if (hasNoMesh) return{};
+
+		auto getDensity = [&](int sx, int sy, int sz)->float {
+			return datas[sx * (SIDE + 1) * (SIDE + 1) + sy * (SIDE + 1) + sz];
+		};
 			
 		int dirMask[4] = { 1,0,0,0 };
 		for (int dir = 0;dir < 3;dir++) {
@@ -629,8 +653,8 @@ namespace nova_engine::render::utils {
 						int nx = x + dirMask[0], ny = y + dirMask[1], nz = z + dirMask[2];
 
 						//分别获取自身与邻居密度值
-						float d1 = sampleDensity(x, y, z);
-						float d2 = sampleDensity(nx, ny, nz);
+						float d1 = getDensity(x, y, z);
+						float d2 = getDensity(nx, ny, nz);
 
 						//判断是否与交界面相交
 						//负数为内部，正数为外部
@@ -648,9 +672,9 @@ namespace nova_engine::render::utils {
 
 							//从顶点梯度计算光照法线
 							glm::vec3 grad;
-							grad.x = sampleDensity(px + 1, py, pz) - sampleDensity(px, py, pz);
-							grad.y = sampleDensity(px, py + 1, pz) - sampleDensity(px, py, pz);
-							grad.z = sampleDensity(px, py, pz + 1) - sampleDensity(px, py, pz);
+							grad.x = getDensity(px + 1, py, pz) - getDensity(px, py, pz);
+							grad.y = getDensity(px, py + 1, pz) - getDensity(px, py, pz);
+							grad.z = getDensity(px, py, pz + 1) - getDensity(px, py, pz);
 							if (glm::length(grad) >= 1e-6)
 								edgeNormalCaches[index] = glm::normalize(grad);
 							else
@@ -854,6 +878,25 @@ namespace nova_engine::render::utils {
 			return normals[idx3(x, y, z)];
 			};
 
+		//预先采样密度
+		std::vector<float> datas;
+		bool inside = safeDensity(0, 0, 0) < 0;
+		bool hasNoMesh = true;
+
+		datas.reserve(N * N * N);
+		size_t dataIdx = 0;
+		for (int x = 0;x < N;x++) {
+			for (int y = 0;y < N;y++) {
+				for (int z = 0;z < N;z++) {
+					float d = safeDensity(x, y, z);
+					hasNoMesh = (inside == (d < 0)) && hasNoMesh;
+					datas[dataIdx++] = d;
+				}
+			}
+		}
+
+		if (hasNoMesh) return{};
+
 		for (int x = 0; x < N; x++) {
 			for (int y = 0; y < N; y++) {
 				for (int z = 0; z < N; z++) {
@@ -908,8 +951,8 @@ namespace nova_engine::render::utils {
 		for (int ex = 0; ex < SIZE; ex++) {
 			for (int ey = 0; ey < N; ey++) {
 				for (int ez = 0; ez < N; ez++) {
-					float d1 = safeDensity(ex, ey, ez);
-					float d2 = safeDensity(ex + 1, ey, ez);
+					float d1 = datas[idx3(ex, ey, ez)];
+					float d2 = datas[idx3(ex + 1, ey, ez)];
 					if ((d1 < 0) != (d2 < 0)) {
 						float t = d1 / (d1 - d2);
 						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex + 1, ey, ez), t);
@@ -928,8 +971,8 @@ namespace nova_engine::render::utils {
 		for (int ex = 0; ex < N; ex++) {
 			for (int ey = 0; ey < SIZE; ey++) {
 				for (int ez = 0; ez < N; ez++) {
-					float d1 = safeDensity(ex, ey, ez);
-					float d2 = safeDensity(ex, ey + 1, ez);
+					float d1 = datas[idx3(ex, ey, ez)];
+					float d2 = datas[idx3(ex, ey + 1, ez)];
 					if ((d1 < 0) != (d2 < 0)) {
 						float t = d1 / (d1 - d2);
 						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex, ey + 1, ez), t);
@@ -948,8 +991,8 @@ namespace nova_engine::render::utils {
 		for (int ex = 0; ex < N; ex++) {
 			for (int ey = 0; ey < N; ey++) {
 				for (int ez = 0; ez < SIZE; ez++) {
-					float d1 = safeDensity(ex, ey, ez);
-					float d2 = safeDensity(ex, ey, ez + 1);
+					float d1 = datas[idx3(ex, ey, ez)];
+					float d2 = datas[idx3(ex, ey, ez + 1)];
 					if ((d1 < 0) != (d2 < 0)) {
 						float t = d1 / (d1 - d2);
 						glm::vec3 p = glm::mix(glm::vec3(ex, ey, ez), glm::vec3(ex, ey, ez + 1), t);
@@ -983,9 +1026,9 @@ namespace nova_engine::render::utils {
 			{ 0,1,2 },{ 2,3,2 },{ 4,5,2 },{ 6,7,2 }    // X 方向
 		};
 
-		for (int x = 1; x < N; x++) {
-			for (int y = 1; y < N; y++) {
-				for (int z = 1; z < N; z++) {
+		for (int x = 0; x < N; x++) {
+			for (int y = 0; y < N; y++) {
+				for (int z = 0; z < N; z++) {
 					glm::vec3 sum(0.0f), sumN(0.0f);
 					int count = 0;
 
@@ -1027,9 +1070,9 @@ namespace nova_engine::render::utils {
 
 		core::MeshData data{};
 
-		for (int x = 1; x < N - 1; x++) {
-			for (int y = 1; y < N - 1; y++) {
-				for (int z = 1; z < N - 1; z++) {
+		for (int x = 0; x < N; x++) {
+			for (int y = 0; y < N; y++) {
+				for (int z = 0; z < N; z++) {
 					for (int dir = 0; dir < 3; dir++) {
 						size_t eIdx;
 						glm::vec3 ePos;
@@ -1039,19 +1082,19 @@ namespace nova_engine::render::utils {
 							if (x >= SIZE) continue;
 							eIdx = eidxX(x, y + 1, z + 1);
 							ePos = edgePosX[eIdx]; eOri = edgeOriX[eIdx];
-							if (x == 0) continue;             // -x 边界跳过沿 X 的共享棱
+							//if (x == 0) continue;             // -x 边界跳过沿 X 的共享棱
 						}
 						else if (dir == 1) {                  // 沿 Y 共享棱在 (x+1, y, z+1)
 							if (x + 1 >= N || y >= SIZE || z + 1 >= N) continue;
 							eIdx = eidxY(x + 1, y, z + 1);
 							ePos = edgePosY[eIdx]; eOri = edgeOriY[eIdx];
-							if (y == 0) continue;             // -y 边界跳过沿 Y 的共享棱
+							//if (y == 0) continue;             // -y 边界跳过沿 Y 的共享棱
 						}
 						else {                                // dir == 0 沿 Z 共享棱在 (x+1, y+1, z)
 							if (x + 1 >= N || y + 1 >= N || z >= SIZE) continue;
 							eIdx = eidxZ(x + 1, y + 1, z);
 							ePos = edgePosZ[eIdx]; eOri = edgeOriZ[eIdx];
-							if (z == 0) continue;             // -z 边界跳过沿 Z 的共享棱
+							//if (z == 0) continue;             // -z 边界跳过沿 Z 的共享棱
 						}
 
 						if (ePos.x == -1.0f) continue;
@@ -1072,9 +1115,9 @@ namespace nova_engine::render::utils {
 
 						uint32_t base = static_cast<uint32_t>(data.vertices.size() / 3);
 						for (int ii = 0; ii < 4; ii++) {
-							data.vertices.push_back(qp[ii].x * scale);
-							data.vertices.push_back(qp[ii].y * scale);
-							data.vertices.push_back(qp[ii].z * scale);
+							data.vertices.push_back((qp[ii].x - 1) * scale);
+							data.vertices.push_back((qp[ii].y - 1)* scale);
+							data.vertices.push_back((qp[ii].z - 1)* scale);
 							data.uvws.push_back(meshBuildTable[0][ii][0]);
 							data.uvws.push_back(meshBuildTable[0][ii][1]);
 							data.uvws.push_back(3.0f);      // w 暂设为 0

@@ -5,6 +5,7 @@
 #include <render/scene/lod_mesh_registry.h>
 #include <core/concurrency/worker.h>
 #include <unordered_set>
+#include <deque>
 
 namespace nova_engine::render::system {
 	struct SubdivideResult {
@@ -23,14 +24,25 @@ namespace nova_engine::render::system {
 
 	class ChunkLodSystem {
 	public:
-		ChunkLodSystem() {
-			subdivideWorker_.Start();
-			combineWorker_.Start();
+		ChunkLodSystem(int workerCount = 3) {
+			for (int i = 0;i < workerCount;i++) {
+				subdivideWorkers_.emplace_back(
+					std::string("SubdivideWorker") + std::to_string(i), 2048, 2048 );
+
+				subdivideWorkers_.back().Start();
+
+				combineWorkers_.emplace_back(
+					std::string("CombineWorker") + std::to_string(i),2048,2048 );
+
+				combineWorkers_.back().Start();
+			}
 		}
 
 		~ChunkLodSystem() {
-			subdivideWorker_.Stop();
-			combineWorker_.Stop();
+			for (int i = 0;i < subdivideWorkers_.size();i++) {
+				subdivideWorkers_[i].Stop();
+				combineWorkers_[i].Stop();
+			}
 		}
 
 		void UpdateLod(
@@ -39,8 +51,8 @@ namespace nova_engine::render::system {
 			scene::LodMeshRegistry& lodMeshRegistry,
 			const voxel::terrain::PlanetTerrainGenerator& generator);
 	private:
-		nova_engine::core::concurrency::Worker<SubdivideResult> subdivideWorker_{ "SubdivideWorker",2048,2048 };
-		nova_engine::core::concurrency::Worker<CombineResult> combineWorker_{ "CombineWorker",2048,2048 };
+		std::deque<nova_engine::core::concurrency::Worker<SubdivideResult>> subdivideWorkers_;
+		std::deque<nova_engine::core::concurrency::Worker<CombineResult>> combineWorkers_;
 
 		std::unordered_set<glm::ivec3> subdivideExists_;
 		std::unordered_set<glm::ivec3> combineExists_;
