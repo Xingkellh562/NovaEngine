@@ -37,7 +37,7 @@ namespace nova_engine::render::system {
             (playerPos.z >> shift) << shift
         };
 
-        for (const auto& p : coordComTable[maxDepth]) {
+        /*for (const auto& p : coordComTable[maxDepth]) {
             int x = p.x + anchor.x;
             int y = p.y + anchor.y;
             int z = p.z + anchor.z;
@@ -51,13 +51,10 @@ namespace nova_engine::render::system {
             else {
                 if (lodMesh) lodMesh->Wake();
             }
-        }
+        }*/
 
-        int budget = 32;
-        for (int d = 0; d <= maxDepth && budget > 0; ++d) {
+        for (int d = 0; d <= maxDepth; ++d) {
             for (const auto& p : coordSubTable[d]) {
-                if (budget <= 0) break;
-
                 int x = p.x + anchor.x;
                 int y = p.y + anchor.y;
                 int z = p.z + anchor.z;
@@ -67,21 +64,16 @@ namespace nova_engine::render::system {
                 lodMeshRegistry.Find(x, y, z, &currentDepth);
                 //细分
                 if (currentDepth < d) {
-
                     SubmitSubdivide(lodMeshRegistry, generator, x, y, z, currentDepth + 1, currentDepth >= d - 1);
-                    --budget;
                 }
             }
         }
 
-        budget = 32;
 
         //坐标检查表：防止上一级遍历误合并下一级坐标
         std::unordered_set<glm::ivec3> existedCoords;
-        for (int d = maxDepth; d >= 0 && budget > 0; --d) {
+        for (int d = maxDepth; d >= 0; --d) {
             for (const auto& p : coordComTable[d]) {
-                if (budget <= 0) break;
-
                 int x = p.x + anchor.x;
                 int y = p.y + anchor.y;
                 int z = p.z + anchor.z;
@@ -93,7 +85,6 @@ namespace nova_engine::render::system {
                 //合并
                 if (currentDepth > d && it == existedCoords.end()) {
                     SubmitCombine(lodMeshRegistry, generator, x, y, z, currentDepth - 1);
-                    //--budget;
                 }
                 existedCoords.insert(p);
             }
@@ -109,7 +100,6 @@ namespace nova_engine::render::system {
                 int y = octree.first.y << bit;
                 int z = octree.first.z << bit;
                 needDelete_.push_back({ x,y,z });
-                lodMeshRegistry.TryDeleteOctree(x, y, z);
             }
         }
 
@@ -165,7 +155,7 @@ namespace nova_engine::render::system {
         static const std::array<glm::ivec3, 8> NeiOffCoord = { {
             { 0,0,0 },{ 1,0,0 },{ 0,1,0 },{ 1,1,0 },
             { 0,0,1 },{ 1,0,1 },{ 0,1,1 },{ 1,1,1 }
-        } };
+        }};
 
         static size_t useCount = 0;
 
@@ -222,7 +212,8 @@ namespace nova_engine::render::system {
             subdivideExists_.erase({ px,py,pz });
         }
         
-        useCount = std::clamp(++useCount,(size_t)0,subdivideWorkers_.size() - 1);
+        ++useCount;
+        if (useCount >= subdivideWorkers_.size()) useCount = 0;
 	}
 
 	void ChunkLodSystem::SubmitCombine(
@@ -275,6 +266,7 @@ namespace nova_engine::render::system {
             combineExists_.erase({ px,py,pz });
         }
 
-        useCount = std::clamp(++useCount, (size_t)0, combineWorkers_.size() - 1);
+        ++useCount;
+        if (useCount >= combineWorkers_.size()) useCount = 0;
 	}
 }

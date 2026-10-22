@@ -79,6 +79,10 @@ namespace nova_engine::render::framework {
 			{ core::ShaderStage::Vertex,   "shaders/vert.glsl" },
 			{ core::ShaderStage::Fragment, "shaders/frag.glsl" },
 			});
+		res.lodShader = MakeShader(device, {
+			{ core::ShaderStage::Vertex,   "shaders/lod_vert.glsl" },
+			{ core::ShaderStage::Fragment, "shaders/lod_frag.glsl" },
+			});
 		res.shadowShader = MakeShader(device, {
 			{ core::ShaderStage::Vertex,   "shaders/para_vert.glsl" },
 			{ core::ShaderStage::Fragment, "shaders/para_frag.glsl" },
@@ -98,6 +102,10 @@ namespace nova_engine::render::framework {
 		res.lightShader = MakeShader(device, {
 			{ core::ShaderStage::Vertex,   "shaders/light_vert.glsl" },
 			{ core::ShaderStage::Fragment, "shaders/light_frag.glsl" },
+			});
+		res.lodLightShader = MakeShader(device, {
+			{ core::ShaderStage::Vertex,   "shaders/lod_light_vert.glsl" },
+			{ core::ShaderStage::Fragment, "shaders/lod_light_frag.glsl" },
 			});
 
 		// ================= 渲染目标 =================
@@ -192,10 +200,17 @@ namespace nova_engine::render::framework {
 		res.opaquePipeline.vertexLayout = core::VertexLayoutId::VoxelMain;
 		res.opaquePipeline.samplerState = res.blockSampler;
 
+		// Lod
+		res.lodPipeline = res.opaquePipeline;
+		res.lodPipeline.shader = res.lodShader;
+
 		// 冯氏光照
 		res.lightPipeline = res.opaquePipeline;
 		res.lightPipeline.shader = res.lightShader;
 		res.lightPipeline.vertexLayout = core::VertexLayoutId::VoxelLight;
+
+		res.lodLightPipeline = res.lightPipeline;
+		res.lodLightPipeline.shader = res.lodLightShader;
 
 		// WBOIT 深度预通道
 		// 关键：colorWrite = false 对应 glColorMask(FALSE,FALSE,FALSE,FALSE)

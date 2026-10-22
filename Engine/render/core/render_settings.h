@@ -12,6 +12,8 @@ namespace nova_engine::render {
 		bool useLod = true;
 		bool debugUI = true;
 
+		float lodSwitchDistance = 64;
+
 		float shadowOrthoSize = 64.0f;
 		uint32_t shadowResolution = 2048;
 		float shadowDistance = 128.0f;

@@ -15,6 +15,7 @@ namespace nova_engine::render::framework {
 		}
 
 		shadowPass_.Record(view, resources, cmd);
+
 		opaquePass_.Record(view, resources, cmd);
 		lightPass_.Record(view, resources, cmd);
 

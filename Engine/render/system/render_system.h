@@ -71,7 +71,5 @@ namespace nova_engine::render::system {
 
 		void UpdateShadowCamera(const nova_engine::core::world::World& world,
 			const RenderSettings& settings);
-
-		//LodSystem lodSystem_;
 	};
 }

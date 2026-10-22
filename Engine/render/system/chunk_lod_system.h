@@ -25,6 +25,7 @@ namespace nova_engine::render::system {
 	class ChunkLodSystem {
 	public:
 		ChunkLodSystem(int workerCount = 3) {
+			//一个工作线程消费不过来那就给我开三个啊啊啊
 			for (int i = 0;i < workerCount;i++) {
 				subdivideWorkers_.emplace_back(
 					std::string("SubdivideWorker") + std::to_string(i), 2048, 2048 );

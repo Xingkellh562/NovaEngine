@@ -24,6 +24,24 @@ namespace nova_engine::render::framework {
 			static_cast<int>(view.viewportWidth),
 			static_cast<int>(view.viewportHeight) });
 
+		if (view.settings->useLod && view.lodMesh != nullptr) {
+			cmd.SetPipelineState(res.lodPipeline);
+
+			cmd.SetShaderParam("view", view.camera->GetRelativeViewMatrix());
+			cmd.SetShaderParam("projection", view.camera->GetTransformMatrix(
+				static_cast<int>(view.viewportWidth),
+				static_cast<int>(view.viewportHeight)
+			));
+
+			cmd.SetShaderParam("distance", view.settings->lodSwitchDistance);
+
+			cmd.BindTexture(0, "uTextures", res.blockTextures);
+
+			for (const auto& m : view.lodMesh->AllData()) {
+				if (!m.awake) continue;
+				cmd.DrawMesh(m.mesh, core::MakeModelMatrix(m.position, m.rotation, view.mainOrigin));
+			}
+		}
 		cmd.SetPipelineState(res.opaquePipeline);
 
 		cmd.SetShaderParam("view", view.camera->GetRelativeViewMatrix());
@@ -39,14 +57,6 @@ namespace nova_engine::render::framework {
 				cmd.DrawMesh(m.mesh, core::MakeModelMatrix(m.position, m.rotation, view.mainOrigin));
 			}
 		}
-		
-		if (view.settings->useLod && view.lodMesh != nullptr){
-			for (const auto& m : view.lodMesh->AllData()) {
-				if (!m.awake) continue;
-				cmd.DrawMesh(m.mesh, core::MakeModelMatrix(m.position, m.rotation, view.mainOrigin));
-			}
-		}
-
 		cmd.EndRenderTarget();
 	}
 }

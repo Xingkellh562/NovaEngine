@@ -25,15 +25,19 @@ namespace nova_engine::render::framework {
 		core::TextureHandle blockTextures{};
 
 		core::ShaderHandle baseShader{};
+		core::ShaderHandle lodShader{};
 		core::ShaderHandle shadowShader{};
 		core::ShaderHandle lightShader{};
+		core::ShaderHandle lodLightShader{};
 		core::ShaderHandle depthPrepassShader{};
 		core::ShaderHandle accumPassShader{};
 		core::ShaderHandle postProcessShader{};
 
 		core::PipelineState shadowPipeline{};
+		core::PipelineState lodPipeline{};
 		core::PipelineState opaquePipeline{};
 		core::PipelineState lightPipeline{};
+		core::PipelineState lodLightPipeline{};
 		core::PipelineState wboitDepthPipeline{};
 		core::PipelineState wboitAccumPipeline{};
 		core::PipelineState postProcessPipeline{};

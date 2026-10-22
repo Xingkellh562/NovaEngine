@@ -51,7 +51,19 @@ namespace nova_engine::render::framework {
 			}
 		}
 
+		cmd.SetPipelineState(res.lodLightPipeline);
+
+		cmd.SetShaderParam("view", view.camera->GetRelativeViewMatrix());
+		
+		cmd.SetShaderParam("projection", view.camera->GetTransformMatrix(
+			static_cast<int>(view.viewportWidth),
+			static_cast<int>(view.viewportHeight)
+		));
+
+		cmd.BindTexture(0, "uTextureArray", res.blockTextures);
 		if (view.settings) {
+			cmd.SetShaderParam("distance", view.settings->lodSwitchDistance);
+			cmd.SetShaderParam("lightDir", view.settings->lightDirection);
 			if (view.settings->useLod && view.lodMesh != nullptr) {
 				for (const auto& m : view.lodMesh->AllData()) {
 					if (m.awake) drawOne(m);
