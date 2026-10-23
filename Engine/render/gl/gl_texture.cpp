@@ -68,8 +68,10 @@ namespace nova_engine::render::gl {
 	}
 
 	bool GLTexture::CreateArray(const core::TextureArrayDesc& desc,
-		const std::vector<const void*>& layerPixels) {
+		std::span<const std::byte* const> layerPixels) {
 		Destroy();
+
+		if (desc.tileSize == 0) return false;   // 已由上层校验，这里只是防御
 
 		const GLTexFormat fmt = ToGLTexFormat(desc.format);
 		const GLsizei size = static_cast<GLsizei>(desc.tileSize);
@@ -78,25 +80,24 @@ namespace nova_engine::render::gl {
 		target_ = GL_TEXTURE_2D_ARRAY;
 		glBindTexture(target_, texture_);
 
-		// 对应改动前 gltexture_array.cpp:36-38
 		glTexImage3D(target_, 0, fmt.internalFormat, size, size,
 			static_cast<GLsizei>(desc.layers), 0,
 			fmt.format, fmt.type, nullptr);
 
 		for (std::size_t i = 0; i < layerPixels.size() && i < desc.layers; ++i) {
 			if (layerPixels[i] == nullptr) continue;
-			// 对应 gltexture_array.cpp:56-58
 			glTexSubImage3D(target_, 0, 0, 0, static_cast<GLint>(i),
 				size, size, 1, fmt.format, fmt.type, layerPixels[i]);
 		}
 
 		ApplySampler(target_, desc.defaultSampler);
-
-		if (desc.generateMipmaps) glGenerateMipmap(target_);   // gltexture_array.cpp:67
-
+		if (desc.generateMipmaps) glGenerateMipmap(target_);
 		glBindTexture(target_, 0);
 
 		width_ = height_ = static_cast<int>(size);
+
+		// 层名字 → 索引的表保留在这里也没坏处，但**不要再对外暴露 FindLayerIndex** ——
+		// 查询统一走 scene::TextureSet。
 		for (const core::TextureArrayLayer& layer : desc.sources) {
 			layerIndex_[layer.name] = layer.index;
 		}

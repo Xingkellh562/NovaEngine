@@ -30,6 +30,8 @@ namespace nova_engine::render::core {
 
 		bool depthCompareMode = false;
 		float borderColor[4] = { 1.0f,1.0f,1.0f,1.0f };
+
+		bool preferRgbaDecode = true;
 	};
 
 	struct TextureArrayLayer {
@@ -40,7 +42,9 @@ namespace nova_engine::render::core {
 
 	struct TextureArrayDesc : TextureDesc
 	{
-		uint32_t tileSize = 0; //单层边长，0=由第一张图决定
+		//契约（由 assets::LoadTextureArray 保证）：
+		//   加载器返回的 desc 里，tileSize 和 layers 一定已经被填好并校验过。
+		uint32_t tileSize = 0;
 		std::vector<TextureArrayLayer> sources;
 	};
 
@@ -55,5 +59,15 @@ namespace nova_engine::render::core {
 
 	struct TextureAtlasDesc : TextureDesc {
 		std::vector<TextureSpirit> sources;
+
+		//归一化 UV 时向内收缩的半像素数。
+		//
+		//   Linear 采样 + 缩小时，成员边界会和邻居混色（bleeding）。
+		//   内缩半个纹素能显著缓解；有 padding 时配合 edge-extend 可以基本消除。
+		//   设为 0 表示不内缩（Nearest 采样 + 1:1 显示时不需要）。
+		float insetTexels = 0.5f;
+
+		//这张图在 TextureSet 里的页号
+		uint32_t pageIndex = 0;
 	};
 }

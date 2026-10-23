@@ -12,6 +12,8 @@ namespace nova_engine::render {
             data_(data, data + width * height * channels) {
         }
 
+        TextureData() = default;
+
         // 禁止隐式拷贝（数据量大），可提供移动语义
         TextureData(const TextureData&) = default;
         TextureData& operator=(const TextureData&) = default;
@@ -31,9 +33,9 @@ namespace nova_engine::render {
         }
 
     private:
-        int width_;
-        int height_;
-        int channels_;
+        int width_ = 0;
+        int height_ = 0;
+        int channels_ = 0;
         std::vector<unsigned char> data_;
     };
 

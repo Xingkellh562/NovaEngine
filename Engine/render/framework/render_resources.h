@@ -32,6 +32,7 @@ namespace nova_engine::render::framework {
 		core::ShaderHandle depthPrepassShader{};
 		core::ShaderHandle accumPassShader{};
 		core::ShaderHandle postProcessShader{};
+		core::ShaderHandle uiShader{};
 
 		core::PipelineState shadowPipeline{};
 		core::PipelineState lodPipeline{};
@@ -41,6 +42,7 @@ namespace nova_engine::render::framework {
 		core::PipelineState wboitDepthPipeline{};
 		core::PipelineState wboitAccumPipeline{};
 		core::PipelineState postProcessPipeline{};
+		core::PipelineState uiPipeline{};
 
 		core::MeshHandle fullscreenQuad{};
 

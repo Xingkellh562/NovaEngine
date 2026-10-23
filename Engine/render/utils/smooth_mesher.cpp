@@ -844,9 +844,22 @@ namespace nova_engine::render::utils {
 				}
 		if (hasNoMesh) return {};
 
+		std::vector<float> texture((size_t)N * N * N);
+		for (int x = 0; x < N; x++)
+			for (int y = 0; y < N; y++)
+				for (int z = 0; z < N; z++) {
+					float t = nova_engine::utils::assist::UnpackTexIdx(rawData[idx3(x, y, z)]);
+					texture[idx3(x, y, z)] = t;
+				}
+
 		auto densitySafe = [&](int x, int y, int z) -> float {
 			if (x < 0 || x >= N || y < 0 || y >= N || z < 0 || z >= N) return 1.0f;
 			return density[idx3(x, y, z)];
+			};
+
+		auto textureSafe = [&](int x, int y, int z) -> float {
+			if (x < 0 || x >= N || y < 0 || y >= N || z < 0 || z >= N) return 1.0f;
+			return texture[idx3(x, y, z)];
 			};
 
 		// 法线：严格复刻原版：内部中心差分，边界单侧差分
@@ -884,10 +897,12 @@ namespace nova_engine::render::utils {
 		thread_local std::vector<glm::vec3> edgePosX, edgePosY, edgePosZ;
 		thread_local std::vector<glm::vec3> edgeNormX, edgeNormY, edgeNormZ;
 		thread_local std::vector<uint8_t>   edgeOriX, edgeOriY, edgeOriZ;
+		thread_local std::vector<uint16_t> edgeTexX, edgeTexY, edgeTexZ;
 
 		edgePosX.assign(szX, glm::vec3(-1.0f)); edgePosY.assign(szY, glm::vec3(-1.0f)); edgePosZ.assign(szZ, glm::vec3(-1.0f));
 		edgeNormX.assign(szX, glm::vec3(0.0f)); edgeNormY.assign(szY, glm::vec3(0.0f)); edgeNormZ.assign(szZ, glm::vec3(0.0f));
 		edgeOriX.assign(szX, 0); edgeOriY.assign(szY, 0); edgeOriZ.assign(szZ, 0);
+		edgeTexX.assign(szX, 0);edgeTexY.assign(szY, 0);edgeTexZ.assign(szZ, 0);
 
 		auto eidxX = [](int ex, int ey, int ez) -> size_t { return (size_t(ex) * N + ey) * N + ez; };
 		auto eidxY = [](int ex, int ey, int ez) -> size_t { return size_t(ex) * SIZE * N + size_t(ey) * N + ez; };
@@ -907,10 +922,14 @@ namespace nova_engine::render::utils {
 			n = (len > 1e-6f) ? n / len : glm::vec3(0.0f);
 			uint8_t ori = (d1 < 0.0f) ? 1 : 2;
 
-			if (axis == 0) { size_t i = eidxX(x, y, z); edgePosX[i] = p; edgeNormX[i] = n; edgeOriX[i] = ori; }
-			else if (axis == 1) { size_t i = eidxY(x, y, z); edgePosY[i] = p; edgeNormY[i] = n; edgeOriY[i] = ori; }
-			else { size_t i = eidxZ(x, y, z); edgePosZ[i] = p; edgeNormZ[i] = n; edgeOriZ[i] = ori; }
-			};
+			uint16_t tex = 0;
+			if (d1 < 0.0) tex = texture[idx3(x, y, z)];
+			else tex = texture[idx3(nx, ny, nz)];
+
+			if (axis == 0) { size_t i = eidxX(x, y, z); edgePosX[i] = p; edgeNormX[i] = n; edgeOriX[i] = ori; edgeTexX[i] = tex; }
+			else if (axis == 1) { size_t i = eidxY(x, y, z); edgePosY[i] = p; edgeNormY[i] = n; edgeOriY[i] = ori;edgeTexY[i] = tex;}
+			else { size_t i = eidxZ(x, y, z); edgePosZ[i] = p; edgeNormZ[i] = n; edgeOriZ[i] = ori;edgeTexZ[i] = tex;}
+		};
 
 		for (int x = 0; x < SIZE; x++) for (int y = 0; y < N; y++) for (int z = 0; z < N; z++) fillEdge(0, x, y, z);
 		for (int x = 0; x < N; x++) for (int y = 0; y < SIZE; y++) for (int z = 0; z < N; z++) fillEdge(1, x, y, z);
@@ -971,19 +990,19 @@ namespace nova_engine::render::utils {
 			for (int y = 0; y < N; y++)
 				for (int z = 0; z < N; z++) {
 					for (int dir = 0; dir < 3; dir++) {
-						size_t eIdx; glm::vec3 ePos; uint8_t eOri;
+						size_t eIdx; glm::vec3 ePos; uint8_t eOri;uint16_t eTex;
 						if (dir == 2) { // 沿 X，共享棱在 (x, y+1, z+1)
 							// 原版只检查 x>=SIZE，这里补上 y/z 越界检查，避免越界读取
 							if (x >= SIZE || y + 1 >= N || z + 1 >= N) continue;
-							eIdx = eidxX(x, y + 1, z + 1); ePos = edgePosX[eIdx]; eOri = edgeOriX[eIdx];
+							eIdx = eidxX(x, y + 1, z + 1); ePos = edgePosX[eIdx]; eOri = edgeOriX[eIdx]; eTex = edgeTexX[eIdx];
 						}
 						else if (dir == 1) { // 沿 Y，共享棱在 (x+1, y, z+1)
 							if (x + 1 >= N || y >= SIZE || z + 1 >= N) continue;
-							eIdx = eidxY(x + 1, y, z + 1); ePos = edgePosY[eIdx]; eOri = edgeOriY[eIdx];
+							eIdx = eidxY(x + 1, y, z + 1); ePos = edgePosY[eIdx]; eOri = edgeOriY[eIdx]; eTex = edgeTexY[eIdx];
 						}
 						else { // 沿 Z，共享棱在 (x+1, y+1, z)
 							if (x + 1 >= N || y + 1 >= N || z >= SIZE) continue;
-							eIdx = eidxZ(x + 1, y + 1, z); ePos = edgePosZ[eIdx]; eOri = edgeOriZ[eIdx];
+							eIdx = eidxZ(x + 1, y + 1, z); ePos = edgePosZ[eIdx]; eOri = edgeOriZ[eIdx]; eTex = edgeTexZ[eIdx];
 						}
 						if (ePos.x == -1.0f) continue;
 
@@ -1008,7 +1027,7 @@ namespace nova_engine::render::utils {
 							data.vertices.push_back((qp[ii].z - 1) * scale);
 							data.uvws.push_back(meshBuildTable[0][ii][0]);
 							data.uvws.push_back(meshBuildTable[0][ii][1]);
-							data.uvws.push_back(3.0f);
+							data.uvws.push_back(static_cast<float>(eTex));
 							data.normals.push_back(qn[ii].x);
 							data.normals.push_back(qn[ii].y);
 							data.normals.push_back(qn[ii].z);

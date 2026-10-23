@@ -12,6 +12,7 @@ namespace nova_engine::render::core {
 		VoxelShadow = 1,
 		VoxelLight = 2,
 		ScreenQuad = 3,
+		UI = 4,
 	};
 
 	struct PipelineState {

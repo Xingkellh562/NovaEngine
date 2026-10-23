@@ -15,6 +15,8 @@ namespace nova_engine::render::system {
 			device, static_cast<uint32_t>(scene::MeshLayer::Count));
 		lodMesh_ = std::make_unique<scene::LodMeshRegistry>(device);
 
+		uiMesh_ = std::make_unique<scene::UIMeshRegistry>(device);
+
 		// LodSystem 不需要 device —— 它只产出 MeshData，
 		// GPU 上传由 LodMeshRegistry 内部完成
 		NE_CORE_INFO("RenderSystem", "Initialized on {}", device.Name());
@@ -23,6 +25,7 @@ namespace nova_engine::render::system {
 	void RenderSystem::Shutdown() {
 		lodMesh_.reset();
 		chunkMesh_.reset();
+		uiMesh_.reset();
 		// meshBuildWorker_ 由构造/析构管理，这里不动
 	}
 
@@ -133,6 +136,7 @@ namespace nova_engine::render::system {
 		view_.settings = &settings;
 		view_.chunkMesh = chunkMesh_.get();
 		view_.lodMesh = settings.useLod ? lodMesh_.get() : nullptr;
+		view_.uiMesh = uiMesh_.get();
 
 		view_.mainOrigin = mainCamera_.position;
 		view_.shadowOrigin = shadowCamera_.position;

@@ -9,6 +9,7 @@ namespace nova_engine::render::core {
 		std::vector<float> uvws;
 		std::vector<float> aos;
 		std::vector<float> normals;
+		std::vector<float> colors;
 		std::vector<uint32_t> indices;
 
 		bool IsValid() const {

@@ -36,7 +36,7 @@ namespace nova_engine::render::gl {
 		screenQuad_ = false;
 		indexCount_ = static_cast<uint32_t>(data.indices.size());
 
-		if (vbos_[0] == 0) glGenBuffers(4, vbos_.data());
+		if (vbos_[0] == 0) glGenBuffers(static_cast<GLsizei>(vbos_.size()), vbos_.data());
 		if (ebo_ == 0)     glGenBuffers(1, &ebo_);
 
 		// 空网格：释放显存（对应改动前 glmesh.cpp:98-115）
@@ -55,6 +55,7 @@ namespace nova_engine::render::gl {
 		UploadStream(vbos_[1], data.uvws.data(), data.uvws.size() * sizeof(float));
 		UploadStream(vbos_[2], data.aos.data(), data.aos.size() * sizeof(float));
 		UploadStream(vbos_[3], data.normals.data(), data.normals.size() * sizeof(float));
+		UploadStream(vbos_[4], data.colors.data(), data.colors.size() * sizeof(float));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,

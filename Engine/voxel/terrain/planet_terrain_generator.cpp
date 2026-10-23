@@ -93,11 +93,11 @@ namespace nova_engine::voxel::terrain {
 
 					int tex = 0;
 
-					if (density > 0.1)tex = 0;
-					else if (density > -0.1) tex = 3;
+					if (density > 0.3)tex = 0;
+					else if (density > -0.3) tex = 3;
 					else tex = 1;
 
-					data.datas_[x * sampleSize * sampleSize + y * sampleSize + z] = utils::assist::Pack(density, tex);
+					data.datas_[x * sampleSize * sampleSize + y * sampleSize + z] = utils::assist::Pack(density, 3.0);
 				}
 		return data;
 	}

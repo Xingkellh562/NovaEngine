@@ -5,6 +5,7 @@
 #include "passes/post_process_pass.h"
 #include "passes/shadow_pass.h"
 #include "passes/transparent_pass.h"
+#include "passes/ui_pass.h"
 
 namespace nova_engine::render::device { class ICommandList; }
 namespace nova_engine::render::scene { struct RenderView; }
@@ -30,6 +31,7 @@ namespace nova_engine::render::framework {
 		LightPass       lightPass_;
 		TransparentPass transparentPass_;
 		PostProcessPass postProcessPass_;
+		UIPass          uiPass_;
 	};
 
 }

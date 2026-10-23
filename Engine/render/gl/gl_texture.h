@@ -6,6 +6,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <span>
 
 namespace nova_engine::render::gl {
 
@@ -21,7 +22,7 @@ namespace nova_engine::render::gl {
 
 		bool Create2D(const core::TextureDesc& desc, const void* pixels);
 		bool CreateArray(const core::TextureArrayDesc& desc,
-			const std::vector<const void*>& layerPixels);
+			std::span<const std::byte* const> layerPixels);
 
 		bool ReallocateStorage(const core::TextureDesc& desc);
 

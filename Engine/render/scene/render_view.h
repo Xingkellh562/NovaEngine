@@ -5,6 +5,7 @@
 
 #include "chunk_mesh_registry.h"
 #include "lod_mesh_registry.h"
+#include "ui_mesh_registry.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
@@ -26,7 +27,7 @@ namespace nova_engine::render::scene {
 
 		const ChunkMeshSet* chunkMesh = nullptr;
 		const LodMeshRegistry* lodMesh = nullptr;
-
+		const UIMeshRegistry* uiMesh = nullptr;
 
 
 		// 渲染相对原点。

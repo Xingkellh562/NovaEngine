@@ -2,8 +2,6 @@
 
 #include "gl_enums.h"
 
-#include <render/texture.h>   // render::LoadTexture / TextureData
-
 #include <log/logger.h>
 
 #include <stdexcept>
@@ -64,53 +62,28 @@ namespace nova_engine::render::gl {
 		return core::TextureHandle{ textures_.Add(std::move(texture)) };
 	}
 
-	core::TextureHandle GLDevice::CreateTextureArray(const core::TextureArrayDesc& desc) {
-		std::vector<TextureData> loaded;
-		std::vector<const void*> pixels;
-		loaded.reserve(desc.sources.size());
-		pixels.reserve(desc.sources.size());
+	core::TextureHandle GLDevice::CreateTextureArray(
+		const core::TextureArrayDesc& desc,
+		std::span<const std::byte* const> layerPixels) {
 
-		for (const core::TextureArrayLayer& layer : desc.sources) {
-			loaded.push_back(LoadTexture(layer.path.c_str()));
-			pixels.push_back(loaded.back().data());
+		// ★ 断言而不是兜底：这些字段现在由 assets::LoadTextureArray 保证非零。
+		//   如果这里为 0，说明调用方绕过了加载器。
+		if (desc.tileSize == 0 || desc.layers == 0) {
+			NE_CORE_ERROR("RenderGL",
+				"CreateTextureArray: tileSize={} layers={} — "
+				"desc 未经 assets::LoadTextureArray 填充？",
+				desc.tileSize, desc.layers);
+			return {};
 		}
-
-		// ★ tileSize == 0 时从第一张图推导（TextureArrayDesc 的注释承诺了这件事，
-		//   但之前没人实现，导致创建出 0×0 的纹理数组 —— 合法、不报错、画面全错）
-		core::TextureArrayDesc effective = desc;
-		if (effective.tileSize == 0) {
-			if (loaded.empty() || loaded[0].width() <= 0) {
-				NE_CORE_ERROR("RenderGL",
-					"CreateTextureArray: cannot derive tile size (no valid source images)");
-				return {};
-			}
-			effective.tileSize = static_cast<uint32_t>(loaded[0].width());
-			NE_CORE_INFO("RenderGL", "CreateTextureArray: tileSize {}x{} derived from '{}'",
-				effective.tileSize, loaded[0].height(), desc.sources[0].path);
-		}
-
-		// ★ 校验每层尺寸一致
-		for (std::size_t i = 0; i < loaded.size(); ++i) {
-			if (static_cast<uint32_t>(loaded[i].width()) != effective.tileSize ||
-				static_cast<uint32_t>(loaded[i].height()) != effective.tileSize) {
-				NE_CORE_ERROR("RenderGL",
-					"CreateTextureArray: layer '{}' is {}x{}, expected {}x{}",
-					desc.sources[i].path, loaded[i].width(), loaded[i].height(),
-					effective.tileSize, effective.tileSize);
-				return {};
-			}
-		}
-
-		// ★ layers 与实际图片数不符时以实际为准（并告警）
-		if (effective.layers != loaded.size()) {
-			NE_CORE_WARN("RenderGL",
-				"CreateTextureArray: layers={} but {} images; using {}",
-				effective.layers, loaded.size(), loaded.size());
-			effective.layers = static_cast<uint32_t>(loaded.size());
+		if (layerPixels.size() != desc.layers) {
+			NE_CORE_ERROR("RenderGL",
+				"CreateTextureArray: got {} layer pointers, desc says {}",
+				layerPixels.size(), desc.layers);
+			return {};
 		}
 
 		GLTexture texture;
-		if (!texture.CreateArray(effective, pixels)) {
+		if (!texture.CreateArray(desc, layerPixels)) {
 			NE_CORE_ERROR("RenderGL", "CreateTextureArray failed");
 			return {};
 		}

@@ -260,12 +260,12 @@ namespace nova_engine::render::utils {
 		}
 		catch (std::exception& e) {
 			NE_CORE_ERROR("MeshBuilder", "Failed to build mesh : '{}'", e.what());
-			return { {{{std::move(vertices), std::move(uvws), std::move(aos),{}, std::move(indices)}},
-				{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos),{}, std::move(lucencyIdx)}}} };
+			return { { { { std::move(vertices), std::move(uvws), std::move(aos),{},{}, std::move(indices) } },
+				{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos),{},{}, std::move(lucencyIdx)}}} };
 		}
 
-		return { {{{std::move(vertices), std::move(uvws), std::move(aos),std::move(normals), std::move(indices)}},
-			{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos),std::move(lucencyNormals), std::move(lucencyIdx)}}} };
+		return { {{{std::move(vertices), std::move(uvws), std::move(aos),std::move(normals),{}, std::move(indices)}},
+			{{std::move(lucencyVer), std::move(lucencyUvws), std::move(lucencyAos),std::move(lucencyNormals),{}, std::move(lucencyIdx)}}} };
 	}
 
 
@@ -287,8 +287,6 @@ namespace nova_engine::render::utils {
 		aos.reserve(MAX_VERTS_FLOATS / 4);
 		normals.reserve(MAX_VERTS_FLOATS * 3 / 4);
 		indices.reserve(MAX_INDICES / 4);
-
-		
 
 		int blockCount = library.Size();
 		std::vector<const voxel::block::BlockMesh*> blockMeshs;
@@ -359,9 +357,9 @@ namespace nova_engine::render::utils {
 		catch (const std::exception& e)
 		{
 			NE_CORE_ERROR("MeshBuilder", "Failed to build mesh : '{}'", e.what());
-			return {std::move(vertices), std::move(uvws), std::move(aos),std::move(normals), std::move(indices)};
+			return {std::move(vertices), std::move(uvws), std::move(aos),std::move(normals),{} ,std::move(indices)};
 		}
-		return { std::move(vertices), std::move(uvws), std::move(aos), std::move(normals),std::move(indices) };
+		return { std::move(vertices), std::move(uvws), std::move(aos), std::move(normals),{},std::move(indices) };
 	}
 
 	core::MeshData MeshBuilder::BuildLodMesh(const voxel::lod::LodVoxelData& lodData, size_t scale, const voxel::block::BlockLibrary& library) {
@@ -461,8 +459,8 @@ namespace nova_engine::render::utils {
 		catch (const std::exception& e)
 		{
 			NE_CORE_ERROR("MeshBuilder", "Failed to build mesh : '{}'", e.what());
-			return { std::move(vertices), std::move(uvws), std::move(aos),std::move(normals), std::move(indices) };
+			return { std::move(vertices), std::move(uvws), std::move(aos),std::move(normals),{}, std::move(indices) };
 		}
-		return { std::move(vertices), std::move(uvws), std::move(aos),std::move(normals), std::move(indices) };
+		return { std::move(vertices), std::move(uvws), std::move(aos),std::move(normals),{}, std::move(indices) };
 	}
 }

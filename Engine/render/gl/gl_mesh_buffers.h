@@ -35,7 +35,7 @@ namespace nova_engine::render::gl {
 		bool     isScreenQuad() const { return screenQuad_; }
 
 	private:
-		std::array<GLuint, 4> vbos_{};
+		std::array<GLuint, 5> vbos_{};
 		GLuint   ebo_ = 0;
 		uint32_t indexCount_ = 0;
 		bool     screenQuad_ = false;

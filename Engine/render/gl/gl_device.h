@@ -29,7 +29,10 @@ namespace nova_engine::render::gl {
 		// ---------------- 纹理 ----------------
 		core::TextureHandle CreateTexture(const core::TextureDesc&,
 			std::span<const std::byte> pixels) override;
-		core::TextureHandle CreateTextureArray(const core::TextureArrayDesc&) override;
+		core::TextureHandle CreateTextureArray(
+			const core::TextureArrayDesc& desc,
+			std::span<const std::byte* const> layerPixels) override;
+
 		void          DestroyTexture(core::TextureHandle) override;
 
 		// ---------------- 着色器 ----------------

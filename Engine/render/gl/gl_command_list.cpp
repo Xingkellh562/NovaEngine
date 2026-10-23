@@ -247,6 +247,19 @@ namespace nova_engine::render::gl {
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 			glEnableVertexAttribArray(1);
 			break;
+
+		case core::VertexLayoutId::UI:
+			// 0 = pos2, 1 = uv2 , 2 = color4
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo(0));
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo(1));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo(4));
+			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+			glEnableVertexAttribArray(2);
+			break;
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo());

@@ -24,6 +24,8 @@ namespace nova_engine::render::framework {
 		}
 
 		postProcessPass_.Record(view, resources, cmd);
+
+		uiPass_.Record(view, resources, cmd);
 	}
 
 }

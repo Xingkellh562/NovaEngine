@@ -6,6 +6,8 @@
 
 #include <filesystem>
 
+#include <render/assets/texture_loader.h>
+
 namespace nova_engine::render::framework {
 
 	using namespace nova_engine::render;
@@ -34,39 +36,6 @@ namespace nova_engine::render::framework {
 			desc.stages.assign(stages.begin(), stages.end());
 			return device.CreateShader(desc);
 		}
-
-		core::TextureArrayDesc MakeBlockTextureArrayDesc(std::string_view path) {
-			namespace fs = std::filesystem;
-
-			std::vector<fs::path> filePaths;
-			for (const auto& entry : fs::directory_iterator(path)) {
-				if (entry.is_regular_file() && entry.path().extension() == ".png") {
-					filePaths.push_back(entry.path());
-				}
-			}
-
-			std::sort(filePaths.begin(), filePaths.end());
-			core::TextureArrayDesc desc{};
-			desc.defaultSampler.minFilter = core::TextureFilter::LinearMipmapLinear;
-			desc.defaultSampler.magFilter = core::TextureFilter::Linear;
-			desc.defaultSampler.wrap = core::TextureWrap::Repeat;
-			desc.generateMipmaps = true;
-			if (filePaths.empty()) {
-				NE_CORE_ERROR("RenderSystem", "Create texture array failed,because the directory is empty.");
-				return desc;
-			}
-			for (int i = 0;i < filePaths.size();i++) {
-				core::TextureArrayLayer layer{};
-				layer.name = filePaths[i].stem().string();
-				layer.path = filePaths[i].string();
-				layer.index = i;
-
-				desc.sources.push_back(layer);
-			}
-			desc.layers = static_cast<uint32_t>(filePaths.size());
-			return desc;
-		}
-
 	} // namespace
 
 	RenderResources CreateRenderResources(device::IRenderDevice& device,
@@ -106,6 +75,10 @@ namespace nova_engine::render::framework {
 		res.lodLightShader = MakeShader(device, {
 			{ core::ShaderStage::Vertex,   "shaders/lod_light_vert.glsl" },
 			{ core::ShaderStage::Fragment, "shaders/lod_light_frag.glsl" },
+			});
+		res.uiShader = MakeShader(device, {
+			{ core::ShaderStage::Vertex,   "shaders/ui_vert.glsl" },
+			{ core::ShaderStage::Fragment, "shaders/ui_frag.glsl" },
 			});
 
 		// ================= 渲染目标 =================
@@ -172,7 +145,22 @@ namespace nova_engine::render::framework {
 		res.revealTex = device.GetAttachment(res.oitFrame, "RevealTex");
 
 		// ================= 方块纹理数组 =================
-		res.blockTextures = device.CreateTextureArray(MakeBlockTextureArrayDesc("assets/block_textures"));
+		assets::TextureArrayOptions arrayOpts;
+		arrayOpts.generateMipmaps = true;
+		arrayOpts.sampler = BlockArraySampler();
+		auto arrayAsset = assets::LoadTextureArray("assets/block_textures", arrayOpts);
+		if (!arrayAsset.Valid()) {
+			NE_CORE_ERROR("RenderFramework", "block texture array failed to load");
+			return res;
+		}
+
+		std::vector<const std::byte*> layerBytes;
+		layerBytes.reserve(arrayAsset.layers.size());
+		for (const render::TextureData& d : arrayAsset.layers) {
+			layerBytes.push_back(reinterpret_cast<const std::byte*>(d.data()));
+		}
+
+		res.blockTextures = device.CreateTextureArray(arrayAsset.desc, layerBytes);
 
 		// ================= 内建网格 =================
 		res.fullscreenQuad = device.FullscreenQuad();
@@ -241,6 +229,12 @@ namespace nova_engine::render::framework {
 		res.postProcessPipeline.colorTargets = 1;
 		res.postProcessPipeline.vertexLayout = core::VertexLayoutId::ScreenQuad;
 		res.postProcessPipeline.samplerState = res.linearSampler;
+
+		// ui
+		res.uiPipeline = res.postProcessPipeline;
+		res.uiPipeline.shader = res.uiShader;
+		res.uiPipeline.vertexLayout = core::VertexLayoutId::UI;
+
 
 		NE_CORE_INFO("RenderFramework", "Render resources created on {}", device.Name());
 

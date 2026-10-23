@@ -39,7 +39,8 @@ namespace nova_engine::render::device {
 			std::span<const std::byte> pixels) = 0;
 
 		//按desc.sources的路径逐个加载并上传
-		virtual core::TextureHandle CreateTextureArray(const core::TextureArrayDesc&) = 0;
+		virtual core::TextureHandle CreateTextureArray(const core::TextureArrayDesc&, 
+			std::span<const std::byte* const> layerPixels) = 0;
 		virtual void DestroyTexture(core::TextureHandle) = 0;
 
 		virtual core::ShaderHandle CreateShader(const core::ShaderDesc&) = 0;

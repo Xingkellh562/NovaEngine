@@ -34,6 +34,10 @@ namespace nova_engine::render::core {
 			return glm::ortho(-halfSize, halfSize, -halfSize, halfSize, 0.1f, 300.0f);
 		}
 
+		const glm::mat4 GetOrthoMatrix(float width,float height) const {
+			return glm::ortho(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+		}
+
 		const glm::vec3 GetWorldUp() const {
 			return glm::vec3(0, 1, 0);
 		}
